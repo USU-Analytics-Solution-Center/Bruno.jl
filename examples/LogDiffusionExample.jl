@@ -4,6 +4,7 @@ import Plots.plot!
 
 # include Bruno library
 include("../src/Bruno.jl")
+using Bruno.DataGeneration.LogDiffusion
 
 # Initialize a Log-Diffusion Data-Gen utility
 nTimeStep = 100
