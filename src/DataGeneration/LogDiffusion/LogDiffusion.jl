@@ -168,13 +168,12 @@ plot!(plt, time1, data1, show=true, color="red", legend=false, linewidth=3)
 ```
 
 """
-function getTime(Param::ParamLogDiff)
+function getTime(Param::ParamLogDiff, tStart=DateTime(2000))
     secondPerDay = (3600*24)
     nSecondPerStepInt = floor(Param.dt*secondPerDay)
     nSecondPerStepSec = Second(nSecondPerStepInt)
     nSecondAll = Second(nSecondPerStepInt*Param.nTimeStep)
 
-    tStart = DateTime(2000)
     tFinal = tStart + nSecondAll
     time = tStart:nSecondPerStepSec:tFinal
     return time
