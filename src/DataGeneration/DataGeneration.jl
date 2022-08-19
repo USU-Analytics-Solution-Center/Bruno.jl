@@ -1,5 +1,10 @@
 module DataGeneration
-include("LogDiffusion/LogDiffusion.jl")
-greet2() = print("Hello World!")
 
-end
+export ParamLogDiff, TSBootMethod, StationaryBootstrap, MovingBlockBootstrap, 
+    CircularBlockBootstrap
+export getData, getTime
+include("logdiffusion.jl")
+greet2() = print("Hello World!")
+include("bootstrap.jl")
+
+end # module 

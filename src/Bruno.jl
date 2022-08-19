@@ -1,5 +1,8 @@
 module Bruno
 include("DataGeneration/DataGeneration.jl")
-greet() = print("Hello World!")
+using .DataGeneration
 
+export ParamLogDiff, TSBootMethod, StationaryBootstrap, MovingBlockBootstrap, 
+    CircularBlockBootstrap
+export getData, getTime
 end # module
