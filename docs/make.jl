@@ -12,4 +12,5 @@ makedocs(
 # for more information.
 deploydocs(
     repo = "github.com/USU-Analytics-Solution-Center/Bruno.jl.git"
+    versions = nothing
 )
