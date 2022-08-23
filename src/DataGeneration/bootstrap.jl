@@ -25,13 +25,16 @@ struct StationaryBootstrap <: TSBootMethod
     n::Integer # desired size of resampled data
     block_size::Float32 #desired average block size (will add more to this later)
     dt::Real # change in time between timestep in days
-    StationaryBootstrap(input_data, n; block_size=2.0, dt=1) = 
-        new(input_data, n, block_size, dt)
-    StationaryBootstrap(input_data, n, block_size, dt) =
-        new(input_data, n, block_size, dt)
-    StationaryBootstrap(;input_data, n, block_size, dt) = 
-        new(input_data, n, block_size, dt) 
+    StationaryBootstrap(input_data, n; block_size=2.0, dt=1) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : 
+    new(input_data, n, block_size, dt)
+    StationaryBootstrap( ;input_data, n, block_size=2.0, dt=1) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : 
+    new(input_data, n, block_size, dt)
+    StationaryBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : new(input_data, n, block_size, dt)
 end
+
 
 """
 ## Description
@@ -56,10 +59,15 @@ struct MovingBlockBootstrap <: TSBootMethod
     n::Integer
     block_size::Integer
     dt::Real
-    MovingBlockBootstrap(input_data, n; block_size=10, dt=1) = 
-        new(input_data, n, block_size, dt)
-    MovingBlockBootstrap(input_data, n, block_size, dt) = 
-        new(input_data, n, block_size, dt)
+    MovingBlockBootstrap(input_data, n; block_size=10, dt=1) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : 
+    new(input_data, n, block_size, dt)
+    MovingBlockBootstrap( ;input_data, n, block_size=10, dt=1) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : 
+    new(input_data, n, block_size, dt)
+    MovingBlockBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
+    error("block_size cannot be larger than the length of the input data array") : 
+    new(input_data, n, block_size, dt)
 end
 
 """
@@ -85,11 +93,18 @@ struct CircularBlockBootstrap <: TSBootMethod
     n::Integer
     block_size::Integer
     dt::Real
-    CircularBlockBootstrap(input_data, n; block_size=10, dt=1) = 
+    CircularBlockBootstrap(input_data, n; block_size=10, dt=1) = block_size > length(input_data) ?
+        error("block_size cannot be larger than the length of the input data array") : 
         new(input_data, n, block_size, dt)
-    CircularBlockBootstrap(input_data, n, block_size, dt) = 
+    CircularBlockBootstrap( ;input_data, n, block_size=10, dt=1) = block_size > length(input_data) ?
+        error("block_size cannot be larger than the length of the input data array") : 
         new(input_data, n, block_size, dt)
+    CircularBlockBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
+        error("block_size cannot be larger than the length of the input data array") : 
+        new(input_data, n, block_size, dt)
+
 end
+
 
 function getData(Param::StationaryBootstrap, nSimulation::Integer=1)
     p = 1/Param.block_size
