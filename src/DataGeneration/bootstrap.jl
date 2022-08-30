@@ -1,112 +1,68 @@
 import Distributions.Geometric
 
 abstract type TSBootMethod end
+struct Stationary <: TSBootMethod end
+struct MovingBlock <: TSBootMethod end
+struct CircularBlock <: TSBootMethod end
 
 """
 ## Description
-Contains the parameters needed to perform a stationary bootstrap (Politis and Romano, 1994)
-with geometrically distributed block sizes. 
+Contains the parameters needed to perform block bootstrap of type T to be used by getData() 
+function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
+These structs can be constructed directly or with the `data_gen_input()` function. 
 
 ## Syntax 
 ```
-P = StationaryBootstrap(input_data, n; kwargs...)
+P = BootstrapInput{T <: TSBootMethod}(; kwargs...)
 ```
 
-## Positional Inputs 
-- `input_data`: data to be resampled. Must be a 1-D array
-- `n::Integer`: size of resampled output data
-
 ## Keyword Arguments
-- `block_size::Float32`: average block size to use. Default: 2.0.
+- `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
+- `n::Integer`: size of resampled output data. Default: 100
+- `block_size::Integer`: block size to use. Default: 2
 - `dt::Real` assumed change in time between samples in days. Default: 1.
 """
-struct StationaryBootstrap <: TSBootMethod 
-    input_data # array of data to be resampled
+struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
+    input_data::Array{<:Real} # array of data to be resampled
     n::Integer # desired size of resampled data
     block_size::Float32 #desired average block size (will add more to this later)
     dt::Real # change in time between timestep in days
-    StationaryBootstrap(input_data, n; block_size=2.0, dt=1) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : 
-    new(input_data, n, block_size, dt)
-    StationaryBootstrap( ;input_data, n, block_size=2.0, dt=1) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : 
-    new(input_data, n, block_size, dt)
-    StationaryBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : new(input_data, n, block_size, dt)
-end
-
-
-"""
-## Description
-Contains the parameters needed to perform a moving block bootstrap without
-wraparound as introduced by Kunsh (1989). To be used by getData() function.
-
-## Syntax 
-```
-P = MovingBlockBootstrap(input_data, n; kwargs...)
-```
-
-## Positional Inputs 
-- `input_data`: data to be resampled. Must be a 1-D array
-- `n::Integer`: size of resampled output data
-
-## Keyword Arguments
-- `block_size::Integer`: block size to use. Default: 2
-- `dt::Real` assumed change in time between samples in days. Default: 1.
-"""
-struct MovingBlockBootstrap <: TSBootMethod 
-    input_data
-    n::Integer
-    block_size::Integer
-    dt::Real
-    MovingBlockBootstrap(input_data, n; block_size=10, dt=1) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : 
-    new(input_data, n, block_size, dt)
-    MovingBlockBootstrap( ;input_data, n, block_size=10, dt=1) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : 
-    new(input_data, n, block_size, dt)
-    MovingBlockBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
-    error("block_size cannot be larger than the length of the input data array") : 
-    new(input_data, n, block_size, dt)
+    
+    # constructor for kwargs
+    function BootstrapInput{T}(; input_data, n = 100, block_size = 10, dt = 1) where {T<:TSBootMethod}
+        # check input_data is more than a single data point 
+        if length(input_data) < 2
+            error("input_data must have at least 2 elements") 
+        end
+        # check block_size is smaller than input_data 
+        if length(input_data) < block_size
+            error("block_length must be smaller than the size of the input_data")
+        end
+        if n < 1
+            error("n (size of resampled data) must be greater than 0")
+        end
+        new(input_data, n, block_size, dt)
+    end
+    # constructor for inputing args in exact correct order
+    function BootstrapInput{T}(input_data, n, block_size, dt) where {T<:TSBootMethod}
+        if length(input_data) < 2
+            error("input_data must have at least 2 elements") 
+        end
+        # check block_size is smaller than input_data 
+        if length(input_data) < block_size
+            error("block_length must be smaller than the size of the input_data")
+        end
+        if n < 1
+            error("n (size of resampled data) must be greater than 0")
+        end
+        new(input_data, n, block_size, dt)
+    end
 end
 
 """
-## Description
-Contains the parameters needed to perform a circular block bootstrap (bootstrap with 
-wrapping). To be used by getData() function.
-
-## Syntax 
-```
-P = CircularBlockBootstrap(input_data, n; kwargs...)
-```
-
-## Positional Inputs 
-- `input_data`: data to be resampled. Must be a 1-D array
-- `n::Integer`: size of resampled output data
-
-## Keyword Arguments
-- `block_size::Integer`: block size to use. Default: 2
-- `dt::Real` assumed change in time between samples in days. Default: 1.
+    getData(Param::BootstrapInput{Stationary})
 """
-struct CircularBlockBootstrap <: TSBootMethod 
-    input_data
-    n::Integer
-    block_size::Integer
-    dt::Real
-    CircularBlockBootstrap(input_data, n; block_size=10, dt=1) = block_size > length(input_data) ?
-        error("block_size cannot be larger than the length of the input data array") : 
-        new(input_data, n, block_size, dt)
-    CircularBlockBootstrap( ;input_data, n, block_size=10, dt=1) = block_size > length(input_data) ?
-        error("block_size cannot be larger than the length of the input data array") : 
-        new(input_data, n, block_size, dt)
-    CircularBlockBootstrap(input_data, n, block_size, dt) = block_size > length(input_data) ?
-        error("block_size cannot be larger than the length of the input data array") : 
-        new(input_data, n, block_size, dt)
-
-end
-
-
-function getData(Param::StationaryBootstrap, nSimulation::Integer=1)
+function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     p = 1/Param.block_size
     data = zeros((Param.n, nSimulation)) 
     for run_num in 1:nSimulation
@@ -143,17 +99,17 @@ function getData(Param::StationaryBootstrap, nSimulation::Integer=1)
     return data
 end
 
-function getData(Param::MovingBlockBootstrap, nSimulation::Integer=1)
+function getData(Param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     data = zeros(Param.n)
     for run_num in 1:nSimulation
         block_counter = 0
-        start_index = rand(1:(length(Param.input_data)- Param.block_size))
+        start_index = rand(1:floor(Int, length(Param.input_data)- Param.block_size))
         for i in 1:Param.n
             if block_counter < Param.block_size 
                 data[i, run_num] = Param.input_data[start_index + block_counter]
                 block_counter += 1
             else
-                start_index = rand(1:(length(Param.input_data) - Param.block_size))
+                start_index = rand(1:floor(Int, length(Param.input_data)- Param.block_size))
                 data[i, run_num] = Param.input_data[start_index]
                 block_counter = 1
             end
@@ -162,7 +118,7 @@ function getData(Param::MovingBlockBootstrap, nSimulation::Integer=1)
     return data
 end
 
-function getData(Param::CircularBlockBootstrap, nSimulation::Integer=1)
+function getData(Param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
     data = zeros(Param.n)
     for run_num in 1:nSimulation
         block_counter = 0

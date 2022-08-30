@@ -52,7 +52,7 @@ Param2 = ParamLogDiff(nTimeStep, volatility=0)
 ```
 
 """
-struct ParamLogDiff 
+struct ParamLogDiff <: DataGenInput
     nTimeStep::Integer # number of timesteps to simulate
     initial::Real # in dollars
     dt::Real # change in time between timesteps in days
@@ -75,12 +75,13 @@ data = getData(Param, nSimulation)
 ## Positional Inputs
 - `Param::DataGenerator`: Parameters that describe the desired data generating process  
 - `nSimulation::Integer`: nSimulation is the number of simulations to run.  
-Possible DataGenerator parameter types are
+Possible DataGenInput parameter types are
 - `::ParamLogDiff` - log-normal diffusion process 
-- `::MovingBlockBootstrap`
-- `::CircularBlockBootstrap`
-- `::StationaryBootstrap`
+- `::BootstrapInput{MovingBlock}`
+- `::BootstrapInput{CircularBlock}`
+- `::BootstrapInput{Stationary}`
 
+DataGenInput parameter types can be constructed directly or with `data_gen_input()` function.
 
 ## Outputs
 - `data::AbstractArray`: nTimeStep x nSimulation Real valued array, where each column
