@@ -59,9 +59,6 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     end
 end
 
-"""
-    getData(Param::BootstrapInput{Stationary})
-"""
 function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     p = 1/Param.block_size
     data = zeros((Param.n, nSimulation)) 
@@ -141,4 +138,83 @@ function getData(Param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
         end
     end
     return data
+end
+
+# functions for block length - math taken part directly from block length paper
+# not for the end user to ever see or use.
+# PAPER NAME HERE.... DOCUMENT LATER! 
+
+# these are for the block_length parameters, to use with multiple dispatch.
+function D(g_hat, bootstrap_method::Stationary)
+    2 * (g_hat ^ 2)
+end
+
+function D(g_hat, bootstrap_method::CircularBlock)
+    (4 / 3) * (g_hat ^ 2)
+end
+D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, Circular()) # catch all other types
+
+"""
+    opt_block_length(array, bootstrap_method::TSBootMethod)
+
+Computes the optimal block length for a time series block bootstrap using the methods defined 
+by Politis and White (2004). 
+
+If bootstrap method other than Stationary or CircularBlock is used, the function defaults 
+to CircularBlock
+
+# Example
+```
+using Bruno
+using Distributions: Normal
+
+#create ar(1) data set
+ar1 = [1.0]
+for i in _:799
+    push!(ar1, ar1[end] * 0.7 + rand(Normal()))
+end
+
+#find optimal block lengths
+st_bl = opt_block_length(ar1, Stationary())
+cb_bl = opt_block_length(ar1, CircularBlock())
+```
+"""
+function opt_block_length(array, bootstrap_method::TSBootMethod)
+    N = size(array)[1]
+    K_N = max(5,floor(Int, sqrt(log10(N))))
+    # m_max from Kevin Sheppard arch package and Andrew Patton Matlab code
+    m_max = ceil(Int, sqrt(N)) + K_N
+    # constant to check rho array against 
+    comp = 2 * sqrt( log10(N) / N)
+    eps = array .- mean(array)
+    # array to put autocovariances in so they don't get computed multiple times
+    R = zeros(m_max + 1)
+    R_0 = dot(eps, eps) / N
+
+    m = nothing
+    # finding the m and M variables from Politis paper
+    for i in 1:m_max
+        # compute R(i) the autocovariances
+        R[i] = dot(eps[1:end-i], eps[i+1:end]) / N
+        if i > K_N 
+            # check rho for m = i - K_N through K_N values
+            if max([abs(R[t]/ R_0) for t in (i - K_N):i]...) < comp && m === nothing
+                m = i - K_N
+            end
+        end
+    end
+
+    m === nothing ? M = m_max : M = min(2 * max(m, 1), m_max) # check for m > max_m
+    
+    # figure out G for the equation
+    G = 0.0
+    g_hat = R_0
+    for k in 1:M 
+        lambda = k/M <= 1 / 2 ? 1 : 2 * (1 - (k/M))
+        # G and g_hat are symmetric summations around 0, so we can just multiply each term by 2
+        G += 2 * lambda * k * R[k] 
+        g_hat += 2 * lambda * R[k]
+    end
+    b_length = ((2 * G^2)/ D(g_hat, bootstrap_method))^(1/3) * N ^ (1/3)
+    return b_length
 end
