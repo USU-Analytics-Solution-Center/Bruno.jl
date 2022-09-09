@@ -142,7 +142,7 @@ end
 
 # functions for block length - math taken part directly from block length paper
 # not for the end user to ever see or use.
-# PAPER NAME HERE.... DOCUMENT LATER! 
+
 
 # these are for the block_length parameters, to use with multiple dispatch.
 function D(g_hat, bootstrap_method::Stationary)
@@ -216,5 +216,6 @@ function opt_block_length(array, bootstrap_method::TSBootMethod)
         g_hat += 2 * lambda * R[k]
     end
     b_length = ((2 * G^2)/ D(g_hat, bootstrap_method))^(1/3) * N ^ (1/3)
-    return b_length
+    b_max = ceil(min(3 * sqrt(N), N / 3))
+    return min(b_length, b_max)
 end
