@@ -1,18 +1,15 @@
-module LogDiffusion
 import Dates.DateTime
 import Dates.Second
 import Random.rand
 import Distributions.Normal
-export ParamLogDiff
-export getData
-export getTime
+
 
 """
 ## Description
 ParamLogDiff contains parameters that are used to synthesize data
 from a log-normal diffusion process of the form
 
-     ``P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}``
+``P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}``
 
 where P_t is the value of the data at timestep t. The drift and 
 volatility represent the mean and standard deviation of a normal 
@@ -20,13 +17,13 @@ distribution. The equation given above expresses them as such by
 letting v be a draw from a standard normal distribution which is 
 then shifted and scaled by the drift and volatility terms
 
- ## Syntax
- ```
- P = ParamLogDiff(nTimeStep) 
- P = ParamLogDiff(..., "name", value)
- ```
+## Syntax
+```
+P = ParamLogDiff(nTimeStep) 
+P = ParamLogDiff(..., "name", value)
+```
 
- ## Positional Inputs
+## Positional Inputs
 - `nTimeStep::Integer`: nTimeStep is the number of time steps 
                         to synthesize.
 
@@ -41,8 +38,9 @@ then shifted and scaled by the drift and volatility terms
                  log-normal diffusion process. Default 5.38e-4
 
 ## Example
+
 ```
-using Bruno.DataGeneration.LogDiffusion
+using Bruno
 
 # initialize first parameter with default values
 nTimeStep = 100
@@ -50,10 +48,11 @@ Param1 = ParamLogDiff(nTimeStep)
 
 # initialize a second parameter with zero volatility
 Param2 = ParamLogDiff(nTimeStep, volatility=0)
+
 ```
 
 """
-struct ParamLogDiff 
+struct ParamLogDiff <: DataGenInput
     nTimeStep::Integer # number of timesteps to simulate
     initial::Real # in dollars
     dt::Real # change in time between timesteps in days
@@ -65,8 +64,7 @@ end
 
 """
 ## Description
-getData is a function that generates data according to the log-normal 
-    diffusion process described in ParamLogDiff
+getData is a function that generates data according to the parameter type
 
 ## Syntax
 ```
@@ -75,8 +73,15 @@ data = getData(Param, nSimulation)
 ```
 
 ## Positional Inputs
-- `Param::ParamLogDiff`: Parameters that describe the desired log-diffusion process  
+- `Param::DataGenerator`: Parameters that describe the desired data generating process  
 - `nSimulation::Integer`: nSimulation is the number of simulations to run.  
+Possible DataGenInput parameter types are
+- `::ParamLogDiff` - log-normal diffusion process 
+- `::BootstrapInput{MovingBlock}`
+- `::BootstrapInput{CircularBlock}`
+- `::BootstrapInput{Stationary}`
+
+DataGenInput parameter types can be constructed directly or with `data_gen_input()` function.
 
 ## Outputs
 - `data::AbstractArray`: nTimeStep x nSimulation Real valued array, where each column
@@ -87,8 +92,8 @@ data = getData(Param, nSimulation)
 ```
 # initialize parameters
 nTimeStep = 100
-Param1 = Bruno.DataGeneration.LogDiffusion.ParamLogDiff(nTimeStep)
-Param2 = Bruno.DataGeneration.LogDiffusion.ParamLogDiff(nTimeStep, volatility=0)
+Param1 = ParamLogDiff(nTimeStep)
+Param2 = ParamLogDiff(nTimeStep, volatility=0)
 
 # create two datasets, one with default values, the second with no volatility
 data1 = getData(Param1)
@@ -101,17 +106,15 @@ data3 = getData(Param1,nSimulation)
 # plot results
 plt = plot(data3, show=true, color="blue", legend=false)
 plot!(plt, data1, show=true, color="red", legend=false, linewidth=3)
-
 ```
-
-
 """
 function getData(Param::ParamLogDiff, nSimulation::Integer=1)
     
     # compute array of random values
     nData = Param.nTimeStep + 1
     data = zeros((nData, nSimulation))
-    data[2:nData,:] = rand(Normal(Param.drift,Param.volatility), (Param.nTimeStep,nSimulation))
+    data[2:nData,:] = rand(Normal(Param.drift,Param.volatility),
+         (Param.nTimeStep,nSimulation))
     data = exp.(cumsum(data,dims=1) .+ log(Param.initial))
 
     # export values
@@ -177,5 +180,4 @@ function getTime(Param::ParamLogDiff, tStart=DateTime(2000))
     tFinal = tStart + nSecondAll
     time = tStart:nSecondPerStepSec:tFinal
     return time
-end
 end
