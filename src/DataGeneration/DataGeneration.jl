@@ -95,7 +95,7 @@ function data_gen_input(data_gen_type::Symbol; kwargs...)
                     drift = kwargs[:drift]             
         )
     else
-        println("Please use one of the data gen patterns provided")
+        error("Please use one of the data gen patterns provided")
     end
 end
 end # module 

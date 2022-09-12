@@ -60,7 +60,7 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
 end
 
 function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
-    p = 1/Param.block_size
+    p = 1 / Param.block_size
     data = zeros((Param.n, nSimulation)) 
     for run_num in 1:nSimulation
         # generates block size and starting position for first block
@@ -87,7 +87,7 @@ function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
             end
 
             if block_index == length(Param.input_data)
-                block_index = 1 # wrap around the dataset to the start
+                block_index = 1  # wrap around the dataset to the start
             else
                 block_index += 1
             end
@@ -100,7 +100,7 @@ function getData(Param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     data = zeros(Param.n)
     for run_num in 1:nSimulation
         block_counter = 0
-        start_index = rand(1:floor(Int, length(Param.input_data)- Param.block_size))
+        start_index = rand(1:floor(Int, length(Param.input_data) - Param.block_size))
         for i in 1:Param.n
             if block_counter < Param.block_size 
                 data[i, run_num] = Param.input_data[start_index + block_counter]
