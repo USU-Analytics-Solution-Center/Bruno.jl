@@ -7,7 +7,7 @@ prices = df[!, "Adj Close"]
 
 widget = Stock(prices, "AAPL", 1, 1)
 
-list_of_widgets = factory(widget, Stationary(), 1)
+list_of_widgets = factory(widget, Stationary(), 5)
 
 println("Original prices")
 println(widget.prices)
