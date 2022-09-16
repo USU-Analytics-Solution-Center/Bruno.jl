@@ -79,3 +79,11 @@ end
     @test isapprox(opt_block_length(ar, Stationary()), 6.3085; atol=.001)
     @test isapprox(opt_block_length(ar, CircularBlock()), 7.2214; atol = .001)
 end
+
+@testset "$bstype Dimensional check for nSimulation > 1" for bstype in [Stationary, 
+                                                            MovingBlock, CircularBlock]
+    n = 10 # number of rows (resample size) in the resulting matrix
+    m = 4 # number of columns (runs) in resulting matrix
+    bs_input = BootstrapInput{bstype}([1,2,3,4,5,6,7,8], n, 3, 1)
+    @test size(getData(bs_input, m)) == (n, m)
+end
