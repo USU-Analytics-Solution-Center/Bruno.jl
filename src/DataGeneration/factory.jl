@@ -6,15 +6,13 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
                                 dt = widget.time_delta)
 
     bs_data = getData(input, nWidgets)
-    widget_ar = Array{Widget}
+    widget_ar = Vector{Widget}()
     for column in 1:nWidgets
-        x = typeof(widget)(bs_data[:, column], 
-                            widget.name,
-                            var(bs_data[:, column]),                            
-                            widget.time_delta)
-        append!(widget_ar, x)
-        # println(x)
-    
+        push!(widget_ar, typeof(widget)(bs_data[:, column], 
+                                        widget.name,
+                                        var(bs_data[:, column]),                            
+                                        widget.time_delta)
+                )
     end
     return(widget_ar)
 end
