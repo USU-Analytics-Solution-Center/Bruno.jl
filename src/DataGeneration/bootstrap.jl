@@ -20,16 +20,14 @@ P = BootstrapInput{T <: TSBootMethod}(; kwargs...)
 - `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
 - `n::Integer`: size of resampled output data. Default: 100
 - `block_size::Integer`: block size to use. Default: 2
-- `dt::Real` assumed change in time between samples in days. Default: 1.
 """
 struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     input_data::Array{<:Real} # array of data to be resampled
     n::Integer # desired size of resampled data
     block_size::Float32 #desired average block size (will add more to this later)
-    dt::Real # change in time between timestep in days
     
     # constructor for kwargs
-    function BootstrapInput{T}(; input_data, n = 100, block_size = 10, dt = 1) where {T<:TSBootMethod}
+    function BootstrapInput{T}(; input_data, n = 100, block_size = 10) where {T<:TSBootMethod}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
@@ -41,10 +39,10 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size, dt)
+        new(input_data, n, block_size)
     end
     # constructor for inputing args in exact correct order
-    function BootstrapInput{T}(input_data, n, block_size, dt) where {T<:TSBootMethod}
+    function BootstrapInput{T}(input_data, n, block_size) where {T<:TSBootMethod}
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
         end
@@ -55,7 +53,7 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size, dt)
+        new(input_data, n, block_size)
     end
 end
 
@@ -152,7 +150,7 @@ end
 function D(g_hat, bootstrap_method::CircularBlock)
     (4 / 3) * (g_hat ^ 2)
 end
-D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, Circular()) # catch all other types
+D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, CircularBlock()) # catch all other types
 
 """
     opt_block_length(array, bootstrap_method::TSBootMethod)
