@@ -97,7 +97,7 @@ function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
 end
 
 function getData(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
-    data = zeros(param.n)
+    data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
         start_index = rand(1:floor(Int, length(param.input_data) - param.block_size))
@@ -116,7 +116,7 @@ function getData(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
 end
 
 function getData(param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
-    data = zeros(param.n)
+    data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
         index_num = rand(1:length(param.input_data))
