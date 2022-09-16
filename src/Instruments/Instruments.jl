@@ -1,4 +1,5 @@
 module Instruments
+using Statistics: var
 
 # export from widgets
 export Widget, Stock, Commodity, Bond
