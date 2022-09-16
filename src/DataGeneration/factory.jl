@@ -12,8 +12,9 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
                             widget.name,
                             var(bs_data[:, column]),                            
                             widget.time_delta)
+        append!(widget_ar, x)
         # println(x)
-    return(x)
-    end
     
+    end
+    return(widget_ar)
 end
