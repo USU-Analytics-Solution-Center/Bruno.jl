@@ -13,8 +13,13 @@ print("loaded Julia in ", js_loaded - js_start)
 date_set = pd.read_csv("examples/AAPL.CSV")["Adj Close"].tolist()
 an_obj = Main.Instruments.Stock(date_set, "AAPL", -1, 1)  # create a julia struct
 list_of_widgets = []
-for i in range(1000):
-    list_of_widgets.append(Main.DataGeneration.factory(an_obj, Main.DataGeneration.Stationary(), 1))
 
-for widget in list_of_widgets:
-    print(widget.volatility)
+n = 1000000
+list_of_widgets = Main.DataGeneration.factory(an_obj, Main.DataGeneration.Stationary(), n)
+
+print("Done with Julia code")
+value = 0
+for obj in list_of_widgets:
+    value += obj.volatility
+
+print(value / n)
