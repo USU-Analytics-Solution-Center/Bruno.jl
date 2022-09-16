@@ -30,8 +30,6 @@ P = ParamLogDiff(..., "name", value)
 ## Name-Value Inputs
 - `initial::Real`: initial is the assumed value at the 0th time step.
                    Default: 100.
-- `dt::Real`: dt is the assumed change in time between samples in 
-              days. Default: 1.
 - `volatility::Real`: volatility expresses the price volatility as 
                       a standard deviation per time step. Default: 9.3e-3
 - `drift::Real`: The drift parameter describes the mean of the 
@@ -55,11 +53,10 @@ Param2 = ParamLogDiff(nTimeStep, volatility=0)
 struct ParamLogDiff <: DataGenInput
     nTimeStep::Integer # number of timesteps to simulate
     initial::Real # in dollars
-    dt::Real # change in time between timesteps in days
     volatility::Real # volatility as a standard deviation
     drift::Real # 
-    ParamLogDiff(nTimeStep; initial=100, dt=1, volatility=0.00930, drift=0.000538) = 
-        new(nTimeStep, initial, dt, volatility, drift)
+    ParamLogDiff(nTimeStep; initial=100, volatility=0.00930, drift=0.000538) = 
+        new(nTimeStep, initial, volatility, drift)
 end
 
 """
