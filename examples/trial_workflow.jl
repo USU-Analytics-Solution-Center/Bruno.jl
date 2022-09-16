@@ -9,11 +9,7 @@ widget = Stock(prices, "AAPL", 1, 1)
 
 list_of_widgets = factory(widget, Stationary(), 5)
 
-println("Original prices")
-println(widget.prices)
-println(widget.volatility)
-println("bootstrapped prices")
-println(list_of_widgets.prices)
-println(list_of_widgets.volatility)
-
+for i in list_of_widgets
+    println(i.volatility)
+end
 
