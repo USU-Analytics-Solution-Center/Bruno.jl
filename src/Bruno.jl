@@ -4,7 +4,8 @@ include("Instruments/Instruments.jl")
 
 using .Instruments
 export Widget, Stock, Commodity, Bond 
-export FinancialInstrument, Option, CallOption, PutOption, Future
+export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
+AmericanCallOption, EuroPutOption, AmericanPutOption, Future
 
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
