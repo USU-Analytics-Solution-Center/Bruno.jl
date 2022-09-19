@@ -11,7 +11,7 @@ AmericanCallOption, EuroPutOption, AmericanPutOption, Future
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration
 
-export ParamLogDiff 
+export LogDiffInput 
 export getData, getTime, data_gen_input
 export DataGenInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
 export opt_block_length
