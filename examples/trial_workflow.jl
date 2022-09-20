@@ -10,8 +10,11 @@ widget = Stock(;kwargs...)
 
 list_of_widgets = factory(widget, Stationary(), 5)
 
-a_fin_inst = CallOption(list_of_widgets[1], 12, Dict("a" => 1, "b" => 2, "c" => 3))
+a_fin_inst = EuroCallOption(list_of_widgets[1])
 
+x = price(a_fin_inst, BinomialTree, 3, .05, 140, 0)
+
+print(x)
 # for i in list_of_widgets
 #     println(i.volatility)
 # end
