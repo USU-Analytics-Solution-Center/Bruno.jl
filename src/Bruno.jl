@@ -4,13 +4,14 @@ include("Instruments/Instruments.jl")
 
 using .Instruments
 export Widget, Stock, Commodity, Bond 
-export FinancialInstrument, Option, CallOption, PutOption, Future
+export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
+AmericanCallOption, EuroPutOption, AmericanPutOption, Future
 
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration
 
-export ParamLogDiff 
+export LogDiffInput 
 export getData, getTime, data_gen_input
 export DataGenInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
 export opt_block_length
