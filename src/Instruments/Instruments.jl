@@ -4,7 +4,10 @@ using Statistics: var
 # export from widgets
 export Widget, Stock, Commodity, Bond
 # exports from financial_instruments
-export FinancialInstrument, Option, CallOption, PutOption, Future
+export FinancialInstrument, Option, CallOption, PutOption, 
+EuroCallOption, AmericanCallOption, EuroPutOption, AmericanPutOption,
+Future
+
     
 include("widgets.jl")
 include("financial_instruments.jl")
