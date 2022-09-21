@@ -27,7 +27,7 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
 
     u = get_u(r, delta, dt, sigma)  # up movement 
     d = get_d(r, delta, dt, sigma)  # down movement
-    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
+    p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
     
     c = 0
     # value of the call is a weighted average of the values at each terminal node multiplied by the corresponding probability value
@@ -45,21 +45,21 @@ price(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth
 
 Computes the value of an American Call Option. 
 """
-function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
     u = get_u(r, delta, dt, sigma)  # up movement 
     d = get_d(r, delta, dt, sigma)  # down movement
-    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
+    p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
     
     # Get terminal node p*
     a_vector = AbstractFloat[]
     for k in tree_depth:-1:0
-        push!(a_vector, max(s_0 - strike_price * u ^ k * d ^ (tree_depth - k), 0))
+        push!(a_vector, max(s_0 * u ^ k * d ^ (tree_depth - k) - strike_price, 0))
     end
-
+    println(a_vector)
     to_return = 0
     
     for i in 1:tree_depth+1
@@ -76,6 +76,7 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, 
             place_holder += 1
         end
         to_return = a_vector[1]
+        println(a_vector)
         pop!(a_vector)
 
     end
@@ -96,7 +97,7 @@ function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_
 
     u = get_u(r, delta, dt, sigma)  # up movement 
     d = get_d(r, delta, dt, sigma)  # down movement
-    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
+    p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
     
     c = 0
     # value of the call is a weighted average of the values at each terminal node multiplied by the corresponding probability value
@@ -116,14 +117,14 @@ price(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, tree_depth,
 Computes the value of an American put Option. 
 
 """
-function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
     u = get_u(r, delta, dt, sigma)  # up movement 
     d = get_d(r, delta, dt, sigma)  # down movement
-    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
+    p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
     
     # Get terminal node p*
     a_vector = AbstractFloat[]
@@ -155,8 +156,8 @@ function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, t
 end
 
 # helper functions
-function get_p(r, dt, u, d)
-    (exp(r * dt) - d) / (u - d)
+function get_p(r, dt, u, d, delta)
+    (exp((r - delta) * dt) - d) / (u - d)
 end
 
 function get_u(r, delta, dt, sigma)
