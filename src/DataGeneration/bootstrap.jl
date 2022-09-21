@@ -58,7 +58,9 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
 end
 
 function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
-    p = 1 / param.block_size
+    # check for block_size > 1 so geometric distro doesn't blow up
+    param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
+    p = 1 / block_size
     data = zeros((param.n, nSimulation)) 
     for run_num in 1:nSimulation
         # generates block size and starting position for first block

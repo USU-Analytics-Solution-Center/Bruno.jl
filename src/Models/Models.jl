@@ -13,4 +13,5 @@ include("pricingmodels.jl")
 
 export price!, b_tree
 export BinomialTree
+
 end #module
