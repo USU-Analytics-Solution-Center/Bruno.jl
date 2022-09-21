@@ -11,7 +11,7 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
 
     bs_data = getData(input, nWidgets)
     widget_ar = Vector{Widget}()
-    kwargs = NamedTuple(fields .=> getfield.(Ref(widget), fields))
+    kwargs = Dict(fields .=> getfield.(Ref(widget), fields))
     for column in 1:nWidgets
         # take the returns back to prices
         prices = [widget.prices[1]]
@@ -23,10 +23,29 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
     return(widget_ar)
 end
 
+function factory(fin_instrument::FinancialInstrument, 
+                bootstrap_method::TSBootMethod, nInstruments::Signed) 
+    fields = field_exclude(fin_instrument)
+    widget_ar = factory(fin_instrument.widget, bootstrap_method, nInstruments)
+
+    # array for all the instruments 
+    instr_ar = Vector{FinancialInstrument}()
+    kwargs = NamedTuple(fields .=> getfield.(Ref(fin_instrument), fields))
+    for i in 1:nInstruments
+        push!(instr_ar, typeof(fin_instrument)(;widget = widget_ar[i], kwargs...))
+    end
+    return(instr_ar)
+end
+
 function field_exclude(widget::Widget)
-    [p for p in fieldnames(typeof(widget)) if p ∉ (:prices)]
+    [p for p in fieldnames(typeof(widget)) if p ∉ [:prices]]
 end
 
 function field_exclude(widget::Stock)
-    [p for p in fieldnames(typeof(widget)) if p ∉ (:prices, :volatility)]
+    [p for p in fieldnames(typeof(widget)) if p ∉ [:prices, :volatility]]
 end
+
+function field_exclude(instr::FinancialInstrument)
+    [p for p in fieldnames(typeof(instr)) if p ∉ [:widget]]
+end
+

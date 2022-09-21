@@ -14,18 +14,27 @@ struct EuroCallOption{T <: Widget} <: CallOption
     value::Dict{String, AbstractFloat}
     
     # kwargs constructor
-    function EuroCallOption(; widget, maturity = 1, value = Dict{String, AbstractFloat}())  
+    function EuroCallOption{T}(; widget, maturity = 1,
+        value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{typeof(widget)}(widget, maturity, value)
+        new{T}(widget, maturity, value)
+    end
+
+    # ordered arguments constructor
+    function EuroCallOption{T}(widget::T, maturity, value) where {T <: Widget}
+        new{T}(widget, maturity, value)
     end
 end
 
 # Outer constructors for passing only the widget
-EuroCallOption(widget::Widget) = EuroCallOption(;widget = widget)
+EuroCallOption(widget::Widget) = EuroCallOption{typeof(widget)}(;widget = widget)
 EuroCallOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroCallOption(;widget = widget, maturity = maturity, value = value)
+    EuroCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+EuroCallOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+
 
 struct AmericanCallOption{T <: Widget} <: CallOption 
     widget::T
@@ -33,18 +42,26 @@ struct AmericanCallOption{T <: Widget} <: CallOption
     value::Dict{String, AbstractFloat}
 
     # kwargs constructor
-    function AmericanCallOption(; widget, maturity = 1, value = Dict{String, AbstractFloat}())  
+    function AmericanCallOption{T}(; widget, maturity = 1,
+        value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{typeof(widget)}(widget, maturity, value)
+        new{T}(widget, maturity, value)
+    end
+
+    # ordered arguments constructor
+    function AmericanCallOption{T}(widget::T, maturity, value) where {T <: Widget}
+        new{T}(widget, maturity, value)
     end
 end
 
 # Outer constructors for passing only the widget
-AmericanCallOption(widget::Widget) = AmericanCallOption(;widget = widget)
+AmericanCallOption(widget::Widget) = AmericanCallOption{typeof(widget)}(;widget = widget)
 AmericanCallOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanCallOption(;widget = widget, maturity = maturity, value = value)
+    AmericanCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+AmericanCallOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    AmericanCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
 
 struct EuroPutOption{T <: Widget} <: PutOption
     widget::T
@@ -52,37 +69,54 @@ struct EuroPutOption{T <: Widget} <: PutOption
     value::Dict{String, AbstractFloat}
 
     # kwargs constructor
-    function EuroPutOption(; widget, maturity = 1, value = Dict{String, AbstractFloat}())  
+    function EuroPutOption{T}(; widget, maturity = 1,
+        value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{typeof(widget)}(widget, maturity, value)
+        new{T}(widget, maturity, value)
+    end
+
+    # ordered arguments constructor
+    function EuroPutOption{T}(widget::T, maturity, value) where {T <: Widget}
+        new{T}(widget, maturity, value)
     end
 end
 
 # Outer constructors for passing only the widget
-EuroPutOption(widget::Widget) = EuroPutOption(;widget = widget)
+EuroPutOption(widget::Widget) = EuroPutOption{typeof(widget)}(;widget = widget)
 EuroPutOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroPutOption(;widget = widget, maturity = maturity, value = value)
+    EuroPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+EuroPutOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
 
 struct AmericanPutOption{T <: Widget} <: PutOption
     widget::T
     maturity::AbstractFloat
     value::Dict{String, AbstractFloat}
-    
+
     # kwargs constructor
-    function AmericanPutOption(; widget, maturity = 1, value = Dict{String, AbstractFloat}())  
+    function AmericanPutOption{T}(; widget, maturity = 1,
+        value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{typeof(widget)}(widget, maturity, value)
+        new{T}(widget, maturity, value)
+    end
+
+    # ordered arguments constructor
+    function AmericanPutOption{T}(widget::T, maturity, value) where {T <: Widget}
+        new{T}(widget, maturity, value)
     end
 end
 
 # Outer constructors for passing only the widget
-AmericanPutOption(widget::Widget) = AmericanPutOption(;widget = widget)
+AmericanPutOption(widget::Widget) = AmericanPutOption{typeof(widget)}(;widget = widget)
 AmericanPutOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanPutOption(;widget = widget, maturity = maturity, value = value)
+    AmericanPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+AmericanPutOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+
 
 # ------ Type system for futures: subtype of FinancialInstrument ------
 struct Future{T <: Widget} <: FinancialInstrument 
