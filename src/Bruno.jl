@@ -19,6 +19,9 @@ export factory
 
 # Models submodule
 include("Models/Models.jl")
+
+export BinomialTree
+export price!, b_tree
 using .Models
 
 
