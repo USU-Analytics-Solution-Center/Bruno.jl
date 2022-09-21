@@ -46,9 +46,41 @@ price(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth
 Computes the value of an American Call Option. 
 """
 function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
-    println("currently under dev")
-    println(fin_obj)
-    0
+    s_0 = last(fin_obj.widget.prices)  
+    sigma = fin_obj.widget.volatility
+    dt = fin_obj.maturity / tree_depth
+
+    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
+    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
+    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    
+    # Get terminal node p*
+    a_vector = AbstractFloat[]
+    for k in tree_depth:-1:0
+        push!(a_vector, max(s_0 - strike_price * u ^ k * d ^ (tree_depth - k), 0))
+    end
+
+    to_return = 0
+    
+    for i in 1:tree_depth+1
+        place_holder = 0
+        for m in 0:tree_depth - i
+            k = tree_depth - m - i
+            
+            cu = a_vector[m + 1]
+            cd = a_vector[m + 2]
+            current_node = s_0 * u ^ k * d ^ (place_holder)
+
+            a_vector[m + 1] = max(current_node - strike_price, (p * cu + (1 - p) * cd) * exp(-r * dt))
+            
+            place_holder += 1
+        end
+        to_return = a_vector[1]
+        pop!(a_vector)
+
+    end
+
+    fin_obj.value["Binomial_tree"] = to_return
 end
 
 """
@@ -85,7 +117,52 @@ Computes the value of an American put Option.
 
 """
 function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
-    println("currently under dev")
-    println(fin_obj)
-    0
+    s_0 = last(fin_obj.widget.prices)  
+    sigma = fin_obj.widget.volatility
+    dt = fin_obj.maturity / tree_depth
+
+    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
+    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
+    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    
+    # Get terminal node p*
+    a_vector = AbstractFloat[]
+    for k in tree_depth:-1:0
+        push!(a_vector, max(strike_price - s_0 * u ^ k * d ^ (tree_depth - k), 0))
+    end
+
+    to_return = 0
+    
+    for i in 1:tree_depth+1
+        place_holder = 0
+        for m in 0:tree_depth - i
+            k = tree_depth - m - i
+            
+            cu = a_vector[m + 1]
+            cd = a_vector[m + 2]
+            current_node = s_0 * u ^ k * d ^ (place_holder)
+
+            a_vector[m + 1] = max(strike_price - current_node, (p * cu + (1 - p) * cd) * exp(-r * dt))
+            
+            place_holder += 1
+        end
+        to_return = a_vector[1]
+        pop!(a_vector)
+
+    end
+
+    fin_obj.value["Binomial_tree"] = to_return
+end
+
+# helper functions
+function get_p()
+    (exp(r * dt) - d) / (u - d)
+end
+
+function get_u()
+    exp((r - delta) * dt + sigma * sqrt(dt))
+end
+
+function get_d()
+    exp((r - delta) * dt - sigma * sqrt(dt))
 end
