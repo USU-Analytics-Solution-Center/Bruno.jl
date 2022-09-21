@@ -7,3 +7,4 @@ using LinearAlgebra
 
 include("datagentests.jl")
 include("bootstraptests.jl")
+include("pricingmodeltests.jl")
