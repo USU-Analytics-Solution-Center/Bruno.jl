@@ -25,9 +25,9 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
-    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
-    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
-    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    u = get_u(r, delta, dt, sigma)  # up movement 
+    d = get_d(r, delta, dt, sigma)  # down movement
+    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
     
     c = 0
     # value of the call is a weighted average of the values at each terminal node multiplied by the corresponding probability value
@@ -50,9 +50,9 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, 
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
-    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
-    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
-    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    u = get_u(r, delta, dt, sigma)  # up movement 
+    d = get_d(r, delta, dt, sigma)  # down movement
+    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
     
     # Get terminal node p*
     a_vector = AbstractFloat[]
@@ -94,9 +94,9 @@ function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
-    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
-    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
-    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    u = get_u(r, delta, dt, sigma)  # up movement 
+    d = get_d(r, delta, dt, sigma)  # down movement
+    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
     
     c = 0
     # value of the call is a weighted average of the values at each terminal node multiplied by the corresponding probability value
@@ -121,9 +121,9 @@ function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, t
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
 
-    u = exp((r - delta) * dt + sigma * sqrt(dt))  # up movement 
-    d = exp((r - delta) * dt - sigma * sqrt(dt))  # down movement
-    p = (exp(r * dt) - d) / (u - d)  # risk neutral probability of an up move
+    u = get_u(r, delta, dt, sigma)  # up movement 
+    d = get_d(r, delta, dt, sigma)  # down movement
+    p = get_p(r, dt, u, d)  # risk neutral probability of an up move
     
     # Get terminal node p*
     a_vector = AbstractFloat[]
@@ -155,14 +155,14 @@ function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, t
 end
 
 # helper functions
-function get_p()
+function get_p(r, dt, u, d)
     (exp(r * dt) - d) / (u - d)
 end
 
-function get_u()
+function get_u(r, delta, dt, sigma)
     exp((r - delta) * dt + sigma * sqrt(dt))
 end
 
-function get_d()
+function get_d(r, delta, dt, sigma)
     exp((r - delta) * dt - sigma * sqrt(dt))
 end
