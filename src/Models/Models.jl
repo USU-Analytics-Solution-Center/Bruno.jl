@@ -12,6 +12,6 @@ primitive type MonteCarlo <: Model 8 end
 include("pricingmodels.jl")
 
 export price!, b_tree
-export BinomialTree
+export BinomialTree, BlackScholes
 
 end #module
