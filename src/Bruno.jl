@@ -21,7 +21,7 @@ export factory
 include("Models/Models.jl")
 
 export BinomialTree
-export price, b_tree
+export price!, b_tree
 using .Models
 
 

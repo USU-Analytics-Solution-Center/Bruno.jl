@@ -8,18 +8,16 @@ Computes the value of an European Call Option.
 ```
 using Bruno
 
- 
-a_stock = Stock([41], "example", .3)  # create a widget
+a_stock = Stock(41; volatility=.3)  # create a widget
 a_fin_inst = EuroCallOption(a_stock)  # create an Option
-x = price(a_fin_inst, BinomialTree, 3, .08, 40, 0)  # price the Option
+price!(a_fin_inst, BinomialTree; r=.08, strike_price= 40)  # add the binomial Option value to the options values
 ```
 """
-function price(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
     """ 
     EURO OPTION
     tree_depth = the depth of the tree
     r = rate of return
-    sigma = volatility
     strike_price = the strike price in dollars
     delta = intrest rate
     """
@@ -39,10 +37,10 @@ function price(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}, tree_
         c += max(term_val - strike_price, 0) * p_star
     end
 
-    exp(-r * fin_obj.maturity) * c
+    fin_obj.value["Binomial_tree"] = exp(-r * fin_obj.maturity) * c
 end
 
-function price(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
     println("currently under dev")
     println(fin_obj)
     0
