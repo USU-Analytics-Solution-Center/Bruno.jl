@@ -30,8 +30,6 @@ P = ParamLogDiff(..., "name", value)
 ## Name-Value Inputs
 - `initial::Real`: initial is the assumed value at the 0th time step.
                    Default: 100.
-- `dt::Real`: dt is the assumed change in time between samples in 
-              days. Default: 1.
 - `volatility::Real`: volatility expresses the price volatility as 
                       a standard deviation per time step. Default: 9.3e-3
 - `drift::Real`: The drift parameter describes the mean of the 
@@ -52,14 +50,13 @@ Param2 = ParamLogDiff(nTimeStep, volatility=0)
 ```
 
 """
-struct ParamLogDiff <: DataGenInput
+struct LogDiffInput <: DataGenInput
     nTimeStep::Integer # number of timesteps to simulate
     initial::Real # in dollars
-    dt::Real # change in time between timesteps in days
     volatility::Real # volatility as a standard deviation
     drift::Real # 
-    ParamLogDiff(nTimeStep; initial=100, dt=1, volatility=0.00930, drift=0.000538) = 
-        new(nTimeStep, initial, dt, volatility, drift)
+    LogDiffInput(nTimeStep; initial=100, volatility=0.00930, drift=0.000538) = 
+        new(nTimeStep, initial, volatility, drift)
 end
 
 """
@@ -76,7 +73,7 @@ data = getData(Param, nSimulation)
 - `Param::DataGenerator`: Parameters that describe the desired data generating process  
 - `nSimulation::Integer`: nSimulation is the number of simulations to run.  
 Possible DataGenInput parameter types are
-- `::ParamLogDiff` - log-normal diffusion process 
+- `::LogDiffInput` - log-normal diffusion process 
 - `::BootstrapInput{MovingBlock}`
 - `::BootstrapInput{CircularBlock}`
 - `::BootstrapInput{Stationary}`
@@ -92,8 +89,8 @@ DataGenInput parameter types can be constructed directly or with `data_gen_input
 ```
 # initialize parameters
 nTimeStep = 100
-Param1 = ParamLogDiff(nTimeStep)
-Param2 = ParamLogDiff(nTimeStep, volatility=0)
+Param1 = LogDiffInput(nTimeStep)
+Param2 = LogDiffInput(nTimeStep, volatility=0)
 
 # create two datasets, one with default values, the second with no volatility
 data1 = getData(Param1)
@@ -108,7 +105,7 @@ plt = plot(data3, show=true, color="blue", legend=false)
 plot!(plt, data1, show=true, color="red", legend=false, linewidth=3)
 ```
 """
-function getData(Param::ParamLogDiff, nSimulation::Integer=1)
+function getData(Param::LogDiffInput, nSimulation::Integer=1)
     
     # compute array of random values
     nData = Param.nTimeStep + 1
@@ -134,7 +131,7 @@ data = getTime(Param, initial)
 ```
 
 ## Positional Inputs
-- `Param::ParamLogDiff`: Parameters that describe the desired log-diffusion process  
+- `Param::LogDiffInput`: Parameters that describe the desired log-diffusion process  
 - `initial::DateTime`: The time that corresponds to the `initial` parameter in `getData`
 
 ## Outputs
@@ -171,7 +168,7 @@ plot!(plt, time1, data1, show=true, color="red", legend=false, linewidth=3)
 ```
 
 """
-function getTime(Param::ParamLogDiff, tStart=DateTime(2000))
+function getTime(Param::LogDiffInput, tStart=DateTime(2000))
     secondPerDay = (3600*24)
     nSecondPerStepInt = floor(Param.dt*secondPerDay)
     nSecondPerStepSec = Second(nSecondPerStepInt)

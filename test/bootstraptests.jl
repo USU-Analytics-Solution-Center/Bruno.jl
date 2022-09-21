@@ -13,7 +13,7 @@
     beta = top / bottom 
 
     # check a set of bootstraps to see if we can recover beta
-    input = BootstrapInput{v}(ar1, 1000, 50, 1)
+    input = BootstrapInput{v}(ar1, 1000, 50)
     results = zeros(1000)
     for i in 1:1000
         bootstrap = getData(input)
@@ -36,7 +36,7 @@ end
     @test ar1ADF.stat < ar1ADF.cv[1]
 
     # bootstrap AR(1) series 
-    input = BootstrapInput{Stationary}(ar1, 1000, 50, 1)
+    input = BootstrapInput{Stationary}(ar1, 1000, 50)
     bs_data = getData(input)
     bootstrap = [bs_data[i] for i in 1:length(bs_data)]
     bsADF = ADFTest(bootstrap, :none, 0)
@@ -78,4 +78,12 @@ end
     # Politis and White paper defining the algorithm.
     @test isapprox(opt_block_length(ar, Stationary()), 6.3085; atol=.001)
     @test isapprox(opt_block_length(ar, CircularBlock()), 7.2214; atol = .001)
+end
+
+@testset "$bstype Dimensional check for nSimulation > 1" for bstype in [Stationary, 
+                                                            MovingBlock, CircularBlock]
+    n = 10 # number of rows (resample size) in the resulting matrix
+    m = 4 # number of columns (runs) in resulting matrix
+    bs_input = BootstrapInput{bstype}([1,2,3,4,5,6,7,8], n, 3)
+    @test size(getData(bs_input, m)) == (n, m)
 end

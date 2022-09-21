@@ -20,16 +20,14 @@ P = BootstrapInput{T <: TSBootMethod}(; kwargs...)
 - `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
 - `n::Integer`: size of resampled output data. Default: 100
 - `block_size::Integer`: block size to use. Default: 2
-- `dt::Real` assumed change in time between samples in days. Default: 1.
 """
 struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     input_data::Array{<:Real} # array of data to be resampled
     n::Integer # desired size of resampled data
     block_size::Float32 #desired average block size (will add more to this later)
-    dt::Real # change in time between timestep in days
     
     # constructor for kwargs
-    function BootstrapInput{T}(; input_data, n = 100, block_size = 10, dt = 1) where {T<:TSBootMethod}
+    function BootstrapInput{T}(; input_data, n = 100, block_size = 10) where {T<:TSBootMethod}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
@@ -41,10 +39,10 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size, dt)
+        new(input_data, n, block_size)
     end
     # constructor for inputing args in exact correct order
-    function BootstrapInput{T}(input_data, n, block_size, dt) where {T<:TSBootMethod}
+    function BootstrapInput{T}(input_data, n, block_size) where {T<:TSBootMethod}
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
         end
@@ -55,38 +53,40 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size, dt)
+        new(input_data, n, block_size)
     end
 end
 
-function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
-    p = 1 / Param.block_size
-    data = zeros((Param.n, nSimulation)) 
+function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
+    # check for block_size > 1 so geometric distro doesn't blow up
+    param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
+    p = 1 / block_size
+    data = zeros((param.n, nSimulation)) 
     for run_num in 1:nSimulation
         # generates block size and starting position for first block
         block = rand(Geometric(p))
-        while block == 0 || block > Param.n
+        while block == 0 || block > param.n
             block = rand(Geometric(p))
         end
         block_counter = 0
-        block_index = rand(1:length(Param.input_data))
-        for i in 1:Param.n
+        block_index = rand(1:length(param.input_data))
+        for i in 1:param.n
             if block_counter < block 
                 # go on indexing in the current block
-                data[i, run_num] = Param.input_data[block_index]
+                data[i, run_num] = param.input_data[block_index]
                 block_counter += 1
             else
                 # make a new block and sample first index
                 block = rand(Geometric(p)) 
-                while block == 0 || block > Param.n
+                while block == 0 || block > param.n
                     block = rand(Geometric(p))
                 end
-                block_index = rand(1:length(Param.input_data))
-                data[i, run_num] = Param.input_data[block_index]
+                block_index = rand(1:length(param.input_data))
+                data[i, run_num] = param.input_data[block_index]
                 block_counter = 1
             end
 
-            if block_index == length(Param.input_data)
+            if block_index == length(param.input_data)
                 block_index = 1  # wrap around the dataset to the start
             else
                 block_index += 1
@@ -96,18 +96,18 @@ function getData(Param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     return data
 end
 
-function getData(Param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
-    data = zeros(Param.n)
+function getData(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
+    data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
-        start_index = rand(1:floor(Int, length(Param.input_data) - Param.block_size))
-        for i in 1:Param.n
-            if block_counter < Param.block_size 
-                data[i, run_num] = Param.input_data[start_index + block_counter]
+        start_index = rand(1:floor(Int, length(param.input_data) - param.block_size))
+        for i in 1:param.n
+            if block_counter < param.block_size 
+                data[i, run_num] = param.input_data[start_index + block_counter]
                 block_counter += 1
             else
-                start_index = rand(1:floor(Int, length(Param.input_data)- Param.block_size))
-                data[i, run_num] = Param.input_data[start_index]
+                start_index = rand(1:floor(Int, length(param.input_data)- param.block_size))
+                data[i, run_num] = param.input_data[start_index]
                 block_counter = 1
             end
         end
@@ -115,22 +115,22 @@ function getData(Param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     return data
 end
 
-function getData(Param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
-    data = zeros(Param.n)
+function getData(param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
+    data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
-        index_num = rand(1:length(Param.input_data))
-        for i in 1:Param.n
-            if block_counter < Param.block_size
-                data[i, run_num] = Param.input_data[index_num]
+        index_num = rand(1:length(param.input_data))
+        for i in 1:param.n
+            if block_counter < param.block_size
+                data[i, run_num] = param.input_data[index_num]
                 block_counter += 1
             else
-                index_num = rand(1:length(Param.input_data))
-                data[i, run_num] = Param.input_data[index_num]
+                index_num = rand(1:length(param.input_data))
+                data[i, run_num] = param.input_data[index_num]
                 block_counter = 1
             end
 
-            if index_num == length(Param.input_data)
+            if index_num == length(param.input_data)
                 index_num = 1
             else
                 index_num += 1
@@ -152,7 +152,7 @@ end
 function D(g_hat, bootstrap_method::CircularBlock)
     (4 / 3) * (g_hat ^ 2)
 end
-D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, Circular()) # catch all other types
+D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, CircularBlock()) # catch all other types
 
 """
     opt_block_length(array, bootstrap_method::TSBootMethod)
