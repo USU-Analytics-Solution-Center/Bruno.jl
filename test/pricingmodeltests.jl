@@ -3,8 +3,8 @@
     Using "Book Name"
     Assumptions
         Euro Call Option
-        S = $41
-        K = $40
+        S = 41
+        K = 40
         sigma = 0.30
         r = 0.08
         T = 1
