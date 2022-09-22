@@ -92,7 +92,7 @@ end
 function price!(fin_obj::AbstractEuroPut, pricing_model::Type{BlackScholes})
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
-    d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2/ 2)) * fin_obj.maturity) / a1
+    d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
     d2 = d1 - a1 
     value = fin_obj.strike_price * exp(-fin_obj.risk_free_rate * fin_obj.maturity) * cdf(Normal(), -d2) - 
         fin_obj.widget.prices[end] * cdf(Normal(), -d1)

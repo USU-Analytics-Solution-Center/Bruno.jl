@@ -14,7 +14,7 @@
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
     a_fin_inst = EuroCallOption(a_stock, 40)  # create an Option
-    price!(a_fin_inst, BinomialTree; r=.08, strike_price= 40)  # add the binomial Option value to the options values
+    price!(a_fin_inst, BinomialTree; r=.08, strike_price=40)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
     value = a_fin_inst.value["Binomial_tree"]
