@@ -1,9 +1,9 @@
 import Distributions.Geometric
 
 abstract type TSBootMethod end
-struct Stationary <: TSBootMethod end
-struct MovingBlock <: TSBootMethod end
-struct CircularBlock <: TSBootMethod end
+primitive type Stationary <: TSBootMethod  8 end
+primitive type MovingBlock <: TSBootMethod 8 end
+primitive type CircularBlock <: TSBootMethod 8 end
 
 """
 ## Description
@@ -145,14 +145,14 @@ end
 
 
 # these are for the block_length parameters, to use with multiple dispatch.
-function D(g_hat, bootstrap_method::Stationary)
+function D(g_hat, bootstrap_method::Type{Stationary})
     2 * (g_hat ^ 2)
 end
 
-function D(g_hat, bootstrap_method::CircularBlock)
+function D(g_hat, bootstrap_method::Type{CircularBlock})
     (4 / 3) * (g_hat ^ 2)
 end
-D(g_hat, bootstrap_method::TSBootMethod) = D(g_hat, CircularBlock()) # catch all other types
+D(g_hat, bootstrap_method::Type{<:TSBootMethod}) = D(g_hat, CircularBlock) # catch all other types
 
 """
     opt_block_length(array, bootstrap_method::TSBootMethod)
@@ -175,11 +175,11 @@ for i in _:799
 end
 
 #find optimal block lengths
-st_bl = opt_block_length(ar1, Stationary())
-cb_bl = opt_block_length(ar1, CircularBlock())
+st_bl = opt_block_length(ar1, Stationary)
+cb_bl = opt_block_length(ar1, CircularBlock)
 ```
 """
-function opt_block_length(array, bootstrap_method::TSBootMethod)
+function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})
     N = size(array)[1]
     K_N = max(5,floor(Int, sqrt(log10(N))))
     # m_max from Kevin Sheppard arch package and Andrew Patton Matlab code

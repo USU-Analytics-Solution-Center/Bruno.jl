@@ -1,9 +1,8 @@
-function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signed)
+function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
     fields = field_exclude(widget)
     # take the first difference to get to returns
     returns = [widget.prices[i+1] - widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
-
-    input = BootstrapInput{typeof(bootstrap_method)}(;
+    input = BootstrapInput{bootstrap_method}(;
                                 input_data = returns,
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
@@ -24,7 +23,8 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
 end
 
 function factory(fin_instrument::FinancialInstrument, 
-                bootstrap_method::TSBootMethod, nInstruments::Signed) 
+                bootstrap_method::Type{<:TSBootMethod}, 
+                nInstruments::Signed) 
     fields = field_exclude(fin_instrument)
     widget_ar = factory(fin_instrument.widget, bootstrap_method, nInstruments)
 
