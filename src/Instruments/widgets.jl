@@ -1,8 +1,25 @@
 # place to put all widgets, or assets that don't need a model for the base value. 
 # examples: oil, stocks, etc.
+"""
+## Description
+Widgets are the root asset at the heart of the package. A 'Widget' can be any 
+real world finicial object such as a stock, or commodity. 
 
+## Syntax for Kwargs
+```
+kwargs = (prices=prices, name="APPL")
+a_widget = Widget(;kwargs...)
+```
+
+## Syntax for ordered argumentes
+```
+a_widget = Widget(prices=[1, 2, 3, 4, 5], name ="Example", volatility =.3)
+```
+
+"""
 abstract type Widget end
 
+# stocks
 struct Stock <: Widget 
     prices::Array{AbstractFloat}
     name::String
@@ -26,6 +43,7 @@ function Stock(price::Real; name = "", volatility)
     Stock(;prices = prices, name = name , volatility = volatility)
 end
 
+# Commodities
 struct Commodity <: Widget
     prices::Array{AbstractFloat}
     name::String
@@ -49,7 +67,7 @@ function Commodity(price::AbstractFloat; name = "", volatility)
     Commodity(;prices = prices, name = name , volatility = volatility)
 end
 
-
+# bonds
 struct Bond <: Widget
     price::Array{AbstractFloat}
     name::String
