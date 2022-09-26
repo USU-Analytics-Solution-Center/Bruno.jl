@@ -13,7 +13,7 @@
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.08, strike_price=40)  # create an Option
+    a_fin_inst =  EuroCallOption(a_stock, 40; risk_free_rate=.08) # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
