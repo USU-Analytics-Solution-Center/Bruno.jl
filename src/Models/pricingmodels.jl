@@ -246,6 +246,3 @@ end
 function payoff(type::PutOption, final_prices, strike_price)
     max.(strike_price .- final_prices, 0)    
 end
-
-
-end
