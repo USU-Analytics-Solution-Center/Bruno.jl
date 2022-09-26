@@ -70,15 +70,15 @@ end
 
 # bonds
 struct Bond <: Widget
-    price::Array{AbstractFloat}
+    prices::Array{AbstractFloat}
     name::String
     time_mat::AbstractFloat
     coupon_rate::AbstractFloat
 
     # constructor for kwargs
-    function Bond(; price, name="", time_mat=1, coupon_rate=.03)
+    function Bond(; prices, name="", time_mat=1, coupon_rate=.03)
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
-        new(price, name, time_mat, coupon_rate)
+        new(prices, name, time_mat, coupon_rate)
     end
 end
 

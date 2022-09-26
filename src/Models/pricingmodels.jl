@@ -65,7 +65,6 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
     for k in tree_depth:-1:0
         push!(a_vector, max(s_0 * u ^ k * d ^ (tree_depth - k) - strike_price, 0))
     end
-    println(a_vector)
     to_return = 0
     
     for i in 1:tree_depth+1
@@ -82,9 +81,6 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
             place_holder += 1
         end
         to_return = a_vector[1]
-        println(a_vector)
-        pop!(a_vector)
-
     end
 
     fin_obj.value["Binomial_tree"] = to_return
