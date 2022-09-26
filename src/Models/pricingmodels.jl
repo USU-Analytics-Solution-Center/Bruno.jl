@@ -99,3 +99,47 @@ function price!(fin_obj::AbstractEuroPut, pricing_model::Type{BlackScholes})
 
     fin_obj.value["BlackScholes"] = value
 end
+
+# ----- Price models using Monte Carlo sims
+function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{LogDiffusion}};
+    n_sims::Int = 100, sim_size::Int = 100)
+
+    dt = fin_obj.maturity / sim_size
+    # create the data to be used in the analysis 
+    data_input = LogDiffInput(sim_size; initial = fin_obj.widget.prices[end], 
+                                volatility = fin_obj.widget.volatility * sqrt(dt),
+                                drift = fin_obj.risk_free_rate * dt)
+    final_prices = getData(data_input, n_sims)[end,:] 
+    # check for exercise or not
+    value = sum(payoff(fin_obj, final_prices, fin_obj.strike_price)) / n_sims * 
+        exp(-fin_obj.risk_free_rate * fin_obj.maturity)
+
+    fin_obj.value["MC_LogDiffusion"] = value
+end
+
+
+function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{StationaryBootstrap}}; 
+                 n_sims::Int)
+    
+    # create the data to be used in analysis
+    returns = [log(1 + (fin_obj.widget.prices[i+1] - fin_obj.widget.prices[i]) / fin_obj.widget.prices[i]) for 
+        i in 1:(size(fin_obj.widget.prices)[1] - 1)]
+
+    data_input = BootstrapInput{Stationary}(; input_data = returns, 
+                                            n = size(returns)[1])
+    data = getData(data_input, n_sims)
+    final_prices = [fin_obj.widget.prices[end] * exp(sum(data[:,i]) * fin_obj.maturity) for i in 1:n_sims]
+    # calculate the mean present value of the runs
+    value = sum(payoff(fin_obj, final_prices, fin_obj.strike_price)) / n_sims * 
+        exp(-fin_obj.risk_free_rate * fin_obj.maturity)
+
+    fin_obj.value["MC_StationaryBoot"] = value
+end
+
+function payoff(type::CallOption, final_prices, strike_price)
+    max.(final_prices .- strike_price, 0) 
+end
+
+function payoff(type::PutOption, final_prices, strike_price)
+    max.(strike_price .- final_prices, 0)    
+end

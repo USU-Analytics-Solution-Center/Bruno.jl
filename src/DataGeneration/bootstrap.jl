@@ -27,7 +27,7 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     block_size::Float32 #desired average block size (will add more to this later)
     
     # constructor for kwargs
-    function BootstrapInput{T}(; input_data, n = 100, block_size = 10) where {T<:TSBootMethod}
+    function BootstrapInput{T}(; input_data, n = 100, block_size = opt_block_length(input_data, T())) where {T<:TSBootMethod}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
