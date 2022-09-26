@@ -1,15 +1,45 @@
+"""
+factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signed)
+
+Creates nWidgets using a given bootstrap_method. If a widget of type "Stock" is passed
+in then the widget factory will use a given bootstrap method to produce n "Stock" widgets.
+All widgets use first difference.
+
+## Positional Inputs
+- `widget::Widget`: A concrete widget struct. See the widget documentation for more.
+- `bootstrap_method::TSBootMethod`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
+- `nWidgets::Signed`: The amount of widgets you want widget factory to return.
+
+
+# Example
+```
+using Bruno
+using CSV
+using DataFrames
+
+df = CSV.read("./examples/AAPL.csv", DataFrame)
+prices = df[!, "Adj Close"]
+
+kwargs = (prices=prices, name="APPL")
+widget = Stock(;kwargs...)
+
+list_of_widgets = factory(widget, Stationary(), 5)
+```
+"""
 function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signed)
     fields = field_exclude(widget)
     # take the first difference to get to returns
     returns = [widget.prices[i+1] - widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
 
+    # bootstrap the returns
     input = BootstrapInput{typeof(bootstrap_method)}(;
                                 input_data = returns,
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
                                 )
-
     bs_data = getData(input, nWidgets)
+
+    # Create a vector of widgets
     widget_ar = Vector{Widget}()
     kwargs = Dict(fields .=> getfield.(Ref(widget), fields))
     for column in 1:nWidgets
@@ -18,13 +48,16 @@ function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signe
         for i in 1:length(returns)
             push!(prices, prices[end] + bs_data[i,column])
         end
+
+        # Add a new widget to the return vector 
         push!(widget_ar, typeof(widget)(;prices = prices, kwargs...))
     end
     return(widget_ar)
 end
 
 function factory(fin_instrument::FinancialInstrument, 
-                bootstrap_method::TSBootMethod, nInstruments::Signed) 
+                bootstrap_method::Type{<:TSBootMethod}, 
+                nInstruments::Signed) 
     fields = field_exclude(fin_instrument)
     widget_ar = factory(fin_instrument.widget, bootstrap_method, nInstruments)
 
@@ -36,6 +69,10 @@ function factory(fin_instrument::FinancialInstrument,
     end
     return(instr_ar)
 end
+
+# field_exclude functions are used to execlude specific struct attributes
+# from the factory and leave each struct to figure out those feilds in
+# their own constructor
 
 function field_exclude(widget::Widget)
     [p for p in fieldnames(typeof(widget)) if p ∉ [:prices]]

@@ -51,19 +51,19 @@ input = data_gen_input(:MBBootstrap ; kwargs...)
 """
 function data_gen_input(data_gen_type::Symbol; kwargs...)
     if data_gen_type == :MBBootstrap
-        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] : opt_block_length(kwargs[:input_data], CircularBlock())
+        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] : opt_block_length(kwargs[:input_data], CircularBlock)
         BootstrapInput{MovingBlock}(kwargs[:input_data],
                                 kwargs[:n],
                                 block_size
        ) 
     elseif data_gen_type == :CBBootstrap
-        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] : opt_block_length(kwargs[:input_data], CircularBlock())
+        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] : opt_block_length(kwargs[:input_data], CircularBlock)
         BootstrapInput{CircularBlock}(kwargs[:input_data],
                                 kwargs[:n],
                                 block_size
        ) 
     elseif data_gen_type == :StationaryBootstrap
-        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] :  opt_block_length(kwargs[:input_data], Stationary())
+        block_size = :block_size in keys(kwargs) ? kwargs[:block_size] :  opt_block_length(kwargs[:input_data], Stationary)
         BootstrapInput{Stationary}(kwargs[:input_data],
                                 kwargs[:n],
                                 block_size

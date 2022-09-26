@@ -5,122 +5,143 @@ abstract type FinancialInstrument end
 
 # ----- Type system for options: subtype of FinancialInstrument ------
 abstract type Option <: FinancialInstrument end
+
+# ----- Abstract type for all call and put options -----
 abstract type CallOption <: Option end
 abstract type PutOption <: Option end
 
-struct EuroCallOption{T <: Widget} <: CallOption
+# ----- Finer subtype for Euro and American options. use for general case dispatch
+abstract type AbstractEuroCall <: CallOption end
+abstract type AbstractAmericanCall <: CallOption end
+abstract type AbstractEuroPut <: PutOption end
+abstract type AbstractAmericanPut <: PutOption end
+
+# ----- Concrete types for Euro and American call options
+struct EuroCallOption{T <: Widget} <: AbstractEuroCall
     widget::T
+    strike_price::AbstractFloat
     maturity::AbstractFloat
+    risk_free_rate::AbstractFloat
     value::Dict{String, AbstractFloat}
     
     # kwargs constructor
-    function EuroCallOption{T}(; widget, maturity = 1,
+    function EuroCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
         value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, maturity, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 
     # ordered arguments constructor
-    function EuroCallOption{T}(widget::T, maturity, value) where {T <: Widget}
-        new{T}(widget, maturity, value)
+    function EuroCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 end
 
 # Outer constructors for passing only the widget
-EuroCallOption(widget::Widget) = EuroCallOption{typeof(widget)}(;widget = widget)
-EuroCallOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
-EuroCallOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    EuroCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+EuroCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
+EuroCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
+    EuroCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
+EuroCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-
-struct AmericanCallOption{T <: Widget} <: CallOption 
+struct AmericanCallOption{T <: Widget} <: AbstractAmericanCall
     widget::T
+    strike_price::AbstractFloat
     maturity::AbstractFloat
+    risk_free_rate::AbstractFloat
     value::Dict{String, AbstractFloat}
-
+    
     # kwargs constructor
-    function AmericanCallOption{T}(; widget, maturity = 1,
+    function AmericanCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
         value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, maturity, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 
     # ordered arguments constructor
-    function AmericanCallOption{T}(widget::T, maturity, value) where {T <: Widget}
-        new{T}(widget, maturity, value)
+    function AmericanCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 end
 
 # Outer constructors for passing only the widget
-AmericanCallOption(widget::Widget) = AmericanCallOption{typeof(widget)}(;widget = widget)
-AmericanCallOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
-AmericanCallOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    AmericanCallOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+AmericanCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
+    AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
+AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
+    AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
+AmericanCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-struct EuroPutOption{T <: Widget} <: PutOption
+struct EuroPutOption{T <: Widget} <: AbstractEuroPut
     widget::T
+    strike_price::AbstractFloat
     maturity::AbstractFloat
+    risk_free_rate::AbstractFloat
     value::Dict{String, AbstractFloat}
-
+    
     # kwargs constructor
-    function EuroPutOption{T}(; widget, maturity = 1,
+    function EuroPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
         value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, maturity, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 
     # ordered arguments constructor
-    function EuroPutOption{T}(widget::T, maturity, value) where {T <: Widget}
-        new{T}(widget, maturity, value)
+    function EuroPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 end
 
 # Outer constructors for passing only the widget
-EuroPutOption(widget::Widget) = EuroPutOption{typeof(widget)}(;widget = widget)
-EuroPutOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
-EuroPutOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    EuroPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+EuroPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
+EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
+    EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
+EuroPutOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-struct AmericanPutOption{T <: Widget} <: PutOption
+struct AmericanPutOption{T <: Widget} <: AbstractAmericanPut
     widget::T
+    strike_price::AbstractFloat
     maturity::AbstractFloat
+    risk_free_rate::AbstractFloat
     value::Dict{String, AbstractFloat}
-
+    
     # kwargs constructor
-    function AmericanPutOption{T}(; widget, maturity = 1,
+    function AmericanPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
         value = Dict{String, AbstractFloat}()) where {T <: Widget}
         value == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, maturity, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 
     # ordered arguments constructor
-    function AmericanPutOption{T}(widget::T, maturity, value) where {T <: Widget}
-        new{T}(widget, maturity, value)
+    function AmericanPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
     end
 end
 
 # Outer constructors for passing only the widget
-AmericanPutOption(widget::Widget) = AmericanPutOption{typeof(widget)}(;widget = widget)
-AmericanPutOption(widget::Widget, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
-AmericanPutOption(;widget, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    AmericanPutOption{typeof(widget)}(;widget = widget, maturity = maturity, value = value)
+AmericanPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
+AmericanPutOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
+    AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
+AmericanPutOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
 
 # ------ Type system for futures: subtype of FinancialInstrument ------
 struct Future{T <: Widget} <: FinancialInstrument 
     widget::T
+    strike_price::AbstractFloat
     maturity::AbstractFloat
     value::Dict{String, AbstractFloat}
 end
