@@ -56,8 +56,8 @@ end
     # test for minimum block lenght value (this should require using b_max in the function, 
     # not b_length) These minimum parameters are from Andrew Patton's matlab code as well
     # as the python arch package by Kevin Sheppard
-    @test opt_block_length(ar, Stationary()) == 7.0
-    @test opt_block_length(ar, CircularBlock())  == 7.0
+    @test opt_block_length(ar, Stationary) == 7.0
+    @test opt_block_length(ar, CircularBlock)  == 7.0
 
     # AR(1) dataset to be used in the larger series 
     ar = [1.0, 1.513150483642114, 1.4372622307759826, 1.4479754825782691, 0.6450704760464047, 
@@ -76,8 +76,8 @@ end
 
     # testing out the block size using the data above against computed values using the 
     # Politis and White paper defining the algorithm.
-    @test isapprox(opt_block_length(ar, Stationary()), 6.3085; atol=.001)
-    @test isapprox(opt_block_length(ar, CircularBlock()), 7.2214; atol = .001)
+    @test isapprox(opt_block_length(ar, Stationary), 6.3085; atol=.001)
+    @test isapprox(opt_block_length(ar, CircularBlock), 7.2214; atol = .001)
 end
 
 @testset "$bstype Dimensional check for nSimulation > 1" for bstype in [Stationary, 
