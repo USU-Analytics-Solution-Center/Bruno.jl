@@ -176,6 +176,7 @@ end
 
 function get_d(r, delta, dt, sigma)
     exp((r - delta) * dt - sigma * sqrt(dt))
+end
 
 
 # ----- Price models for call and put options using BlackScholes
