@@ -13,15 +13,15 @@
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = EuroCallOption(a_stock, 40)  # create an Option
-    price!(a_fin_inst, BinomialTree; r=.08, strike_price=40)  # add the binomial Option value to the options values
+    a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.08, strike_price=40)  # create an Option
+    price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
     value = a_fin_inst.value["Binomial_tree"]
     @test value != Nothing
 
     # Check if it is the correct value
-    @test  7.073 <= value <= 7.074 
+    @test  7.073 <= value <= 7.074
     
 end
 
@@ -41,8 +41,8 @@ end
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = EuroPutOption(a_stock)  # create an Option
-    price!(a_fin_inst, BinomialTree; r=.08, strike_price= 40)  # add the binomial Option value to the options values
+    a_fin_inst = EuroPutOption(a_stock; risk_free_rate=.08, strike_price=40)  # create an Option
+    price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
     value = a_fin_inst.value["Binomial_tree"]
@@ -68,8 +68,8 @@ end
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = AmericanPutOption(a_stock)  # create an Option
-    price!(a_fin_inst, BinomialTree; r=.08, strike_price= 40)  # add the binomial Option value to the options values
+    a_fin_inst = AmericanPutOption(a_stock; strike_price=40, risk_free_rate=.08)  # create an Option
+    price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
     value = a_fin_inst.value["Binomial_tree"]
@@ -95,8 +95,8 @@ end
     """
     # Create needed values
     a_stock = Stock(110; volatility=.3)  # create a widget
-    a_fin_inst = AmericanCallOption(a_stock)  # create an Option
-    price!(a_fin_inst, BinomialTree; r=.05, strike_price= 100, delta=.035)  # add the binomial Option value to the options values
+    a_fin_inst = AmericanCallOption(a_stock; risk_free_rate=.05, strike_price=100)  # create an Option
+    price!(a_fin_inst, BinomialTree; delta=.035)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
     value = a_fin_inst.value["Binomial_tree"]
