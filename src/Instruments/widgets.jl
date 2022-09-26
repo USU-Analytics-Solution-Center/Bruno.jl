@@ -74,6 +74,12 @@ struct Bond <: Widget
     name::String
     time_mat::AbstractFloat
     coupon_rate::AbstractFloat
+
+    # constructor for kwargs
+    function Bond(; price, name="", time_mat=1, coupon_rate=.03)
+        @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
+        new(price, name, time_mat, coupon_rate)
+    end
 end
 
 # Helpers 
