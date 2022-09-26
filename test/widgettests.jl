@@ -23,13 +23,13 @@
 
     # Test ordered argumentes when name not given
     a_widget = Stock(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], volatility=.05)
-    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test a_widget.volatility == .05
     @test a_widget.name == ""
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
     # Test ordered argumentes when all given
     a_widget = Stock(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], volatility=.05, name="Example")
-    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test a_widget.volatility == .05
     @test a_widget.name == "Example"
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
