@@ -26,13 +26,13 @@ widget = Stock(;kwargs...)
 list_of_widgets = factory(widget, Stationary(), 5)
 ```
 """
-function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signed)
+function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
     fields = field_exclude(widget)
     # take the first difference to get to returns
     returns = [widget.prices[i+1] - widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
 
     # bootstrap the returns
-    input = BootstrapInput{typeof(bootstrap_method)}(;
+    input = BootstrapInput{bootstrap_method}(;
                                 input_data = returns,
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
