@@ -1,3 +1,5 @@
+using Distributions: Normal, cdf
+
 """
 price(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
 
@@ -9,11 +11,11 @@ Computes the value of an European Call Option.
 using Bruno
 
 a_stock = Stock(41; volatility=.3)  # create a widget
-a_fin_inst = EuroCallOption(a_stock)  # create an Option
-price!(a_fin_inst, BinomialTree; r=.08, strike_price= 40)  # add the binomial Option value to the options values
+a_fin_inst = EuroCallOption(a_stock; risk_free_rate=.05, strike_price=40)  # create an Option
+price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 ```
 """
-function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
+function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
     """ 
     EURO OPTION
     tree_depth = the depth of the tree
@@ -21,6 +23,8 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
     strike_price = the strike price in dollars
     delta = intrest rate
     """
+    r = fin_obj.risk_free_rate
+    strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
@@ -45,7 +49,9 @@ price(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}, tree_depth
 
 Computes the value of an American Call Option. 
 """
-function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
+function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+    r = fin_obj.risk_free_rate
+    strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
@@ -85,12 +91,14 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
 end
 
 """
-price(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+price(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}, tree_depth, delta)
 
 Computes the value of an European Put Option. 
 
 """
-function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
+function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+    r = fin_obj.risk_free_rate
+    strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
@@ -112,12 +120,14 @@ function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_
 end
 
 """
-price(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, tree_depth, r, strike_price, delta)
+price(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}, tree_depth, delta)
 
 Computes the value of an American put Option. 
 
 """
-function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, r=0.05, strike_price, delta=0)
+function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+    r = fin_obj.risk_free_rate
+    strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
     sigma = fin_obj.widget.volatility
     dt = fin_obj.maturity / tree_depth
@@ -166,4 +176,28 @@ end
 
 function get_d(r, delta, dt, sigma)
     exp((r - delta) * dt - sigma * sqrt(dt))
+
+
+# ----- Price models for call and put options using BlackScholes
+function price!(fin_obj::AbstractEuroCall, pricing_model::Type{BlackScholes})
+    c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
+    a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
+    d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
+    d2 = d1 - a1 
+    value = fin_obj.widget.prices[end] * cdf(Normal(), d1) - fin_obj.strike_price *
+        exp(-fin_obj.risk_free_rate * fin_obj.maturity) * cdf(Normal(), d2)
+
+    fin_obj.value["BlackScholes"] = value
+end
+
+function price!(fin_obj::AbstractEuroPut, pricing_model::Type{BlackScholes})
+    c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
+    a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
+    d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
+    d2 = d1 - a1 
+    value = fin_obj.strike_price * exp(-fin_obj.risk_free_rate * fin_obj.maturity) * cdf(Normal(), -d2) - 
+        fin_obj.widget.prices[end] * cdf(Normal(), -d1)
+
+    fin_obj.value["BlackScholes"] = value
+
 end

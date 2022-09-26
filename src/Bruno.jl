@@ -6,6 +6,7 @@ using .Instruments
 export Widget, Stock, Commodity, Bond 
 export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
 AmericanCallOption, EuroPutOption, AmericanPutOption, Future
+export AbstractEuroCall, AbstractAmericanCall, AbstractEuroPut, AbstractAmericanPut
 
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
@@ -20,7 +21,7 @@ export factory
 # Models submodule
 include("Models/Models.jl")
 
-export BinomialTree
+export BinomialTree, BlackScholes
 export price!, b_tree
 using .Models
 

@@ -1,5 +1,12 @@
+using Statistics: std
 # place to put all widgets, or assets that don't need a model for the base value. 
 # examples: oil, stocks, etc.
+
+function get_volatility(prices) 
+    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)]
+    cont_return = log.(returns)
+    std(cont_return) 
+end
 
 abstract type Widget end
 
@@ -9,13 +16,13 @@ struct Stock <: Widget
     volatility::AbstractFloat
     
     # constructor for kwargs
-    function Stock(; prices, name = "", volatility = var(prices))
+    function Stock(; prices, name = "", volatility = get_volatility(prices))
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Stock(prices, name = "", volatility = var(prices))  
+    function Stock(prices, name = "", volatility = get_volatility(prices))  
         new(prices, name, volatility)
     end
 end
@@ -32,13 +39,13 @@ struct Commodity <: Widget
     volatility::AbstractFloat
 
     # constructor for kwargs
-    function Commodity(; prices, name = "", volatility = var(prices))
+    function Commodity(; prices, name = "", volatility = get_volatility(prices))
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Commodity(prices, name = "", volatility = var(prices))  
+    function Commodity(prices, name = "", volatility = get_volatility(prices))  
         new(prices, name, volatility)
     end
 end
