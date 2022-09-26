@@ -41,7 +41,7 @@ end
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = EuroPutOption(a_stock; risk_free_rate=.08, strike_price=40)  # create an Option
+    a_fin_inst = EuroPutOption(a_stock, 40; risk_free_rate=.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
@@ -68,7 +68,7 @@ end
     """
     # Create needed values
     a_stock = Stock(41; volatility=.3)  # create a widget
-    a_fin_inst = AmericanPutOption(a_stock; strike_price=40, risk_free_rate=.08)  # create an Option
+    a_fin_inst = AmericanPutOption(a_stock, 40; risk_free_rate=.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
@@ -95,7 +95,7 @@ end
     """
     # Create needed values
     a_stock = Stock(110; volatility=.3)  # create a widget
-    a_fin_inst = AmericanCallOption(a_stock; risk_free_rate=.05, strike_price=100)  # create an Option
+    a_fin_inst = AmericanCallOption(a_stock, 100; risk_free_rate=.05)  # create an Option
     price!(a_fin_inst, BinomialTree; delta=.035)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
