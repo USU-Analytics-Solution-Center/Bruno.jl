@@ -34,3 +34,40 @@
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
 end
+
+@testset "Commodities Creation" begin
+    # Test the Commodity widget creation
+    
+    # Test kwarg creation when vol not given
+    kwargs  = (prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], name="Example")
+    a_widget = Commodity(;kwargs...)
+    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test a_widget.name == "Example"
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+    
+    # Test kwarg creation when all given
+    kwargs  = (prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], name="Example", volatility=.05)
+    a_widget = Commodity(;kwargs...)
+    @test a_widget.volatility == .05
+    @test a_widget.name == "Example"
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+
+    # Test ordered argumentes when only price given
+    a_widget = Commodity([1, 2, 3, 4, 5, 4, 3, 2, 1])
+    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test a_widget.name == ""
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+
+    # Test ordered argumentes when name not given
+    a_widget = Commodity(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], volatility=.05)
+    @test a_widget.volatility == .05
+    @test a_widget.name == ""
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+
+    # Test ordered argumentes when all given
+    a_widget = Commodity(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], volatility=.05, name="Example")
+    @test a_widget.volatility == .05
+    @test a_widget.name == "Example"
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+
+end
