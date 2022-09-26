@@ -142,6 +142,7 @@ AmericanPutOption(;widget, strike_price, maturity = 1, value = Dict{String, Abst
 struct Future{T <: Widget} <: FinancialInstrument 
     widget::T
     strike_price::AbstractFloat
+    risk_free_rate::AbstractFloat
     maturity::AbstractFloat
     value::Dict{String, AbstractFloat}
 end
