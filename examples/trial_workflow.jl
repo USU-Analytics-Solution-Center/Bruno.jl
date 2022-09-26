@@ -8,7 +8,7 @@ prices = df[!, "Adj Close"]
 kwargs = (prices=prices, name="APPL")
 widget = Stock(;kwargs...)
 
-list_of_widgets = factory(widget, Stationary(), 5)
+list_of_widgets = factory(widget, Stationary, 5)
 
 a_fin_inst = EuroCallOption(list_of_widgets[1])
 
