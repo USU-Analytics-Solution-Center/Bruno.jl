@@ -27,7 +27,7 @@ struct Stock <: Widget
     volatility::AbstractFloat
     
     # constructor for kwargs
-    function Stock(; prices, name = "", volatility = get_volatility(prices))
+    function Stock(; prices, name = "", volatility = get_volatility(prices), _...)
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, volatility)
     end
@@ -51,7 +51,7 @@ struct Commodity <: Widget
     volatility::AbstractFloat
 
     # constructor for kwargs
-    function Commodity(; prices, name = "", volatility = get_volatility(prices))
+    function Commodity(; prices, name = "", volatility = get_volatility(prices), _...)
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, volatility)
     end
@@ -76,7 +76,7 @@ struct Bond <: Widget
     coupon_rate::AbstractFloat
 
     # constructor for kwargs
-    function Bond(; prices, name="", time_mat=1, coupon_rate=.03)
+    function Bond(; prices, name="", time_mat=1, coupon_rate=.03, _...)
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, time_mat, coupon_rate)
     end
