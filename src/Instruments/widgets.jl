@@ -6,7 +6,6 @@ using Statistics: std
 Widgets are the root asset at the heart of the package. A 'Widget' can be any 
 real world finicial object such as a stock, or commodity. 
 
-<<<<<<< HEAD
 ## Syntax for Kwargs
 ```
 kwargs = (prices=prices, name="APPL")
@@ -19,12 +18,6 @@ a_widget = Widget(prices=[1, 2, 3, 4, 5], name ="Example", volatility =.3)
 ```
 
 """
-function get_volatility(prices) 
-    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)]
-    cont_return = log.(returns)
-    std(cont_return) 
-end
-
 abstract type Widget end
 
 # stocks
@@ -81,4 +74,12 @@ struct Bond <: Widget
     name::String
     time_mat::AbstractFloat
     coupon_rate::AbstractFloat
+end
+
+# Helpers 
+
+function get_volatility(prices) 
+    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)]
+    cont_return = log.(returns)
+    std(cont_return) 
 end
