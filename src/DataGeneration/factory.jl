@@ -23,7 +23,7 @@ prices = df[!, "Adj Close"]
 kwargs = (prices=prices, name="APPL")
 widget = Stock(;kwargs...)
 
-list_of_widgets = factory(widget, Stationary(), 5)
+list_of_widgets = factory(widget, Stationary, 5)
 ```
 """
 function factory(widget::Widget, bootstrap_method::TSBootMethod, nWidgets::Signed)
