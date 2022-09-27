@@ -180,7 +180,7 @@ end
 
 
 # ----- Price models for call and put options using BlackScholes
-function price!(fin_obj::AbstractEuroCall, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackScholes})
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
@@ -191,7 +191,7 @@ function price!(fin_obj::AbstractEuroCall, pricing_model::Type{BlackScholes})
     fin_obj.value["BlackScholes"] = value
 end
 
-function price!(fin_obj::AbstractEuroPut, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScholes})
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1

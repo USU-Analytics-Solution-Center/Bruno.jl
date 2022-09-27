@@ -7,17 +7,11 @@ abstract type FinancialInstrument end
 abstract type Option <: FinancialInstrument end
 
 # ----- Abstract type for all call and put options -----
-abstract type CallOption <: Option end
-abstract type PutOption <: Option end
-
-# ----- Finer subtype for Euro and American options. use for general case dispatch
-abstract type AbstractEuroCall <: CallOption end
-abstract type AbstractAmericanCall <: CallOption end
-abstract type AbstractEuroPut <: PutOption end
-abstract type AbstractAmericanPut <: PutOption end
+abstract type CallOption{T <:Widget} <: Option end
+abstract type PutOption{T <:Widget} <: Option end
 
 # ----- Concrete types for Euro and American call options
-struct EuroCallOption{T <: Widget} <: AbstractEuroCall
+struct EuroCallOption{T <: Widget} <: CallOption{T}
     widget::T
     strike_price::AbstractFloat
     maturity::AbstractFloat
@@ -47,7 +41,7 @@ EuroCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{
 EuroCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
     EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-struct AmericanCallOption{T <: Widget} <: AbstractAmericanCall
+struct AmericanCallOption{T <: Widget} <: CallOption{T}
     widget::T
     strike_price::AbstractFloat
     maturity::AbstractFloat
@@ -77,7 +71,7 @@ AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::D
 AmericanCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
     AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-struct EuroPutOption{T <: Widget} <: AbstractEuroPut
+struct EuroPutOption{T <: Widget} <: PutOption{T}
     widget::T
     strike_price::AbstractFloat
     maturity::AbstractFloat
@@ -107,7 +101,7 @@ EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{S
 EuroPutOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
     EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
 
-struct AmericanPutOption{T <: Widget} <: AbstractAmericanPut
+struct AmericanPutOption{T <: Widget} <: PutOption{T}
     widget::T
     strike_price::AbstractFloat
     maturity::AbstractFloat
