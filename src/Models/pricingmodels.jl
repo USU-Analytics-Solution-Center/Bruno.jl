@@ -65,7 +65,6 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
     for k in tree_depth:-1:0
         push!(a_vector, max(s_0 * u ^ k * d ^ (tree_depth - k) - strike_price, 0))
     end
-    println(a_vector)
     to_return = 0
     
     for i in 1:tree_depth+1
@@ -82,9 +81,6 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
             place_holder += 1
         end
         to_return = a_vector[1]
-        println(a_vector)
-        pop!(a_vector)
-
     end
 
     fin_obj.value["Binomial_tree"] = to_return
@@ -180,7 +176,7 @@ end
 
 
 # ----- Price models for call and put options using BlackScholes
-function price!(fin_obj::AbstractEuroCall, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackScholes})
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
@@ -191,7 +187,7 @@ function price!(fin_obj::AbstractEuroCall, pricing_model::Type{BlackScholes})
     fin_obj.value["BlackScholes"] = value
 end
 
-function price!(fin_obj::AbstractEuroPut, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScholes})
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
