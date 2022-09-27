@@ -5,8 +5,8 @@ using Statistics: mean
 using HypothesisTests: ADFTest
 using LinearAlgebra 
 
+include("widgettests.jl")
 include("datagentests.jl")
 include("bootstraptests.jl")
-include("pricingmodeltests.jl")
-include("widgettests.jl")
 include("factorytest.jl")
+include("pricingmodeltests.jl")
