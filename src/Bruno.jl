@@ -6,7 +6,6 @@ using .Instruments
 export Widget, Stock, Commodity, Bond 
 export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
 AmericanCallOption, EuroPutOption, AmericanPutOption, Future
-export AbstractEuroCall, AbstractAmericanCall, AbstractEuroPut, AbstractAmericanPut
 
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
