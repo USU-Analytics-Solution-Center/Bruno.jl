@@ -45,6 +45,32 @@ end
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
 end
+
+@testset "Bonds Creation" begin
+    # Test the Commodity widget creation
+
+    # Test ordered argumentes when only price given
+    a_widget = Bond([1, 2, 3, 4, 5, 4, 3, 2, 1])
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+    @test a_widget.name == ""
+    @test a_widget.time_mat == 1
+    @test a_widget.coupon_rate == .03
+    # Test ordered argumentes when name not given
+    a_widget = Bond(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], time_mat=2)
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+    @test a_widget.name == ""
+    @test a_widget.time_mat == 2
+    @test a_widget.coupon_rate == .03
+
+    # Test ordered argumentes when all given
+    a_widget = Bond(prices=[1, 2, 3, 4, 5, 4, 3, 2, 1], time_mat=2, name="Example", coupon_rate=.5)
+    @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
+    @test a_widget.name == "Example"
+    @test a_widget.time_mat == 2
+    @test a_widget.coupon_rate == .5
+
+end
+
 end 
 
 @testset "Kwargs creation tests" begin 
@@ -54,22 +80,22 @@ end
         # Test kwarg creation when only prices is given
         kwargs = Dict(:prices => [1, 2, 3, 4, 5, 4, 3, 2, 1])
         a_widget = widget(;kwargs...)
-        fields = [p for p in fieldnames(typeof(a_widget))]  # get the first item from list of widgets as all others will be indeticale
+        fields = [p for p in fieldnames(typeof(a_widget))] 
         iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
         @test length(findall(Base.isempty, iter)) == 1  # Test all fields in each widget have been filled in. Name defaults to "" and counts as isempty
 
         # Test kwarg creation when price and name given
         kwargs = Dict(:prices => [1, 2, 3, 4, 5, 4, 3, 2, 1], :name => "Example")
         a_widget = widget(;kwargs...)
-        fields = [p for p in fieldnames(typeof(a_widget))]  # get the first item from list of widgets as all others will be indeticale
+        fields = [p for p in fieldnames(typeof(a_widget))]
         iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
-        @test length(findall(Base.isempty, iter)) == 0  # Test all fields in each widget have been filled in
+        @test length(findall(Base.isempty, iter)) == 0 
 
         # Test kwarg creation when obstructing feilds provided
         kwargs = Dict(:prices => [1, 2, 3, 4, 5, 4, 3, 2, 1], :name => "Example", :time_mat => 1, :volatility => .5, :foo => "bar")
         a_widget = widget(;kwargs...)
-        fields = [p for p in fieldnames(typeof(a_widget))]  # get the first item from list of widgets as all others will be indeticale
+        fields = [p for p in fieldnames(typeof(a_widget))]
         iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
-        @test length(findall(Base.isempty, iter)) == 0  # Test all fields in each widget have been filled in
+        @test length(findall(Base.isempty, iter)) == 0  
     end
 end 

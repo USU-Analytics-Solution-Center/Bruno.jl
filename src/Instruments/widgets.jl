@@ -62,7 +62,7 @@ struct Commodity <: Widget
     end
 end
 
-# outer constructor to make a stock with a (static) single price
+# outer constructor to make a Commodity with a (static) single price
 function Commodity(price::AbstractFloat; name = "", volatility)
     prices = [price]
     Commodity(;prices = prices, name = name , volatility = volatility)
@@ -80,6 +80,17 @@ struct Bond <: Widget
         @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
         new(prices, name, time_mat, coupon_rate)
     end
+
+    # constructor for ordered argumentes 
+    function Bond(prices, name="", time_mat=1, coupon_rate=.03)  
+        new(prices, name, time_mat, coupon_rate)
+    end
+end
+
+# outer constructor to make a Bond with a (static) single price
+function Bond(price::AbstractFloat; name="", time_mat=1, coupon_rate=.03)
+    prices = [price]
+    Bond(;prices=prices, name=name , time_mat=time_mat, coupon_rate=coupon_rate)
 end
 
 # Helpers 
