@@ -19,19 +19,27 @@ function main()
     deleteat!(list_of_functions, findall(x->x=="Widget", list_of_functions))
     
     # Set up
-    df = DataFrame(functions=list_of_functions, time=[-1 for v in list_of_functions])  # Set up the df to have negative run times. IF a functions stays negative we know it wasnt tested
+    df = DataFrame(functions=list_of_functions)  # Set up the df
     generic_arguments = Dict(:prices => [151.76, 150.77, 150.43, 152.74, 153.72, 156.90, 154.48, 150.70, 152.37, 155.31, 153.84], 
                                 :volatility => .05, 
-                                :name => "a_name")
+                                :name => "a_name",
+                                :to_produce => 50)
 
     # Start calling the known functions
-    known_functions = [profile_stock, profile_commodity]  # <--- add the head of a function here after writing it
+    known_functions = [profile_stock, profile_commodity, profile_factory]  # <--- add the head of a function here after writing it
     results = Dict()
     for a_function in known_functions
         name, elapsed = a_function(generic_arguments)
         results[name] = elapsed
     end
-    println(results)
+
+    # update df with results
+    the_keys = collect(keys(results))
+    new_df = DataFrame(functions=the_keys, time=[results[i] for i in the_keys])
+
+    leftjoin!(df, new_df, on=:functions)
+    println(df)
+
 end
 
 """
@@ -44,6 +52,7 @@ all struct variables it wont have to calculate the var.
 
 Functions calls written:
     Stock
+    Commodity
 
 Functions calls to be written:
     AbstractAmericanCall    
@@ -58,8 +67,7 @@ Functions calls to be written:
     BootstrapInput          
     CallOption              
     CircularBlock           
-    CircularBlockBootstrap  
-    Commodity               
+    CircularBlockBootstrap               
     DataGenInput            
     EuroCallOption          
     EuroPutOption           
@@ -96,4 +104,11 @@ function profile_commodity(kwargs)
 
     timed = @benchmark Commodity($prices);
     return ("Commodity", mean(timed).time)
+end
+
+function profile_factory(kwargs)
+    a_stock = Stock(kwargs[:prices])
+    timed = @benchmark factory($a_stock, Stationary, $kwargs[:to_produce])
+
+    return ("factory", mean(timed).time)
 end
