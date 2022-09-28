@@ -1,6 +1,8 @@
 using Bruno
 using BenchmarkTools
 using DataFrames
+using CSV
+using Dates
 
 function collect_functions(x::Module)
     results = String[]
@@ -38,8 +40,15 @@ function main()
     new_df = DataFrame(functions=the_keys, time=[results[i] for i in the_keys])
 
     leftjoin!(df, new_df, on=:functions)
-    println(df)
+    replace!(df.time, missing => -1);
 
+    # Save csv to Fi
+    # if isfile("foo.txt")
+    #     CSV.write("example.csv", df)
+    # end
+    # CSV.write("results/test.csv", df)
+    CSV.write("results/" * Dates.format(now(), "yyyy-mm-dd_HH_MM_SS") * ".csv", df)
+    
 end
 
 """
@@ -53,6 +62,7 @@ all struct variables it wont have to calculate the var.
 Functions calls written:
     Stock
     Commodity
+    factory
 
 Functions calls to be written:
     AbstractAmericanCall    
@@ -84,8 +94,7 @@ Functions calls to be written:
     StationaryBootstrap                        
     TSBootMethod                              
     b_tree                  
-    data_gen_input          
-    factory                 
+    data_gen_input                           
     getData                 
     getTime                 
     opt_block_length        
