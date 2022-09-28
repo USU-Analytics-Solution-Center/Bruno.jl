@@ -28,10 +28,11 @@ function main()
                                 :to_produce => 50)
 
     # Start calling the known functions
-    known_functions = [profile_stock, profile_commodity, profile_factory]  # <--- add the head of a function here after writing it
+    known_functions = [profile_stock, profile_commodity, profile_factory, profile_bond]  # <--- add the head of a function here after writing it
     results = Dict()
     for a_function in known_functions
         name, elapsed = a_function(generic_arguments)
+        println(name, " ", elapsed)
         results[name] = elapsed
     end
 
@@ -62,6 +63,8 @@ all struct variables it wont have to calculate the var.
 Functions calls written:
     Stock
     Commodity
+    BondBond
+    Bond
     factory
 
 Functions calls to be written:
@@ -72,8 +75,7 @@ Functions calls to be written:
     AmericanCallOption      
     AmericanPutOption       
     BinomialTree            
-    BlackScholes            
-    Bond                    
+    BlackScholes                                
     BootstrapInput          
     CallOption              
     CircularBlock           
@@ -113,6 +115,13 @@ function profile_commodity(kwargs)
 
     timed = @benchmark Commodity($prices);
     return ("Commodity", mean(timed).time)
+end
+
+function profile_bond(kwargs)
+    prices = kwargs[:prices]
+
+    timed = @benchmark Bond($prices);
+    return ("Bond", mean(timed).time)
 end
 
 function profile_factory(kwargs)
