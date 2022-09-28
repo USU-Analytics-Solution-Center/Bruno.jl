@@ -20,7 +20,7 @@ a_widget = Widget(prices=[1, 2, 3, 4, 5], name ="Example", volatility =.3)
 """
 abstract type Widget end
 
-# stocks
+# ------ Stocks ------
 struct Stock <: Widget 
     prices::Array{AbstractFloat}
     name::String
@@ -28,12 +28,15 @@ struct Stock <: Widget
     
     # constructor for kwargs
     function Stock(; prices, name = "", volatility = get_volatility(prices), _...)
-        @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
 
     # constructor for ordered argumentes 
     function Stock(prices, name = "", volatility = get_volatility(prices))  
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
 end
@@ -44,7 +47,7 @@ function Stock(price::Real; name = "", volatility)
     Stock(;prices = prices, name = name , volatility = volatility)
 end
 
-# Commodities
+# ------ Commodities ------
 struct Commodity <: Widget
     prices::Array{AbstractFloat}
     name::String
@@ -52,12 +55,15 @@ struct Commodity <: Widget
 
     # constructor for kwargs
     function Commodity(; prices, name = "", volatility = get_volatility(prices), _...)
-        @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
 
     # constructor for ordered argumentes 
     function Commodity(prices, name = "", volatility = get_volatility(prices))  
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
 end
@@ -77,12 +83,13 @@ struct Bond <: Widget
 
     # constructor for kwargs
     function Bond(; prices, name="", time_mat=1, coupon_rate=.03, _...)
-        @assert size(prices)[1] > 0 "Prices cannot be an empty vector"
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         new(prices, name, time_mat, coupon_rate)
     end
 
     # constructor for ordered argumentes 
     function Bond(prices, name="", time_mat=1, coupon_rate=.03)  
+        size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         new(prices, name, time_mat, coupon_rate)
     end
 end
