@@ -6,20 +6,17 @@ primitive type MovingBlock <: TSBootMethod 8 end
 primitive type CircularBlock <: TSBootMethod 8 end
 
 """
-## Description
+    BootstrapInput{T <: TSBootMethod}(; kwargs...)
+    BootstrapInput(input_data, bootstrap_method::<:TSBootMethod; kwargs...)
+
 Contains the parameters needed to perform block bootstrap of type T to be used by getData() 
 function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
-These structs can be constructed directly or with the `data_gen_input()` function. 
-
-## Syntax 
-```
-P = BootstrapInput{T <: TSBootMethod}(; kwargs...)
-```
 
 ## Keyword Arguments
 - `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
 - `n::Integer`: size of resampled output data. Default: 100
-- `block_size::Integer`: block size to use. Default: 2
+- `block_size::Integer`: block size to use. Defaults to the optimal block length using 
+```opt_block_length()```
 """
 struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     input_data::Array{<:Real} # array of data to be resampled
@@ -27,7 +24,8 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     block_size::Float32 #desired average block size (will add more to this later)
     
     # constructor for kwargs
-    function BootstrapInput{T}(; input_data, n = 100, block_size = opt_block_length(input_data, T())) where {T<:TSBootMethod}
+    function BootstrapInput{T}(; input_data, n=100, block_size= 
+            opt_block_length(input_data, T)) where {T<:TSBootMethod}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements") 
@@ -56,6 +54,12 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
         new(input_data, n, block_size)
     end
 end
+
+# outer constructor for just using input_data and the type
+BootstrapInput(input_data::Array{<:Real}, bootstrap_method::Type{<:TSBootMethod};
+    n=100, block_size=opt_block_length(input_data, bootstrap_method)) = 
+    BootstrapInput{bootstrap_method}(input_data, n, block_size)
+
 
 function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     # check for block_size > 1 so geometric distro doesn't blow up

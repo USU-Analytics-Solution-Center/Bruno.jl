@@ -5,8 +5,9 @@ import Distributions.Normal
 
 
 """
-## Description
-ParamLogDiff contains parameters that are used to synthesize data
+    LogDiffInput(nTimeStep; kwargs...)
+
+LogDiffInput contains parameters that are used to synthesize data
 from a log-normal diffusion process of the form
 
 ``P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}``
@@ -19,15 +20,15 @@ then shifted and scaled by the drift and volatility terms
 
 ## Syntax
 ```
-P = ParamLogDiff(nTimeStep) 
-P = ParamLogDiff(..., "name", value)
+P = LogDiffInput(nTimeStep; kwargs...) 
+P = LogDiffInput(..., "name", value)
 ```
 
 ## Positional Inputs
 - `nTimeStep::Integer`: nTimeStep is the number of time steps 
                         to synthesize.
 
-## Name-Value Inputs
+## Keyword Arguments
 - `initial::Real`: initial is the assumed value at the 0th time step.
                    Default: 100.
 - `volatility::Real`: volatility expresses the price volatility as 
@@ -42,10 +43,10 @@ using Bruno
 
 # initialize first parameter with default values
 nTimeStep = 100
-Param1 = ParamLogDiff(nTimeStep)
+input1 = LogDiffInput(nTimeStep)
 
 # initialize a second parameter with zero volatility
-Param2 = ParamLogDiff(nTimeStep, volatility=0)
+input2 = LogDiffInput(nTimeStep, volatility=0)
 
 ```
 
@@ -55,9 +56,22 @@ struct LogDiffInput <: DataGenInput
     initial::Real # in dollars
     volatility::Real # volatility as a standard deviation
     drift::Real # 
-    LogDiffInput(nTimeStep; initial=100, volatility=0.00930, drift=0.000538) = 
+    # constructor for kwargs
+    function LogDiffInput(;nTimeStep, initial=100, volatility=0.00930, drift=0.000538) 
+        nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
+        volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
+    end
+    # constructor for ordered inputs
+    function LogDiffInput(nTimeStep, initial, volatility, drift)  
+        nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
+        volatility >= 0 ? nothing : error("volatility cannot be negative")
+        new(nTimeStep, initial, volatility, drift)
+    end
 end
+# outer constructor for passing just nTimeStep
+LogDiffInput(nTimeStep::Int; initial=100, volatility=.00930, drift=.000538) = 
+    LogDiffInput(nTimeStep, initial, volatility, drift)
 
 """
 ## Description
