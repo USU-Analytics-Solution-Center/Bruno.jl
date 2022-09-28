@@ -43,10 +43,10 @@ using Bruno
 
 # initialize first parameter with default values
 nTimeStep = 100
-Input1 = LogDiffInput(nTimeStep)
+input1 = LogDiffInput(nTimeStep)
 
 # initialize a second parameter with zero volatility
-Input2 = LogDiffInput(nTimeStep, volatility=0)
+input2 = LogDiffInput(nTimeStep, volatility=0)
 
 ```
 
