@@ -3,6 +3,7 @@ using BenchmarkTools
 using DataFrames
 using CSV
 using Dates
+using Base.Threads
 
 function collect_functions(x::Module)
     results = String[]
@@ -30,10 +31,17 @@ function main()
     # Start calling the known functions
     known_functions = [profile_stock, profile_commodity, profile_factory, profile_bond]  # <--- add the head of a function here after writing it
     results = Dict()
-    for a_function in known_functions
-        name, elapsed = a_function(generic_arguments)
+
+    lk = ReentrantLock()
+    lk2 = ReentrantLock()
+    @threads for a_function in known_functions
+        print()
+        name, elapsed = a_function(generic_arguments, lk2)
         println(name, " ", elapsed)
-        results[name] = elapsed
+        
+        lock(lk) do 
+            results[name] = elapsed
+        end
     end
 
     # update df with results
@@ -44,10 +52,6 @@ function main()
     replace!(df.time, missing => -1);
 
     # Save csv to Fi
-    # if isfile("foo.txt")
-    #     CSV.write("example.csv", df)
-    # end
-    # CSV.write("results/test.csv", df)
     CSV.write("results/" * Dates.format(now(), "yyyy-mm-dd_HH_MM_SS") * ".csv", df)
     
 end
@@ -103,30 +107,38 @@ Functions calls to be written:
     price!                  
 """
 
-function profile_stock(kwargs)
+function profile_stock(kwargs, a_lock)
     prices = kwargs[:prices]
 
-    timed = @benchmark Stock($prices);
-    return ("Stock", mean(timed).time)
+    lock(a_lock) do 
+        timed = @benchmark Stock($prices);
+        return ("Stock", mean(timed).time)
+    end
 end
 
-function profile_commodity(kwargs)
+function profile_commodity(kwargs, a_lock)
     prices = kwargs[:prices]
 
-    timed = @benchmark Commodity($prices);
-    return ("Commodity", mean(timed).time)
+    lock(a_lock) do 
+        timed = @benchmark Commodity($prices);
+        return ("Commodity", mean(timed).time)
+    end
 end
 
-function profile_bond(kwargs)
+function profile_bond(kwargs, a_lock)
     prices = kwargs[:prices]
 
-    timed = @benchmark Bond($prices);
-    return ("Bond", mean(timed).time)
+    lock(a_lock) do 
+        timed = @benchmark Bond($prices);
+        return ("Bond", mean(timed).time)
+    end
 end
 
-function profile_factory(kwargs)
+function profile_factory(kwargs, a_lock)
     a_stock = Stock(kwargs[:prices])
-    timed = @benchmark factory($a_stock, Stationary, $kwargs[:to_produce])
-
-    return ("factory", mean(timed).time)
+    
+    lock(a_lock) do 
+        timed = @benchmark factory($a_stock, Stationary, $kwargs[:to_produce])
+        return ("factory", mean(timed).time)
+    end
 end
