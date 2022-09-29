@@ -18,7 +18,8 @@ function main()
 
     # Deletes things that dont need to be tested like "Bruno", or "Widget" as they are not functions
     obs_to_remove = ["Bruno", "Widget", "BinomialTree", "BlackScholes", "BootstrapInput", "CallOption", "Option", "DataGenInput", "getTime",
-                    "FinancialInstrument"]
+                    "FinancialInstrument", "LogDiffusion", "MonteCarlo", "MonteCarloModel", "PutOption", "StationaryBootstrap",
+                    "TSBootMethod", "CircularBlockBootstrap","b_tree"]
     for name in obs_to_remove
         deleteat!(list_of_functions, findall(x->x==name, list_of_functions))
     end
@@ -36,7 +37,7 @@ function main()
     known_functions = [profile_stock, profile_commodity, profile_factory, profile_bond, profile_american_put,
                         profile_american_call, profile_circuler_bootstrap, profile_stationary_bootstrap,
                         profile_movingblock_bootstrap, profile_euro_call, profile_euro_put, profile_logdiffinput,
-                        profile_getdata]  # <--- add the head of a function here after writing it
+                        profile_getdata, profile_block_len]  # <--- add the head of a function here after writing it
     results = Dict()
     for a_function in known_functions
         name, elapsed = a_function(generic_arguments)
@@ -73,20 +74,13 @@ Functions calls written:
     Stationary
     MovingBlock
     LogDiffInput
+    getData
+    opt_block_length
     factory
 Functions calls to be written:                                                         
-    Future <-- Still under development                      
-    LogDiffusion            
-    MonteCarlo              
-    MonteCarloModel                                       
-    PutOption                             
-    StationaryBootstrap                        
-    TSBootMethod                              
-    b_tree                  
-    data_gen_input                           
-    getData                                  
-    opt_block_length        
-    price!                  
+    Future <-- Still under development                                                                                                     
+    data_gen_input <---- Need to talk to mitch about                                                                
+    price!  <---- Need to talk to mitch about                  
 """
 #------Widgets------
 function profile_stock(kwargs)
@@ -191,6 +185,12 @@ function profile_getdata(kwargs)
     input = BootstrapInput{MovingBlock}(;input_data=returns, n=len, block_size=opt)
     timed = @benchmark getData($input, $n_widgets)
     return ("getData", mean(timed).time)
+end
+
+function profile_block_len(kwargs)
+    prices = kwargs[:prices]
+    timed = @benchmark opt_block_length($prices, $MovingBlock)
+    return ("opt_block_length", mean(timed).time)
 end
 
 function profile_factory(kwargs)
