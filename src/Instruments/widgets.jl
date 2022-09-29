@@ -167,6 +167,7 @@ function Commodity(price::AbstractFloat; name = "", volatility)
 end
 
 # bonds
+"""still under development"""
 struct Bond <: Widget
     prices::Array{AbstractFloat}
     name::String
