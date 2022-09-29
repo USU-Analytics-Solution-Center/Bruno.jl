@@ -27,7 +27,11 @@ struct Stock <: Widget
     volatility::AbstractFloat
     
     # constructor for kwargs
-    function Stock(; prices, name = "", volatility = get_volatility(prices), _...)
+    function Stock(; prices, name="", volatility=get_volatility(prices), _...)
+        # allows single price input through kwargs (and ordered arguments)
+        if typeof(prices) <: Real 
+            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
+        end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
@@ -35,6 +39,9 @@ struct Stock <: Widget
 
     # constructor for ordered argumentes 
     function Stock(prices, name = "", volatility = get_volatility(prices))  
+        if typeof(prices) <: Real 
+            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
+        end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
