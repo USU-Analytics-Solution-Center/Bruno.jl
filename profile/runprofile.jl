@@ -25,10 +25,11 @@ function main()
     generic_arguments = Dict(:prices => [151.76, 150.77, 150.43, 152.74, 153.72, 156.90, 154.48, 150.70, 152.37, 155.31, 153.84], 
                                 :volatility => .05, 
                                 :name => "a_name",
-                                :to_produce => 50)
+                                :to_produce => 50,
+                                :strike_price => 150)
 
     # Start calling the known functions
-    known_functions = [profile_stock, profile_commodity, profile_factory, profile_bond]  # <--- add the head of a function here after writing it
+    known_functions = [profile_stock, profile_commodity, profile_factory, profile_bond, profile_american_put]  # <--- add the head of a function here after writing it
     results = Dict()
     for a_function in known_functions
         name, elapsed = a_function(generic_arguments)
@@ -56,14 +57,9 @@ all struct variables it wont have to calculate the var.
 Functions calls written:
     Stock
     Commodity
-    BondBond
     Bond
     factory
-Functions calls to be written:
-    AbstractAmericanCall    
-    AbstractAmericanPut     
-    AbstractEuroCall        
-    AbstractEuroPut         
+Functions calls to be written:         
     AmericanCallOption      
     AmericanPutOption       
     BinomialTree            
@@ -94,7 +90,7 @@ Functions calls to be written:
     opt_block_length        
     price!                  
 """
-
+#------Widgets------
 function profile_stock(kwargs)
     prices = kwargs[:prices]
 
@@ -116,6 +112,14 @@ function profile_bond(kwargs)
     return ("Bond", mean(timed).time)
 end
 
+#------FinancialInstruments------
+function profile_american_put(kwargs)
+    prices = kwargs[:prices]
+    a_stock = Stock(prices)
+    timed = @benchmark AmericanPutOption($a_stock, $kwargs[:strike_price]);
+    return ("AmericanPutOption", mean(timed).time)
+end
+#------Factory------
 function profile_factory(kwargs)
     a_stock = Stock(kwargs[:prices])
     timed = @benchmark factory($a_stock, Stationary, $kwargs[:to_produce])
