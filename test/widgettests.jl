@@ -108,13 +108,23 @@ end
     end
 
     @testset "Single price errors for $widget" for widget in [Stock, Commodity]
+        # using kwargs price > 0
         @test_throws ErrorException widget(; prices = -1)
+        # using kwargs must give volatility
         @test_throws ErrorException widget(; prices = 1)
+        # using position args price > 0
+        @test_throws ErrorException widget(-1, "", .03)
+        # using position must give volatility
+        @test_throws ErrorException widget(1, "")
     end
 
     @testset "volatility errors for $widget" for widget in [Stock, Commodity]
         @test_throws ErrorException widget(; prices = [1,2,3], volatility = -1)
         @test_throws ErrorException widget(; prices = [1,2,3], volatility = nothing)
+    end
+
+    @testset "time_mat error for Bond" begin
+        @test_throws ErrorException Bond(; prices = [1,2,3], time_mat=0)
     end
 
 end 
