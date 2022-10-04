@@ -41,6 +41,9 @@ struct Stock <: Widget
                 nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        # catch nothing volatility from get_volatility()
+        volatility == nothing ? error("Volatility cannot be nothing") : nothing
+        # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
@@ -54,6 +57,9 @@ struct Stock <: Widget
                 nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        # catch nothing volatility from get_volatility()
+        volatility == nothing ? error("Volatility cannot be nothing") : nothing
+        # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
@@ -114,6 +120,9 @@ struct Commodity <: Widget
                 nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        # catch nothing volatility from get_volatility()
+        volatility == nothing ? error("Volatility cannot be nothing") : nothing
+        # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
@@ -127,6 +136,9 @@ struct Commodity <: Widget
                 nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
+        # catch nothing volatility from get_volatility()
+        volatility == nothing ? error("Volatility cannot be nothing") : nothing
+        # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
         new(prices, name, volatility)
     end
