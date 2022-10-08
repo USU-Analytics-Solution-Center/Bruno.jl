@@ -12,3 +12,12 @@ BootstrapInput
 makedata(::Any)
 ```
 
+## factory function
+```@docs
+factory
+```
+
+## Helper functions
+```@docs
+opt_block_length
+```

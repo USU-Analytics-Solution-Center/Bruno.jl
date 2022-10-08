@@ -185,7 +185,7 @@ julia> using Bruno
 julia> using Distributions: Normal
 
 julia> #create ar(1) data set
-julia> ar1 = [1.0]
+julia> ar1 = [1.0];
 julia> for _ in 1:799
     push!(ar1, ar1[end] * 0.7 + rand(Normal()))
     end
