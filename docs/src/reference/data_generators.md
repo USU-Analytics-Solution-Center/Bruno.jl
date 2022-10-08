@@ -1,3 +1,14 @@
 # Data Generators
 
-Still in development. Documentation to come soon.
+## Inputs
+```@docs
+DataGenInput
+LogDiffInput
+BootstrapInput
+```
+
+## makedata function
+```@docs
+makedata(::Any)
+```
+
