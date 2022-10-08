@@ -2,21 +2,9 @@ using Statistics: std
 # place to put all widgets, or assets that don't need a model for the base value. 
 # examples: oil, stocks, etc.
 """
-## Description
 Widgets are the root asset at the heart of the package. A 'Widget' can be any 
-real world finicial object such as a stock, or commodity. 
-
-## Syntax for Kwargs
-```
-kwargs = (prices=prices, name="APPL")
-a_widget = Widget(;kwargs...)
-```
-
-## Syntax for ordered argumentes
-```
-a_widget = Widget(prices=[1, 2, 3, 4, 5], name ="Example", volatility =.3)
-```
-
+real world finicial object such as a stock, or commodity. For a list of possible subtypes 
+use `subtypes(Widget)`
 """
 abstract type Widget end
 
@@ -173,13 +161,18 @@ julia> Commodity(40; volatility=.05)
 Commodity(AbstractFloat[40.0], "", 0.05)
 ```
 """
-function Commodity(price::AbstractFloat; name = "", volatility)
+function Commodity(price::Real; name = "", volatility)
     prices = [price]
     Commodity(;prices = prices, name = name , volatility = volatility)
 end
 
-# bonds
-"""still under development"""
+# ---------- Bonds -----------------
+""" 
+    Bond <: Widget
+
+Widget subtype. Used as a base or root asset for FinancialInstrument
+"""
+
 struct Bond <: Widget
     prices::Array{AbstractFloat}
     name::String
@@ -202,7 +195,8 @@ struct Bond <: Widget
 end
 
 # outer constructor to make a Bond with a (static) single price
-function Bond(price::AbstractFloat; name="", time_mat=1, coupon_rate=.03)
+"""still under development"""
+function Bond(price::Real; name="", time_mat=1, coupon_rate=.03)
     prices = [price]
     Bond(;prices=prices, name=name , time_mat=time_mat, coupon_rate=coupon_rate)
 end
