@@ -62,8 +62,7 @@ end
 Construct a Stock type to use as a base asset for FinancialInstrument.
 
 ## Arguments
-- `prices`:Historical prices (input as a 1-D array) or the current price input as a number
-`<: Real`
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the stock or stock ticker symbol. Default "".
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
@@ -74,7 +73,7 @@ is given for `prices` volatility must be given.
 julia> Stock([1,2,3,4,5], "Test", .05)
 Stock(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
 
-julia> kwargs = Dict(prices=>[1,2,3,4,5], name=>"Test", volatility=>.05)
+julia> kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05)
 julia> Stock(;kwargs...)
 Stock(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
 
@@ -141,8 +140,7 @@ end
 Construct a Commodity type to use as a base asset for FinancialInstrument.
 
 ## Arguments
-- `prices`:Historical prices (input as a 1-D array) or the current price input as a number
-`<: Real`
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the commodity or commodity ticker symbol. Default "".
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
@@ -153,7 +151,7 @@ is given for `prices` volatility must be given.
 julia> Commodity([1,2,3,4,5], "Test", .05)
 Commodity(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
 
-julia> kwargs = Dict(prices=>[1,2,3,4,5], name=>"Test", volatility=>.05)
+julia> kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05)
 julia> Commodity(;kwargs...)
 Commodity(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
 
@@ -172,7 +170,6 @@ end
 
 Widget subtype. Used as a base or root asset for FinancialInstrument
 """
-
 struct Bond <: Widget
     prices::Array{AbstractFloat}
     name::String
@@ -195,7 +192,32 @@ struct Bond <: Widget
 end
 
 # outer constructor to make a Bond with a (static) single price
-"""still under development"""
+"""
+    Bond(prices, name, time_mat, coupon_rate)
+    Bond(;kwargs)
+    Bond(price; kwargs)
+
+Construct a Bond type to use as a base asset for FinancialInstrument.
+
+## Arguments
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
+- `name::String`: Name of the Bond or issuing company. Default "".
+- `time_mat`: Time until the bond expires (matures) in years. Default 1.
+- `coupon_rate`: The coupon rate for the bond. Default .03.
+
+## Examples
+```jldoctest
+julia> Bond([1,2,3,4,5], "Test", .5, .05)
+Bond(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.5, 0.05)
+
+julia> kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :time_mat=>.5, :coupon_rate=>.05)
+julia> Bond(;kwargs...)
+Bond(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.5, 0.05)
+
+julia> Bond(2; coupon_rate=.05)
+Bond(2.0, "", 1, 0.05)
+```
+"""
 function Bond(price::Real; name="", time_mat=1, coupon_rate=.03)
     prices = [price]
     Bond(;prices=prices, name=name , time_mat=time_mat, coupon_rate=coupon_rate)
