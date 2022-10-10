@@ -16,7 +16,7 @@
     input = BootstrapInput{v}(ar1, 1000, 50)
     results = zeros(1000)
     for i in 1:1000
-        bootstrap = getData(input)
+        bootstrap = makedata(input)
         top = dot(bootstrap[1:end-1], bootstrap[2:end])
         bottom = dot(bootstrap[1:end-1], bootstrap[1:end-1])
         results[i] = top / bottom
@@ -37,7 +37,7 @@ end
 
     # bootstrap AR(1) series 
     input = BootstrapInput{Stationary}(ar1, 1000, 50)
-    bs_data = getData(input)
+    bs_data = makedata(input)
     bootstrap = [bs_data[i] for i in 1:length(bs_data)]
     bsADF = ADFTest(bootstrap, :none, 0)
     
@@ -85,5 +85,5 @@ end
     n = 10 # number of rows (resample size) in the resulting matrix
     m = 4 # number of columns (runs) in resulting matrix
     bs_input = BootstrapInput{bstype}([1,2,3,4,5,6,7,8], n, 3)
-    @test size(getData(bs_input, m)) == (n, m)
+    @test size(makedata(bs_input, m)) == (n, m)
 end
