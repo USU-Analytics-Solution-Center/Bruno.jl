@@ -12,17 +12,15 @@ price!(fin_obj, PricingModelType; kwargs...)
 key word arguments vary depending on the Pricing Model Type.
 
 # Example
-```jldoctest
-julia> using Bruno
+```julia
+# create a base asset
+a_stock = Stock(41; volatility=.3)
 
-julia> # create a base asset
-julia> a_stock = Stock(41; volatility=.3)
+# create a European call option 
+a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05) 
 
-julia> # create a European call option 
-julia> a_fin_inst = EuroCallOption(a_stock; risk_free_rate=.05, strike_price=40) 
-
-julia> # add binomial tree call value to the options value dictionary
-julia> price!(a_fin_inst, BinomialTree)  
+# add binomial tree call value to the options value dictionary
+price!(a_fin_inst, BinomialTree)  
 ```
 """
 price!(fin_obj::Any, pricing_model::Type{<:Any}) = error("Use a FinancialObject and a Model type")
@@ -38,17 +36,16 @@ price a call or put option using the binomial tree pricing method
 `delta`: the continous dividend rate
 
 # Example
-```jldoctest
-julia> using Bruno
+```julia
+# create a base asset
+a_stock = Stock(41; volatility=.3)
 
-julia> # create a base asset
-julia> a_stock = Stock(41; volatility=.3)
+# create a European call option 
+a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05) 
 
-julia> # create a European call option 
-julia> a_fin_inst = EuroCallOption(a_stock; risk_free_rate=.05, strike_price=40) 
-
-julia> # add binomial tree call value to the options value dictionary
-julia> price!(a_fin_inst, BinomialTree)  
+# add binomial tree call value to the options value dictionary
+price!(a_fin_inst, BinomialTree)  
+```
 """
 price!(fin_obj::Option, pricing_model::Type{BinomialTree}) = 
     error("Something went wrong. Make sure you're using a defined Option subtype")
@@ -206,10 +203,10 @@ price a European call or put option using the Black Scholes options pricing form
 `fin_obj::Option`: the call or put option to be priced 
 
 # Examples
-```jldoctest
-julia> stock = Stock(41; volatility=.3)
-julia> call = EuroCallOption(stock, 40; risk_free_rate=.08, maturity=.25)
-julia> price!(call, BlackScholes)
+```julia
+stock = Stock(41; volatility=.3)
+call = EuroCallOption(stock, 40; risk_free_rate=.08, maturity=.25)
+price!(call, BlackScholes)
 ```
 """
 price!(fin_obj::Option, pricing_model::Type{BlackScholes}) = 
@@ -271,14 +268,13 @@ specified. Note: Only European Options call be priced via Monte Carlo methods.
 - `bootstrap_method`: block bootstrap method to be used. Must be a subtype of `TSBootMethod`. Defualt=`Stationary`
 
 # Examples 
-```jldoctest
+```julia
+prices = [1,4,3,4,2,5,6,4,7,5];
+stock = Stock(prices);
+call = EuroCallOption(stock, 8);
 
-julia> prices = [1,4,3,4,2,5,6,4,7,5]
-julia> stock = Stock(prices)
-julia> call = EuroCallOption(stock, 8)
-
-julia> price!(call, MonteCarlo{LogDiffusion}; n_sims=50, sim_size=250)
-julia> price!(call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=10)
+price!(call, MonteCarlo{LogDiffusion}; n_sims=50, sim_size=250)
+price!(call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=10)
 ```
 """
 function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{LogDiffusion}};

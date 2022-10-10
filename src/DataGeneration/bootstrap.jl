@@ -19,15 +19,13 @@ function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or Circ
 - `block_size::Integer`: block size to use. Defaults to the optimal block length using `opt_block_length()`
 
 ## Examples
-```jldoctest
-julia> using Bruno
+```julia
+input_data = [1,2,4,3,5,7,6,3];
+kwargs = Dict(:n=>20);
+input1 = BootstrapInput(input_data, Stationary; kwargs...)
 
-julia> input_data = [1,2,4,3,5,7,6,3];
-julia> kwargs = Dict(:n=>20);
-julia> input1 = BootstrapInput(input_data, Stationary; kwargs...)
-
-julia> kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
-julia> input2 = BootstrapInput{MovingBlock}(;kwargs...)
+kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
+input2 = BootstrapInput{MovingBlock}(;kwargs...)
 ```
 """
 struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
@@ -180,19 +178,18 @@ If bootstrap method other than Stationary or CircularBlock is used, the function
 to CircularBlock
 
 # Examples
-```jldoctest
-julia> using Bruno
-julia> using Distributions: Normal
+```julia
+using Distributions: Normal
 
-julia> #create ar(1) data set
-julia> ar1 = [1.0];
-julia> for _ in 1:799
+# create ar(1) data set
+ar1 = [1.0];
+for _ in 1:799
     push!(ar1, ar1[end] * 0.7 + rand(Normal()))
     end
 
-julia> #find optimal block lengths
-julia> st_bl = opt_block_length(ar1, Stationary)
-julia> cb_bl = opt_block_length(ar1, CircularBlock)
+# find optimal block lengths
+st_bl = opt_block_length(ar1, Stationary)
+cb_bl = opt_block_length(ar1, CircularBlock)
 ```
 """
 function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})

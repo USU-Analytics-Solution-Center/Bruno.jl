@@ -33,17 +33,16 @@ Possible DataGenInput types are
                          data for each timestep
 
 ## Example
-```jldoctest
-julia> # initialize parameters
-julia> nTimeStep = 100;
-julia> input1 = LogDiffInput(nTimeStep);
+```julia
+nTimeStep = 100;
+input1 = LogDiffInput(nTimeStep);
 
-julia> # create a dataset using the log diffusion model
-julia> data1 = makedata(input1, 1)
+# create a dataset using the log diffusion model
+data1 = makedata(input1, 1)
 
-julia> # create another dataset with 2 simulation runs using a startionary bootstrap 
-julia> input2 = BootstrapInput(data1, Stationary; n=100);
-julia> data2 = makedata(input2, 2)
+# create another dataset with 2 simulation runs using a startionary bootstrap 
+input2 = BootstrapInput(data1, Stationary; n=100);
+data2 = makedata(input2, 2)
 ```
 """
 makedata(input::Any) = error("Use a DataGenInput subtype to synthesize data")

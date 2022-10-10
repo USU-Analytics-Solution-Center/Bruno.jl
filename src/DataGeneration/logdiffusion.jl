@@ -28,17 +28,15 @@ then shifted and scaled by the drift and volatility terms
 - `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process. Default 5.38e-4
 
 ## Example
-```jldoctest
-julia> using Bruno
+```julia
+input1 = LogDiffInput(250, 100, .05, .1)
 
-julia> input1 = LogDiffInput(250, 100, .05, .1)
+# initialize first input with default values
+input2 = LogDiffInput(250)
 
-julia> # initialize first input with default values
-julia> input2 = LogDiffInput(250)
-
-julia> # initialize a second input with zero volatility
-julia> kwargs = Dict(:nTimeStep=>250, :initial=>100, :volatility=>.05, :drift=.1)
-julia> input3 = LogDiffInput(;kwargs...)
+# initialize a second input with zero volatility
+kwargs = Dict(:nTimeStep=>250, :initial=>100, :volatility=>.05, :drift=>.1)
+input3 = LogDiffInput(;kwargs...)
 ```
 """
 struct LogDiffInput <: DataGenInput

@@ -12,13 +12,11 @@ All widgets use first difference.
 
 
 # Example
-```jldoctest
-julia> using Bruno
+```julia
+prices = [1,2,5,9,8,10,5,3];
+widget = Stock(prices)
 
-julia> prices = [1,2,5,9,8,10,5,3];
-julia> widget = Stock(prices)
-
-julia> list_of_widgets = factory(widget, Stationary, 2)
+list_of_widgets = factory(widget, Stationary, 2)
 ```
 """
 function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
@@ -32,7 +30,7 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
                                 )
-    bs_data = getData(input, nWidgets)
+    bs_data = makedata(input, nWidgets)
 
     # Create a vector of widgets
     widget_ar = Vector{Widget}()

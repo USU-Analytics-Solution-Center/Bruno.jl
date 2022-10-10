@@ -19,5 +19,5 @@ factory
 
 ## Helper functions
 ```@docs
-opt_block_length
+opt_block_length(::Any, ::Type{<:TSBootMethod})
 ```
