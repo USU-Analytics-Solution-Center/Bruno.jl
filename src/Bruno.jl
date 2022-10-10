@@ -23,8 +23,7 @@ include("Models/Models.jl")
 export BinomialTree, BlackScholes
 export price!, b_tree
 using .Models
-export MonteCarlo, MonteCarloModel, LogDiffusion, StationaryBootstrap, 
-CircularBlockBootstrap
+export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 
 
 
