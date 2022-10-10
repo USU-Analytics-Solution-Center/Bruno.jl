@@ -6,17 +6,27 @@ primitive type MovingBlock <: TSBootMethod 8 end
 primitive type CircularBlock <: TSBootMethod 8 end
 
 """
-    BootstrapInput{T <: TSBootMethod}(; kwargs...)
     BootstrapInput(input_data, bootstrap_method::<:TSBootMethod; kwargs...)
+    BootstrapInput{T <: TSBootMethod}(; kwargs...)
 
-Contains the parameters needed to perform block bootstrap of type T to be used by getData() 
+Contains the parameters needed to perform block bootstrap of type T to be used by `makedata()` 
 function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
 
 ## Keyword Arguments
 - `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
+- `bootstrap_method`: Type of time series bootstrap to use. Must be subtype of TSBootMethod.
 - `n::Integer`: size of resampled output data. Default: 100
-- `block_size::Integer`: block size to use. Defaults to the optimal block length using 
-```opt_block_length()```
+- `block_size::Integer`: block size to use. Defaults to the optimal block length using `opt_block_length()`
+
+## Examples
+```julia
+input_data = [1,2,4,3,5,7,6,3];
+kwargs = Dict(:n=>20);
+input1 = BootstrapInput(input_data, Stationary; kwargs...)
+
+kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
+input2 = BootstrapInput{MovingBlock}(;kwargs...)
+```
 """
 struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     input_data::Array{<:Real} # array of data to be resampled
@@ -61,7 +71,7 @@ BootstrapInput(input_data::Array{<:Real}, bootstrap_method::Type{<:TSBootMethod}
     BootstrapInput{bootstrap_method}(input_data, n, block_size)
 
 
-function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     # check for block_size > 1 so geometric distro doesn't blow up
     param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
     p = 1 / block_size
@@ -100,7 +110,7 @@ function getData(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     return data
 end
 
-function getData(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
@@ -119,7 +129,7 @@ function getData(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     return data
 end
 
-function getData(param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
     data = zeros((param.n, nSimulation))
     for run_num in 1:nSimulation
         block_counter = 0
@@ -167,18 +177,17 @@ by Politis and White (2004).
 If bootstrap method other than Stationary or CircularBlock is used, the function defaults 
 to CircularBlock
 
-# Example
-```
-using Bruno
+# Examples
+```julia
 using Distributions: Normal
 
-#create ar(1) data set
-ar1 = [1.0]
-for i in _:799
+# create ar(1) data set
+ar1 = [1.0];
+for _ in 1:799
     push!(ar1, ar1[end] * 0.7 + rand(Normal()))
-end
+    end
 
-#find optimal block lengths
+# find optimal block lengths
 st_bl = opt_block_length(ar1, Stationary)
 cb_bl = opt_block_length(ar1, CircularBlock)
 ```

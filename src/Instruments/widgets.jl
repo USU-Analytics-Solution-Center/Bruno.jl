@@ -2,21 +2,9 @@ using Statistics: std
 # place to put all widgets, or assets that don't need a model for the base value. 
 # examples: oil, stocks, etc.
 """
-## Description
 Widgets are the root asset at the heart of the package. A 'Widget' can be any 
-real world finicial object such as a stock, or commodity. 
-
-## Syntax for Kwargs
-```
-kwargs = (prices=prices, name="APPL")
-a_widget = Widget(;kwargs...)
-```
-
-## Syntax for ordered argumentes
-```
-a_widget = Widget(prices=[1, 2, 3, 4, 5], name ="Example", volatility =.3)
-```
-
+real world finicial object such as a stock, or commodity. For a list of possible subtypes 
+use `subtypes(Widget)`
 """
 abstract type Widget end
 
@@ -74,24 +62,20 @@ end
 Construct a Stock type to use as a base asset for FinancialInstrument.
 
 ## Arguments
-- `prices`:Historical prices (input as a 1-D array) or the current price input as a number
-`<: Real`
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the stock or stock ticker symbol. Default "".
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
 is given for `prices` volatility must be given.
 
 ## Examples
-```jldoctest
-julia> Stock([1,2,3,4,5], "Test", .05)
-Stock(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
+```julia
+Stock([1,2,3,4,5], "Test", .05)
 
-julia> kwargs = Dict(prices=>[1,2,3,4,5], name=>"Test", volatility=>.05)
-julia> Stock(;kwargs...)
-Stock(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
+kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+Stock(;kwargs...)
 
-julia> Stock(40; volatility=.05)
-Stock(AbstractFloat[40.0], "", 0.05)
+Stock(40; volatility=.05)
 ```
 """
 function Stock(price::Real; name = "", volatility)
@@ -153,33 +137,33 @@ end
 Construct a Commodity type to use as a base asset for FinancialInstrument.
 
 ## Arguments
-- `prices`:Historical prices (input as a 1-D array) or the current price input as a number
-`<: Real`
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the commodity or commodity ticker symbol. Default "".
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
 is given for `prices` volatility must be given.
 
 ## Examples
-```jldoctest
-julia> Commodity([1,2,3,4,5], "Test", .05)
-Commodity(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
+```julia
+Commodity([1,2,3,4,5], "Test", .05)
 
-julia> kwargs = Dict(prices=>[1,2,3,4,5], name=>"Test", volatility=>.05)
-julia> Commodity(;kwargs...)
-Commodity(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "Test", 0.05)
+kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+Commodity(;kwargs...)
 
-julia> Commodity(40; volatility=.05)
-Commodity(AbstractFloat[40.0], "", 0.05)
+Commodity(40; volatility=.05)
 ```
 """
-function Commodity(price::AbstractFloat; name = "", volatility)
+function Commodity(price::Real; name = "", volatility)
     prices = [price]
     Commodity(;prices = prices, name = name , volatility = volatility)
 end
 
-# bonds
-"""still under development"""
+# ---------- Bonds -----------------
+""" 
+    Bond <: Widget
+
+Widget subtype. Used as a base or root asset for FinancialInstrument
+"""
 struct Bond <: Widget
     prices::Array{AbstractFloat}
     name::String
@@ -202,7 +186,30 @@ struct Bond <: Widget
 end
 
 # outer constructor to make a Bond with a (static) single price
-function Bond(price::AbstractFloat; name="", time_mat=1, coupon_rate=.03)
+"""
+    Bond(prices, name, time_mat, coupon_rate)
+    Bond(;kwargs)
+    Bond(price; kwargs)
+
+Construct a Bond type to use as a base asset for FinancialInstrument.
+
+## Arguments
+- `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
+- `name::String`: Name of the Bond or issuing company. Default "".
+- `time_mat`: Time until the bond expires (matures) in years. Default 1.
+- `coupon_rate`: The coupon rate for the bond. Default .03.
+
+## Examples
+```julia
+Bond([1,2,3,4,5], "Test", .5, .05)
+
+kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :time_mat=>.5, :coupon_rate=>.05);
+Bond(;kwargs...)
+
+Bond(2; coupon_rate=.05)
+```
+"""
+function Bond(price::Real; name="", time_mat=1, coupon_rate=.03)
     prices = [price]
     Bond(;prices=prices, name=name , time_mat=time_mat, coupon_rate=coupon_rate)
 end

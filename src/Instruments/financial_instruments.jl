@@ -1,13 +1,29 @@
 # financial instruments that can be passed to simulate. They house underlying widgets as part
 # of the insturment. Ex: Stock call options house an underlying stock
-
+"""FinancialInstrument is the supertype for any instrument that uses a base asset
+(widget) in its definition (like a financial derivative)"""
 abstract type FinancialInstrument end
 
 # ----- Type system for options: subtype of FinancialInstrument ------
+"""
+    Option <: FinancialInstrument
+
+abstract FinancialInstrument subtype. Supertype of all options contract types
+"""
 abstract type Option <: FinancialInstrument end
 
 # ----- Abstract type for all call and put options -----
+"""
+    CallOption{T <: Widget} <: Option
+
+abstract Option subtype. Super type for all call options types
+"""
 abstract type CallOption{T <:Widget} <: Option end
+"""
+    PutOption{T <: Widget} <: Option
+
+abstract Option subtype. Super type for all put options types
+"""
 abstract type PutOption{T <:Widget} <: Option end
 
 # ----- Concrete types for Euro and American call options
@@ -63,22 +79,21 @@ Construct a EuroCallOption with underlying asset `T`
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
-```jldoctest
-julia> stock = Stock([1,2,4,3,5,3])
+```julia
+stock = Stock([1,2,4,3,5,3]);
 
-julia> EuroCallOption(stock, 10)
-EuroCallOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+EuroCallOption(stock, 10)
 
-julia> EuroCallOption(;widget=stock, strike_price=10, maturity=1, risk_free_rate=.02)
-EuroCallOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.02);
+EuroCallOption(;kwargs...)
 ```
 """
 EuroCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
     EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
 EuroCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
     EuroCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
-EuroCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
+EuroCallOption(;widget, strike_price, maturity=1, risk_free_rate=.02, value=Dict{String, AbstractFloat}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, value = value)
 
 """
     AmericanCallOption{T <: Widget} <: CallOption{T}
@@ -132,22 +147,21 @@ Construct a AmericanCallOption with underlying asset `T`
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
-```jldoctest
-julia> stock = Stock([1,2,4,3,5,3])
+```julia
+stock = Stock([1,2,4,3,5,3]);
 
-julia> AmericanCallOption(stock, 10)
-AmericanCallOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+AmericanCallOption(stock, 10)
 
-julia> AmericanCallOption(;widget=stock, strike_price=10, maturity=1, risk_free_rate=.02)
-AmericanCallOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.02);
+AmericanCallOption(;kwargs...)
 ```
 """
 AmericanCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
     AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
-AmericanCallOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
+AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
+    AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
+AmericanCallOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
+    AmericanCallOption{typeof(widget)}(;widget=widget, strike_price=strike_price, maturity=maturity, risk_free_rate=risk_free_rate, value=value)
 
 """
     EuroPutOption{T <: Widget} <: CallOption{T}
@@ -201,22 +215,21 @@ Construct a EuroPutOption with underlying asset `T`
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
-```jldoctest
-julia> stock = Stock([1,2,4,3,5,3])
+```julia
+stock = Stock([1,2,4,3,5,3]);
 
-julia> EuroPutOption(stock, 10)
-EuroPutOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+EuroPutOption(stock, 10)
 
-julia> EuroPutOption(;widget=stock, strike_price=10, maturity=1, risk_free_rate=.02)
-EuroPutOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.02);
+EuroPutOption(;kwargs...)
 ```
 """
 EuroPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
     EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
-EuroPutOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
+EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
+    EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
+EuroPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, value = value)
 
 """
     AmericanPutOption{T <: Widget} <: CallOption{T}
@@ -233,6 +246,7 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
     # kwargs constructor
     function AmericanPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
         value = Dict{String, AbstractFloat}()) where {T <: Widget}
+
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
         value == Dict{String, AbstractFloat}() ? nothing : 
@@ -242,7 +256,9 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
     end
 
     # ordered arguments constructor
-    function AmericanPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+    function AmericanPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, 
+        value) where {T <: Widget}
+
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
         value == Dict{String, AbstractFloat}() ? nothing : 
@@ -270,26 +286,29 @@ Construct an AmericanPutOption with underlying asset `T`
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
-```jldoctest
-julia> stock = Stock([1,2,4,3,5,3])
+```julia
+stock = Stock([1,2,4,3,5,3]);
 
-julia> AmericanPutOption(stock, 10)
-AmericanPutOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+AmericanPutOption(stock, 10)
 
-julia> AmericanPutOption(;widget=stock, strike_price=10, maturity=1, risk_free_rate=.02)
-AmericanPutOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 4.0, 3.0, 5.0, 3.0], "", 0.5753613747628236), 10.0, 1.0, 0.02, Dict{String, AbstractFloat}())
+kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.02);
+AmericanPutOption(;kwargs...)
 ```
 """
 AmericanPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
     AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-AmericanPutOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
-    AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
-AmericanPutOption(;widget, strike_price, maturity = 1, value = Dict{String, AbstractFloat}()) = 
-    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, value = value)
+AmericanPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
+    AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
+AmericanPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
 
 
 # ------ Type system for futures: subtype of FinancialInstrument ------
-"""Still under development"""
+"""
+    Future{T <: Widget} <: FinancialInstrument
+
+Future contract with underlying asset T.
+"""
 struct Future{T <: Widget} <: FinancialInstrument 
     widget::T
     strike_price::AbstractFloat
