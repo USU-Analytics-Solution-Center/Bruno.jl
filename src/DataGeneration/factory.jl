@@ -6,24 +6,17 @@ in then the widget factory will use a given bootstrap method to produce n "Stock
 All widgets use first difference.
 
 ## Positional Inputs
-- `widget::Widget`: A concrete widget struct. See the widget documentation for more.
+- `widget::Widget`: A concrete widget struct. See the Widget documentation for more.
 - `bootstrap_method::TSBootMethod`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
 - `nWidgets::Signed`: The amount of widgets you want widget factory to return.
 
 
 # Example
-```
-using Bruno
-using CSV
-using DataFrames
+```julia
+prices = [1,2,5,9,8,10,5,3];
+widget = Stock(prices)
 
-df = CSV.read("./examples/AAPL.csv", DataFrame)
-prices = df[!, "Adj Close"]
-
-kwargs = (prices=prices, name="APPL")
-widget = Stock(;kwargs...)
-
-list_of_widgets = factory(widget, Stationary(), 5)
+list_of_widgets = factory(widget, Stationary, 2)
 ```
 """
 function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
@@ -37,7 +30,7 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
                                 )
-    bs_data = getData(input, nWidgets)
+    bs_data = makedata(input, nWidgets)
 
     # Create a vector of widgets
     widget_ar = Vector{Widget}()
