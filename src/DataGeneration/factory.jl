@@ -20,11 +20,10 @@ list_of_widgets = factory(widget, Stationary, 2)
 ```
 """
 function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
-    println(widget.prices)
     fields = field_exclude(widget)
-    # take the first difference to get to returns
-    returns = [widget.prices[i+1] - widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
-    println(returns)
+    # calculating the returns
+    # TODO: check if time series Stationary 
+    returns = [(widget.prices[i+1] - widget.prices[i]) / widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
     # bootstrap the returns
     input = BootstrapInput{bootstrap_method}(;
                                 input_data = returns,
@@ -32,7 +31,6 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
                                 )
     bs_data = makedata(input, nWidgets)
-    println("bs_data: ", bs_data)
     # Create a vector of widgets
     widget_ar = Vector{Widget}()
     kwargs = Dict(fields .=> getfield.(Ref(widget), fields))
@@ -40,15 +38,11 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
         # take the returns back to prices
         prices = [widget.prices[1]]
         for i in 1:length(returns)
-            println("prices[end]\t\t", prices[end], "\nbs_data[i, column]\t", bs_data[i, column], "\nVal:\t", prices[end] + bs_data[i, column])
-            println("----------")
-            push!(prices, prices[end] + bs_data[i, column])
+            val = (prices[end] * bs_data[i, column]) + prices[end]
+            push!(prices, val)
         end
-
         # Add a new widget to the return vector
-        println("prices: ", prices) 
         push!(widget_ar, typeof(widget)(;prices = prices, kwargs...))
-        println()
     end
     return(widget_ar)
 end
