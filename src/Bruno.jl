@@ -7,6 +7,8 @@ export Widget, Stock, Commodity, Bond
 export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
 AmericanCallOption, EuroPutOption, AmericanPutOption, Future
 
+export get_volatility  # exporting this to make tests easiers
+
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration

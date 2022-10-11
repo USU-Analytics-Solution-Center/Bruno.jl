@@ -2,7 +2,7 @@ using Bruno
 using CSV
 using DataFrames
 
-df = CSV.read("./examples/AAPL.csv", DataFrame)
+df = CSV.read("./examples/OPEN.csv", DataFrame)
 prices = df[!, "Adj Close"]
 
 kwargs = (prices=prices, name="APPL")
