@@ -3,8 +3,11 @@ using Statistics: std
 # delta hedging
 # min var hedging
 
-function profit(fin_obj::Option, ratio, number_of_contracts)
-   -1 
+function profit(fin_obj::EuroCallOption, ratio, nTimeSteps)
+   past_prices = fin_obj.widget.prices
+   future_widget_prices =  makedata(LogDiffInput(nTimeSteps, past_prices[end], fin_obj.widget.volatility, 0.000538), 1)
+   
+
 end
 
 #-------Helper Functions--------#

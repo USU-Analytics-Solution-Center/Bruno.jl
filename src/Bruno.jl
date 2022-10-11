@@ -28,6 +28,6 @@ export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 # BackTest Module
 include("BackTest/BackTest.jl")
 using .BackTest
-export find_correlation_coeff
+export find_correlation_coeff, profit
 
 end # module
