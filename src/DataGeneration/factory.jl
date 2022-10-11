@@ -38,7 +38,7 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
         # take the returns back to prices
         prices = [widget.prices[1]]
         for i in 1:length(returns)
-            val = (prices[end] * bs_data[i, column]) + prices[end]
+            val = prices[end] * (bs_data[i, column] + 1)
             push!(prices, val)
         end
         # Add a new widget to the return vector
