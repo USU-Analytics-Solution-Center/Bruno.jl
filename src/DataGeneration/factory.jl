@@ -6,39 +6,31 @@ in then the widget factory will use a given bootstrap method to produce n "Stock
 All widgets use first difference.
 
 ## Positional Inputs
-- `widget::Widget`: A concrete widget struct. See the widget documentation for more.
+- `widget::Widget`: A concrete widget struct. See the Widget documentation for more.
 - `bootstrap_method::TSBootMethod`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
 - `nWidgets::Signed`: The amount of widgets you want widget factory to return.
 
 
 # Example
-```
-using Bruno
-using CSV
-using DataFrames
+```julia
+prices = [1,2,5,9,8,10,5,3];
+widget = Stock(prices)
 
-df = CSV.read("./examples/AAPL.csv", DataFrame)
-prices = df[!, "Adj Close"]
-
-kwargs = (prices=prices, name="APPL")
-widget = Stock(;kwargs...)
-
-list_of_widgets = factory(widget, Stationary(), 5)
+list_of_widgets = factory(widget, Stationary, 2)
 ```
 """
 function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
     fields = field_exclude(widget)
-    # take the first difference to get to returns
-    returns = [widget.prices[i+1] - widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
-
+    # calculating the returns
+    # TODO: check if time series Stationary 
+    returns = [(widget.prices[i+1] - widget.prices[i]) / widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
     # bootstrap the returns
     input = BootstrapInput{bootstrap_method}(;
                                 input_data = returns,
                                 n = length(returns),
                                 block_size = opt_block_length(widget.prices, bootstrap_method)
                                 )
-    bs_data = getData(input, nWidgets)
-
+    bs_data = makedata(input, nWidgets)
     # Create a vector of widgets
     widget_ar = Vector{Widget}()
     kwargs = Dict(fields .=> getfield.(Ref(widget), fields))
@@ -46,10 +38,10 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
         # take the returns back to prices
         prices = [widget.prices[1]]
         for i in 1:length(returns)
-            push!(prices, prices[end] + bs_data[i,column])
+            val = prices[end] * (bs_data[i, column] + 1)
+            push!(prices, val)
         end
-
-        # Add a new widget to the return vector 
+        # Add a new widget to the return vector
         push!(widget_ar, typeof(widget)(;prices = prices, kwargs...))
     end
     return(widget_ar)

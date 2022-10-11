@@ -6,14 +6,15 @@ using .Instruments
 export Widget, Stock, Commodity, Bond 
 export FinancialInstrument, Option, CallOption, PutOption, EuroCallOption,
 AmericanCallOption, EuroPutOption, AmericanPutOption, Future
-export AbstractEuroCall, AbstractAmericanCall, AbstractEuroPut, AbstractAmericanPut
+
+export get_volatility  # exporting this to make tests easiers
 
 # DataGeneration submodule
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration
 
 export LogDiffInput 
-export getData, getTime, data_gen_input
+export makedata, getTime, data_gen_input
 export DataGenInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
 export opt_block_length
 export factory
@@ -24,8 +25,7 @@ include("Models/Models.jl")
 export BinomialTree, BlackScholes
 export price!, b_tree
 using .Models
-export MonteCarlo, MonteCarloModel, LogDiffusion, StationaryBootstrap, 
-CircularBlockBootstrap
+export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 
 
 
