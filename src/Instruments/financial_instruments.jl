@@ -37,17 +37,17 @@ struct EuroCallOption{T <: Widget} <: CallOption{T}
     strike_price::AbstractFloat
     maturity::AbstractFloat
     risk_free_rate::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, AbstractFloat}
     
     # kwargs constructor
     function EuroCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
-        value = Dict{String, AbstractFloat}()) where {T <: Widget}
+        values_library = Dict{String, AbstractFloat}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        values_library == Dict{String, AbstractFloat}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_freevrate, values_library)
     end
 
     # ordered arguments constructor
