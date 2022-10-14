@@ -2,6 +2,7 @@ module BackTest
 
 using ..Instruments
 using ..DataGeneration
+using ..Models
 # --- Back Tests for Stocks, Commodities and the like
 abstract type Indicator end
 
@@ -15,7 +16,10 @@ include("indicator.jl")
 abstract type Hedging end
 
 primitive type RatioHedging <: Hedging 8 end
+
 include("hedging.jl")
-export find_correlation_coeff, profit
+
+export RatioHedging
+export find_correlation_coeff, get_returns
 
 end # module 
