@@ -17,7 +17,7 @@
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.value["Binomial_tree"]
+    value = a_fin_inst.values_library["Binomial_tree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -45,7 +45,7 @@ end
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.value["Binomial_tree"]
+    value = a_fin_inst.values_library["Binomial_tree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -72,7 +72,7 @@ end
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.value["Binomial_tree"]
+    value = a_fin_inst.values_library["Binomial_tree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -99,7 +99,7 @@ end
     price!(a_fin_inst, BinomialTree; delta=.035)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.value["Binomial_tree"]
+    value = a_fin_inst.values_library["Binomial_tree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -124,7 +124,7 @@ end
     call = EuroCallOption(stock, 40; risk_free_rate = .08, maturity = .25)
     price!(call, BlackScholes)
 
-    @test isapprox(call.value["BlackScholes"], 3.399; atol = .01)
+    @test isapprox(call.values_library["BlackScholes"]["value"], 3.399; atol = .01)
 end
 
 @testset "EuroPutOption" begin
@@ -143,7 +143,7 @@ end
     put = EuroPutOption(stock, 40; risk_free_rate = .08, maturity = .25)
     price!(put, BlackScholes)
 
-    @test isapprox(put.value["BlackScholes"], 1.607; atol = .01)
+    @test isapprox(put.values_library["BlackScholes"]["value"], 1.607; atol = .01)
 end
 
 end
