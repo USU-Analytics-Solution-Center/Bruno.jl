@@ -1,7 +1,7 @@
 primitive type DeltaHedge 8 end
 primitive type Expiry <: Model 8 end
 
-function get_returns(obj, sign, future_prices, strategy_mode, pricing_mode)
+function get_returns(obj, sign, future_prices, strategy_mode, pricing_mode, n_timesteps)
     # + means going long (buying) - means going short (selling)
     if typeof(obj) <: FinancialInstrument  # Check to see if a given FinancialInstrument has been pre-loaded
         if obj.values_library == Dict{String, Dict{String, AbstractFloat}}()
@@ -12,37 +12,47 @@ function get_returns(obj, sign, future_prices, strategy_mode, pricing_mode)
     # buy or sell the obj depnding on the sign
     bank = -sign(Models.price!(obj, pricing_mode))
 
-    # bank = simulate(obj_bought, future_prices, strategy_mode, pricing_mode, bank, n_timesteps)
-    # unwind position - sell what you have left buy what you short sold
+    bank = simulate(obj, future_prices, strategy_mode, pricing_mode, bank, n_timesteps)
 
+    # unwind position - sell what you have left buy what you short sold
     bank += sign(Models.price!(obj, Expiry))
     
     # return bank
 end
 
 
-# function simulate(fin_obj::Option, future_prices, strategy_mode, pricing_mode, trading_profit, n_timesteps)
-#     # how much money we get/ loose from hedging the position at each time step
-#     # assums we are also closing any hedging positions at the end
-#     # for buying an option
+function simulate(fin_obj::Option, future_prices, strategy_mode, pricing_mode, trading_profit, n_timesteps)
+    # how much money we get/ loose from hedging the position at each time step
+    # assums we are also closing any hedging positions at the end
+    # for buying an option
 
-#     prev_hedging_asset_count = 0
-#     for i in 1:n_timesteps
-#         # gives us the "optimal" holding ratio of fin_obj to underlying asset
-#         hedging_asset_count = strategy(strategy_mode, fin_obj)
-#         # "sells" and "buys" fin_obj and underlyign asset to get to the holding_ratio
-#         trading_profit += interest(stuff...)
-#         trading_profit += rebalance(hedging_asset_count, prev_hedging_asset_count, fin_obj)
+    prev_hedging_asset_count = 0
+    for i in 1:n_timesteps
+        # gives us the "optimal" holding ratio of fin_obj to underlying asset
+        hedging_asset_count = strategy(fin_obj, strategy_mode)
+        # # "sells" and "buys" fin_obj and underlyign asset to get to the holding_ratio
+        # trading_profit += interest(stuff...)
+        # trading_profit += rebalance(hedging_asset_count, prev_hedging_asset_count, fin_obj)
  
-#         prev_hedging_asset_count = hedging_asset_count
-#         push!(fin_obj.widget.prices, popfirst!(future_prices))
-#         price!(fin_obj, pricing_mode)
-#     end
+        # prev_hedging_asset_count = hedging_asset_count
+        # push!(fin_obj.widget.prices, popfirst!(future_prices))
+        # price!(fin_obj, pricing_mode)
+    end
 
-#     # at end of the time steps sell the hedging object
-#     trading_profit += hedging_asset_count * price!(fin_obj.widget, Expiry)
+    # # at end of the time steps sell the hedging object
+    # trading_profit += hedging_asset_count * price!(fin_obj.widget, Expiry)
 
-#     return trading_profit
+    return trading_profit
+end
+
+#-------strategies----------#
+function strategy(fin_obj, strategy_mode::Type{one_to_one})
+    return 1
+end
+
+function strategy(fin_obj, strategy_mode::Type{RatioHedging})
+    return 1
+end
 
 #-------Custome Price!----------#
 # these are extra... really only used for hedging models

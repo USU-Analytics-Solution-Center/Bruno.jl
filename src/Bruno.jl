@@ -30,7 +30,7 @@ export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 # BackTest Module
 include("BackTest/BackTest.jl")
 using .BackTest
-export RatioHedging
+export RatioHedging, one_to_one
 export find_correlation_coeff, get_returns
 
 end # module
