@@ -8,6 +8,7 @@ export FinancialInstrument, Option, CallOption, PutOption,
 EuroCallOption, AmericanCallOption, EuroPutOption, AmericanPutOption,
 Future
 
+export get_volatility  # exporting this to make tests easiers
     
 include("widgets.jl")
 include("financial_instruments.jl")
