@@ -28,6 +28,7 @@ function simulate(fin_obj::Option, future_prices, strategy_mode, pricing_mode, t
     # assums we are also closing any hedging positions at the end
     # for buying an option
     prev_hedging_asset_count = 0
+    hedging_asset_count = 0  # declaring here so for scope reasons
     for i in 1:lastindex(future_prices)
         # gives us the "optimal" holding ratio of fin_obj to underlying asset
         hedging_asset_count = strategy(fin_obj, strategy_mode)
@@ -38,15 +39,11 @@ function simulate(fin_obj::Option, future_prices, strategy_mode, pricing_mode, t
         push!(fin_obj.widget.prices, popfirst!(future_prices))
         println(trading_profit)
     end
-
+    println("\t", hedging_asset_count)
     # # at end of the time steps sell the hedging object
-    # trading_profit += hedging_asset_count * price!(fin_obj.widget, Expiry)
+    trading_profit += hedging_asset_count * price!(fin_obj.widget, Expiry)
 
     return trading_profit
-end
-
-function rebalance(hedging_asset_count, prev_hedging_asset_count, fin_obj)
-    return 
 end
 
 #-------strategies----------#
