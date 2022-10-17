@@ -17,7 +17,7 @@
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.values_library["Binomial_tree"]["value"]
+    value = a_fin_inst.values_library["BinomialTree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -45,7 +45,7 @@ end
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.values_library["Binomial_tree"]["value"]
+    value = a_fin_inst.values_library["BinomialTree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -72,7 +72,7 @@ end
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.values_library["Binomial_tree"]["value"]
+    value = a_fin_inst.values_library["BinomialTree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
@@ -99,7 +99,7 @@ end
     price!(a_fin_inst, BinomialTree; delta=.035)  # add the binomial Option value to the options values
     
     # check that a value was added to a_fin_inst
-    value = a_fin_inst.values_library["Binomial_tree"]["value"]
+    value = a_fin_inst.values_library["BinomialTree"]["value"]
     @test value != Nothing
 
     # Check if it is the correct value
