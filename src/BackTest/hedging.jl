@@ -1,6 +1,3 @@
-using Distributions
-primitive type Expiry <: Model 8 end
-
 function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_timesteps, timesteps_per_period, 
                             cash_injection=0.0, fin_obj_count=0, widget_count=0,pay_int_rate=0, hold_return_int_rate=0; kwargs...)
     # Set up the function  
@@ -30,6 +27,8 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
 
         # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
         add_price_value(obj, popfirst!(future_prices))
+        popfirst!(get_prices(obj))  # remove the most stale price
+
     end
 
     # unwind the postions
@@ -72,7 +71,6 @@ end
 function update_obj(obj::Option, _::Type{<:Naked}, pricing_model, _, timesteps_per_period, _)
      new_obj = typeof(obj)(;widget = obj.widget,
                           maturity = obj.maturity - (1 / timesteps_per_period),
-                          strike_price = obj.strike_price,
                           risk_free_rate = obj.risk_free_rate)
     Models.price!(new_obj, pricing_model)
 
@@ -95,6 +93,8 @@ end
 Extra functions needed to get the hedghing working
 """
 #-------Custome Price!----------#
+primitive type Expiry <: Model 8 end
+
 # these are extra... really only used for hedging models
 Models.price!(fin_obj::Stock) = fin_obj.prices[end]
 Models.price!(fin_obj::Stock, _::Type{<:Model}) = price!(fin_obj::Stock)

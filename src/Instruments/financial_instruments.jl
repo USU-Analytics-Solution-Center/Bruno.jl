@@ -40,7 +40,7 @@ struct EuroCallOption{T <: Widget} <: CallOption{T}
     values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function EuroCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
+    function EuroCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
@@ -88,11 +88,11 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 EuroCallOption(;kwargs...)
 ```
 """
-EuroCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+EuroCallOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
     EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library=values_library)
-EuroCallOption(widget::Widget, strike_price:: Real, maturity::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+EuroCallOption(widget::Widget, strike_price::Real, maturity::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
     EuroCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, values_library=values_library)
-EuroCallOption(;widget, strike_price, maturity=1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+EuroCallOption(;widget, strike_price=widget.prices[end], maturity=1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
     EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, values_library=values_library)
 
 """
@@ -108,7 +108,7 @@ struct AmericanCallOption{T <: Widget} <: CallOption{T}
     values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function AmericanCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
+    function AmericanCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
@@ -156,11 +156,11 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 AmericanCallOption(;kwargs...)
 ```
 """
-AmericanCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+AmericanCallOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
     AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library=values_library)
-AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+AmericanCallOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
     AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library=values_library)
-AmericanCallOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+AmericanCallOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
     AmericanCallOption{typeof(widget)}(;widget=widget, strike_price=strike_price, maturity=maturity, risk_free_rate=risk_free_rate, values_library=values_library)
 
 """
@@ -176,7 +176,7 @@ struct EuroPutOption{T <: Widget} <: PutOption{T}
     values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function EuroPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
+    function EuroPutOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library =Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity > 0 ? nothing : error("maturity must be positive")
@@ -224,11 +224,11 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 EuroPutOption(;kwargs...)
 ```
 """
-EuroPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+EuroPutOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
     EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library = values_library)
-EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+EuroPutOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
     EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
-EuroPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+EuroPutOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
     EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, values_library = values_library)
 
 """
@@ -244,7 +244,7 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
     values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function AmericanPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
+    function AmericanPutOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
@@ -295,11 +295,11 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 AmericanPutOption(;kwargs...)
 ```
 """
-AmericanPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+AmericanPutOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
     AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library = values_library)
-AmericanPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+AmericanPutOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
     AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
-AmericanPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+AmericanPutOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
     AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
 
 
