@@ -43,7 +43,7 @@ struct EuroCallOption{T <: Widget} <: CallOption{T}
     function EuroCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive\nmaturity=", maturity)
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -53,7 +53,7 @@ struct EuroCallOption{T <: Widget} <: CallOption{T}
     # ordered arguments constructor
     function EuroCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -111,7 +111,7 @@ struct AmericanCallOption{T <: Widget} <: CallOption{T}
     function AmericanCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -121,7 +121,7 @@ struct AmericanCallOption{T <: Widget} <: CallOption{T}
     # ordered arguments constructor
     function AmericanCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -179,7 +179,7 @@ struct EuroPutOption{T <: Widget} <: PutOption{T}
     function EuroPutOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
         values_library =Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -189,7 +189,7 @@ struct EuroPutOption{T <: Widget} <: PutOption{T}
     # ordered arguments constructor
     function EuroPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -248,7 +248,7 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
         values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
@@ -260,7 +260,7 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
         values_library) where {T <: Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
+        maturity >= 0 ? nothing : error("maturity must be positive")
         values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")

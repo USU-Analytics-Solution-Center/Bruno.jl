@@ -30,7 +30,7 @@ export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 # BackTest Module
 include("BackTest/BackTest.jl")
 using .BackTest
-export Naked, DeltaHedge
+export Naked, RebalanceDeltaHedge, StaticDeltaHedge
 export find_correlation_coeff, strategy_returns
 
 end # module

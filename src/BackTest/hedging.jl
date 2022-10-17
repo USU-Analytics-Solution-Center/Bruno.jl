@@ -1,5 +1,5 @@
 function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_timesteps, timesteps_per_period, 
-                            cash_injection=0.0, fin_obj_count=0, widget_count=0,pay_int_rate=0, hold_return_int_rate=0; kwargs...)
+                            cash_injection=0.0, fin_obj_count=0.0, widget_count=0.0,pay_int_rate=0, hold_return_int_rate=0; kwargs...)
     # Set up the function  
     future_prices = deepcopy(future_prices)  # we do deep copies so the objects out of scope arent stomped on
     obj = deepcopy(obj)
@@ -11,7 +11,6 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
 
     for step in 1:n_timesteps  # preform a strat for given time steps
         holdings = strategy(obj, pricing_model, strategy_type, holdings, step; kwargs...)  # do the strategy
-        obj = update_obj(obj, strategy_type, pricing_model, n_timesteps, timesteps_per_period, step)  # if we need to mess around with maturity do it here
         
         # updatae the snapshot of holdings for time series analysis
         for (key, value) in holdings
@@ -29,10 +28,13 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
         add_price_value(obj, popfirst!(future_prices))
         popfirst!(get_prices(obj))  # remove the most stale price
 
+        obj = update_obj(obj, strategy_type, pricing_model, n_timesteps, timesteps_per_period, step)
+        println("object maturity \t", obj.maturity)
+        println("time step \t", step, "\n")
     end
 
     # unwind the postions
-    holdings["cash"] += unwind(obj, holdings)
+    holdings["cash"] += unwind(obj, pricing_model, holdings)
     # update holdings one last time
     for (key, value) in holdings
         push!(ts_holdings[key], value)
@@ -43,22 +45,8 @@ end
 
 
 """
-functions Naked strategy_mode
+Active strategies
 """
-function buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
-    holdings["cash"] -= number * Models.price!(fin_obj, pricing_model)["value"] + transaction_cost
-    holdings["fin_obj_count"] += number
-
-    return holdings
-end
-
-function buy(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
-    holdings["cash"] -= number * Models.price!(widget_obj, pricing_model)["value"] + transaction_cost
-    holdings["widget_count"] += number
-
-    return holdings
-end
-
 function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Type{<:Naked}, holdings, step; kwargs...)
     # this is the naked strategy. So we are not hedging... Just buy one of whatever and let it ride
     if step == 1
@@ -68,18 +56,73 @@ function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Ty
     return holdings
 end
 
-function update_obj(obj::Option, _::Type{<:Naked}, pricing_model, _, timesteps_per_period, _)
-     new_obj = typeof(obj)(;widget = obj.widget,
-                          maturity = obj.maturity - (1 / timesteps_per_period),
-                          risk_free_rate = obj.risk_free_rate)
-    Models.price!(new_obj, pricing_model)
+function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Type{<:StaticDeltaHedge}, holdings, step; kwargs...)
+    if step == 1
+        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
+        delta = (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))
+        buy(fin_obj.widget, delta, holdings, pricing_model, 0)  # assuming transaction_cost == 0 for stocks
+    end
 
-    return new_obj
+    return holdings
 end
 
-function unwind(obj::FinancialInstrument, holdings)
-    profit = holdings["fin_obj_count"] * Models.price!(obj, Expiry)
-    holdings["fin_obj_count"] = 0
+function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Type{<:RebalanceDeltaHedge}, holdings, step; kwargs...)
+    if step == 1
+        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])        
+    end
+    if (step - 1) % kwargs[:steps_between] == 0
+        delta = (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))
+        change = delta - holdings["widget_count"]
+        if change > 0
+            buy(fin_obj.widget, change, holdings, pricing_model, 0)  # assuming transaction_cost == 0 for stocks
+        else
+            sell(fin_obj.widget, -change, holdings, pricing_model, 0)
+        end
+    end
+
+    return holdings
+end
+
+"""
+Extra functions needed to get the hedghing working
+"""
+function buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] -= number * Models.price!(fin_obj, pricing_model) + transaction_cost
+    holdings["fin_obj_count"] += number
+
+    return holdings
+end
+
+function buy(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] -= number * widget_obj.prices[end] + transaction_cost
+    holdings["widget_count"] += number
+
+    return holdings
+end
+
+function sell(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] += number * Models.price!(fin_obj, pricing_model) + transaction_cost
+    holdings["fin_obj_count"] -= number
+
+    return holdings
+end
+
+function sell(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] += number * widget_obj.prices[end] + transaction_cost
+    holdings["widget_count"] -= number
+
+    return holdings
+end
+
+function unwind(obj::FinancialInstrument, pricing_model, holdings)
+    profit = nothing
+    if obj.maturity == 0
+        profit = holdings["fin_obj_count"] * Models.price!(obj, Expiry)
+        holdings["fin_obj_count"] = 0
+    elseif obj.maturity > 0
+        profit = holdings["fin_obj_count"] * Models.price!(obj, pricing_model)
+    end
+
     return profit
 end
 
@@ -89,9 +132,16 @@ function unwind(obj::Widget, holdings)
     return profit
 end
 
-"""
-Extra functions needed to get the hedghing working
-"""
+function update_obj(obj::Option, _::Type{<:Hedging}, pricing_model, _, timesteps_per_period, _)
+    new_obj = typeof(obj)(;widget = obj.widget,
+                         maturity = obj.maturity - (1 / timesteps_per_period),
+                         risk_free_rate = obj.risk_free_rate,
+                         strike_price = obj.strike_price)
+   Models.price!(new_obj, pricing_model)
+
+   return new_obj
+end
+
 #-------Custome Price!----------#
 primitive type Expiry <: Model 8 end
 

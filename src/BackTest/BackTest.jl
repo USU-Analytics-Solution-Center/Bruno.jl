@@ -16,11 +16,11 @@ include("indicator.jl")
 abstract type Hedging end
 
 primitive type Naked <: Hedging 8 end
-primitive type DeltaHedge <: Hedging 8 end
-
+primitive type RebalanceDeltaHedge <: Hedging 8 end
+primitive type StaticDeltaHedge <: Hedging 8 end
 include("hedging.jl")
 
-export Naked, DeltaHedge
+export Naked, RebalanceDeltaHedge, StaticDeltaHedge
 export find_correlation_coeff, strategy_returns
 
 end # module 
