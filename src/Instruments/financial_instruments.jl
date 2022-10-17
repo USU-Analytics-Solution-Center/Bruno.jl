@@ -37,27 +37,27 @@ struct EuroCallOption{T <: Widget} <: CallOption{T}
     strike_price::AbstractFloat
     maturity::AbstractFloat
     risk_free_rate::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function EuroCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
-        value = Dict{String, AbstractFloat}()) where {T <: Widget}
+    function EuroCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
+        values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive\nmaturity=", maturity)
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 
     # ordered arguments constructor
-    function EuroCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+    function EuroCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 end
 
@@ -66,7 +66,7 @@ end
     EuroCallOption(widget, strike_price; kwargs...)
     EuroCallOption(;kwargs...)
     EuroCallOption{T<:Widget}(;kwargs...)
-    EuroCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, value)
+    EuroCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
 Construct a EuroCallOption with underlying asset `T` 
 
@@ -75,8 +75,8 @@ Construct a EuroCallOption with underlying asset `T`
 - `strike_price`: Contracted price to buy underlying asset at maturity
 - `maturity`: time to maturity of the option in years. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
-- `value`: The value or price of the call option using different models. Default initializes
-to an empty dictionary. use `price!()` function to load theoretical option prices
+- `values_library`: A dictionary of values returned from pricing functions. Default initializes
+to an empty dictionary. use `price!()` function to load theoretical option prices.
 
 ## Examples
 ```julia
@@ -88,12 +88,12 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 EuroCallOption(;kwargs...)
 ```
 """
-EuroCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
-    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-EuroCallOption(widget::Widget, strike_price:: Real, maturity::Real, value::Dict{String, AbstractFloat}) =
-    EuroCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, value = value)
-EuroCallOption(;widget, strike_price, maturity=1, risk_free_rate=.02, value=Dict{String, AbstractFloat}()) = 
-    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, value = value)
+EuroCallOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library=values_library)
+EuroCallOption(widget::Widget, strike_price::Real, maturity::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+    EuroCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, values_library=values_library)
+EuroCallOption(;widget, strike_price=widget.prices[end], maturity=1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+    EuroCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, values_library=values_library)
 
 """
     AmericanCallOption{T <: Widget} <: CallOption{T}
@@ -105,27 +105,27 @@ struct AmericanCallOption{T <: Widget} <: CallOption{T}
     strike_price::AbstractFloat
     maturity::AbstractFloat
     risk_free_rate::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function AmericanCallOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
-        value = Dict{String, AbstractFloat}()) where {T <: Widget}
+    function AmericanCallOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
+        values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 
     # ordered arguments constructor
-    function AmericanCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+    function AmericanCallOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 end
 
@@ -134,7 +134,7 @@ end
     AmericanCallOption(widget, strike_price; kwargs...)
     AmericanCallOption(;kwargs...)
     AmericanCallOption{T<:Widget}(;kwargs...)
-    AmericanCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, value)
+    AmericanCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
 Construct a AmericanCallOption with underlying asset `T` 
 
@@ -143,7 +143,7 @@ Construct a AmericanCallOption with underlying asset `T`
 - `strike_price`: Contracted price to buy underlying asset at maturity
 - `maturity`: time to maturity of the option in years. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
-- `value`: The value or price of the call option using different models. Default initializes
+- `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
@@ -156,12 +156,12 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 AmericanCallOption(;kwargs...)
 ```
 """
-AmericanCallOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
-    AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-AmericanCallOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
-    AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
-AmericanCallOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
-    AmericanCallOption{typeof(widget)}(;widget=widget, strike_price=strike_price, maturity=maturity, risk_free_rate=risk_free_rate, value=value)
+AmericanCallOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+    AmericanCallOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library=values_library)
+AmericanCallOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+    AmericanCallOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library=values_library)
+AmericanCallOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library=Dict{String, Dict{String, AbstractFloat}}()) = 
+    AmericanCallOption{typeof(widget)}(;widget=widget, strike_price=strike_price, maturity=maturity, risk_free_rate=risk_free_rate, values_library=values_library)
 
 """
     EuroPutOption{T <: Widget} <: CallOption{T}
@@ -173,27 +173,27 @@ struct EuroPutOption{T <: Widget} <: PutOption{T}
     strike_price::AbstractFloat
     maturity::AbstractFloat
     risk_free_rate::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function EuroPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
-        value = Dict{String, AbstractFloat}()) where {T <: Widget}
+    function EuroPutOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
+        values_library =Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 
     # ordered arguments constructor
-    function EuroPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, value) where {T <: Widget}
+    function EuroPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, values_library) where {T <: Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 end
 
@@ -202,7 +202,7 @@ end
     EuroPutOption(widget, strike_price; kwargs...)
     EuroPutOption(;kwargs...)
     EuroPutOption{T<:Widget}(;kwargs...)
-    EuroPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, value)
+    EuroPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
 Construct a EuroPutOption with underlying asset `T` 
 
@@ -211,7 +211,7 @@ Construct a EuroPutOption with underlying asset `T`
 - `strike_price`: Contracted price to buy underlying asset at maturity
 - `maturity`: time to maturity of the option in years. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
-- `value`: The value or price of the call option using different models. Default initializes
+- `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
@@ -224,12 +224,12 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 EuroPutOption(;kwargs...)
 ```
 """
-EuroPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
-    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-EuroPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
-    EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
-EuroPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
-    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, value = value)
+EuroPutOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library = values_library)
+EuroPutOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+    EuroPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
+EuroPutOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+    EuroPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity,risk_free_rate=risk_free_rate, values_library = values_library)
 
 """
     AmericanPutOption{T <: Widget} <: CallOption{T}
@@ -241,30 +241,30 @@ struct AmericanPutOption{T <: Widget} <: PutOption{T}
     strike_price::AbstractFloat
     maturity::AbstractFloat
     risk_free_rate::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, Dict{String, AbstractFloat}}
     
     # kwargs constructor
-    function AmericanPutOption{T}(; widget, strike_price, maturity = 1, risk_free_rate = .02,
-        value = Dict{String, AbstractFloat}()) where {T <: Widget}
+    function AmericanPutOption{T}(; widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate = .02,
+        values_library = Dict{String, Dict{String, AbstractFloat}}()) where {T <: Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 
     # ordered arguments constructor
     function AmericanPutOption{T}(widget::T, strike_price, maturity, risk_free_rate, 
-        value) where {T <: Widget}
+        values_library) where {T <: Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
-        maturity > 0 ? nothing : error("maturity must be positive")
-        value == Dict{String, AbstractFloat}() ? nothing : 
+        maturity >= 0 ? nothing : error("maturity must be positive")
+        values_library == Dict{String, Dict{String, AbstractFloat}}() ? nothing : 
             @warn("It is not recommended to pass values through the constructor, instead 
             model!(Instrument) should be used")
-        new{T}(widget, strike_price,  maturity, risk_free_rate, value)
+        new{T}(widget, strike_price,  maturity, risk_free_rate, values_library)
     end
 end
 
@@ -273,7 +273,7 @@ end
     AmericanPutOption(widget, strike_price; kwargs...)
     AmericanPutOption(;kwargs...)
     AmericanPutOption{T<:Widget}(;kwargs...)
-    AmericanPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, value)
+    AmericanPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
 Construct an AmericanPutOption with underlying asset `T` 
 
@@ -282,7 +282,7 @@ Construct an AmericanPutOption with underlying asset `T`
 - `strike_price`: Contracted price to buy underlying asset at maturity
 - `maturity`: time to maturity of the option in years. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
-- `value`: The value or price of the call option using different models. Default initializes
+- `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
 
 ## Examples
@@ -295,12 +295,12 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 AmericanPutOption(;kwargs...)
 ```
 """
-AmericanPutOption(widget::Widget, strike_price::Real; maturity = 1, risk_free_rate = .02, value = Dict{String, AbstractFloat}()) = 
-    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, value = value)
-AmericanPutOption(widget::Widget, strike_price:: Real, maturity::Real, risk_free_rate::Real, value::Dict{String, AbstractFloat}) =
-    AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
-AmericanPutOption(;widget, strike_price, maturity = 1, risk_free_rate=.02, value = Dict{String, AbstractFloat}()) = 
-    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, value = value)
+AmericanPutOption(widget::Widget, strike_price::Real=widget.prices[end]; maturity = 1, risk_free_rate = .02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate = risk_free_rate, values_library = values_library)
+AmericanPutOption(widget::Widget, strike_price::Real, maturity::Real, risk_free_rate::Real, values_library::Dict{String, Dict{String, AbstractFloat}}) =
+    AmericanPutOption{typeof(widget)}(;widget = widget, strik_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
+AmericanPutOption(;widget, strike_price=widget.prices[end], maturity = 1, risk_free_rate=.02, values_library = Dict{String, Dict{String, AbstractFloat}}()) = 
+    AmericanPutOption{typeof(widget)}(;widget = widget, strike_price = strike_price, maturity = maturity, risk_free_rate=risk_free_rate, values_library = values_library)
 
 
 # ------ Type system for futures: subtype of FinancialInstrument ------
@@ -314,7 +314,7 @@ struct Future{T <: Widget} <: FinancialInstrument
     strike_price::AbstractFloat
     risk_free_rate::AbstractFloat
     maturity::AbstractFloat
-    value::Dict{String, AbstractFloat}
+    values_library::Dict{String, Dict{String, AbstractFloat}}
 end
 
 # ------ Type system for stuff we haven't figured out yet ------ 
@@ -323,3 +323,12 @@ struct ETF <: FinancialInstrument end
 """Still under development"""
 struct InterestRateSwap <: FinancialInstrument end
 
+#------- Helpers
+function add_price_value(a_fin_inst::FinancialInstrument, a_new_price::Real)
+    a_new_price >= 0 ? nothing : @warn("You are trying to add a negative number to a prices list")
+    push!(a_fin_inst.widget.prices, a_new_price) 
+end
+
+function get_prices(a_fin_inst::FinancialInstrument)
+    a_fin_inst.widget.prices
+end

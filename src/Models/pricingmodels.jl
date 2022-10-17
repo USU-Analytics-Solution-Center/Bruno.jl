@@ -24,7 +24,6 @@ price!(a_fin_inst, BinomialTree)
 ```
 """
 price!(fin_obj::Any, pricing_model::Type{<:Any}) = error("Use a FinancialObject and a Model type")
-
 """
     price!(fin_obj::Option, pricing_model::Type{BinomialTree}; kwargs...)
 
@@ -58,6 +57,14 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
     strike_price = the strike price in dollars
     delta = intrest rate
     """
+    # println("Before if \t", tree_depth)
+    # if tree_depth == 3 && delta == 0
+    #     println("In if")
+    #     tree_depth, delta = "BinomialTree" in keys(fin_obj.values_library) ? (fin_obj.values_library["BinomialTree"]["tree_depth"], fin_obj.values_library["BinomialTree"]["tree_depth"]) : (tree_depth, delta)
+    #     tree_depth, delta = floor(Int64, tree_depth), floor(Int64, delta)
+    # end
+    # println("after if\t", tree_depth)
+
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
@@ -75,8 +82,9 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
         term_val = s_0 * u ^ k * d ^ (tree_depth - k)
         c += max(term_val - strike_price, 0) * p_star
     end
-
-    fin_obj.value["Binomial_tree"] = exp(-r * fin_obj.maturity) * c
+    value = exp(-r * fin_obj.maturity) * c
+    fin_obj.values_library["BinomialTree"] = Dict("value" => value, "tree_depth" => tree_depth, "delta" => delta)
+    return value
 end
 
 function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
@@ -113,7 +121,8 @@ function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; 
         to_return = a_vector[1]
     end
 
-    fin_obj.value["Binomial_tree"] = to_return
+    fin_obj.values_library["BinomialTree"] = Dict("value" => to_return, "depth" => tree_depth, "delta" => delta)
+    return to_return
 end
 
 function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
@@ -134,9 +143,10 @@ function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_
         term_val = s_0 * u ^ k * d ^ (tree_depth - k)
         c += max(strike_price - term_val, 0) * p_star
     end
+    value = exp(-r * fin_obj.maturity) * c
+    fin_obj.values_library["BinomialTree"] = Dict("value" => value, "depth" => tree_depth, "delta" => delta)
+    return value
 
-    fin_obj.value["Binomial_tree"] = exp(-r * fin_obj.maturity) * c
-    
 end
 
 function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
@@ -176,7 +186,8 @@ function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; t
 
     end
 
-    fin_obj.value["Binomial_tree"] = to_return
+    fin_obj.values_library["BinomialTree"] = Dict("value" => to_return, "depth" => tree_depth, "delta" => delta)
+    return to_return
 end
 
 # helper functions
@@ -220,7 +231,8 @@ function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackSch
     value = fin_obj.widget.prices[end] * cdf(Normal(), d1) - fin_obj.strike_price *
         exp(-fin_obj.risk_free_rate * fin_obj.maturity) * cdf(Normal(), d2)
 
-    fin_obj.value["BlackScholes"] = value
+    fin_obj.values_library["BlackScholes"] = Dict("value" => value)
+    return value
 end
 
 function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScholes})
@@ -231,7 +243,8 @@ function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScho
     value = fin_obj.strike_price * exp(-fin_obj.risk_free_rate * fin_obj.maturity) * cdf(Normal(), -d2) - 
         fin_obj.widget.prices[end] * cdf(Normal(), -d1)
 
-    fin_obj.value["BlackScholes"] = value
+    fin_obj.values_library["BlackScholes"] = Dict("value" => value)
+    return value
 end
 
 
@@ -290,7 +303,7 @@ function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{LogDiffusion}};
     value = sum(payoff(fin_obj, final_prices, fin_obj.strike_price)) / n_sims * 
         exp(-fin_obj.risk_free_rate * fin_obj.maturity)
 
-    fin_obj.value["MC_LogDiffusion"] = value
+    fin_obj.values_library["MC_LogDiffusion"] = Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
 end
 
 
@@ -309,7 +322,7 @@ function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{MCBootstrap}};
     value = sum(payoff(fin_obj, final_prices, fin_obj.strike_price)) / n_sims * 
         exp(-fin_obj.risk_free_rate * fin_obj.maturity)
 
-    fin_obj.value["MC_Bootstrap{$(bootstrap_method)}"] = value
+    fin_obj.values_library["MC_Bootstrap{$(bootstrap_method)}"] = Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
 end
 
 function payoff(type::CallOption, final_prices, strike_price)
