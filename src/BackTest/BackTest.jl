@@ -15,12 +15,12 @@ include("indicator.jl")
 # --- functions that find the returns for a given hedging Strat
 abstract type Hedging end
 
-primitive type RatioHedging <: Hedging 8 end
-primitive type one_to_one <: Hedging 8 end
+primitive type Naked <: Hedging 8 end
+primitive type DeltaHedge <: Hedging 8 end
 
 include("hedging.jl")
 
-export RatioHedging, one_to_one
-export find_correlation_coeff, get_returns
+export Naked, DeltaHedge
+export find_correlation_coeff, strategy_returns
 
 end # module 

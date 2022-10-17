@@ -323,3 +323,12 @@ struct ETF <: FinancialInstrument end
 """Still under development"""
 struct InterestRateSwap <: FinancialInstrument end
 
+#------- Helpers
+function add_price_value(a_fin_inst::FinancialInstrument, a_new_price::Real)
+    a_new_price >= 0 ? nothing : @warn("You are trying to add a negative number to a prices list")
+    push!(a_fin_inst.widget.prices, a_new_price) 
+end
+
+function get_prices(a_fin_inst::FinancialInstrument)
+    a_fin_inst.widget.prices
+end

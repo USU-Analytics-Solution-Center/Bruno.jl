@@ -1,60 +1,99 @@
 using Distributions
-
-primitive type DeltaHedge 8 end
 primitive type Expiry <: Model 8 end
 
-function get_returns(obj, sign, future_prices, strategy_mode, pricing_mode)
-    # + means going long (buying) - means going short (selling)
-    if typeof(obj) <: FinancialInstrument  # Check to see if a given FinancialInstrument has been pre-loaded
-        if obj.values_library == Dict{String, Dict{String, AbstractFloat}}()
-            @warn("No previous price initialized for the FinancialInstrument using default")
-        end
-    end
-    # initialize your position 
-    # buy or sell the obj depnding on the sign
-    bank = -sign(Models.price!(obj, pricing_mode))
-
-    bank = simulate(obj, future_prices, strategy_mode, pricing_mode, bank)
-
-    # unwind position - sell what you have left buy what you short sold
-    bank += sign(Models.price!(obj, Expiry))
+function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_timesteps, timesteps_per_period, 
+                            cash_injection=0.0, fin_obj_count=0, widget_count=0,pay_int_rate=0, hold_return_int_rate=0; kwargs...)
+    # Set up the function  
+    future_prices = deepcopy(future_prices)  # we do deep copies so the objects out of scope arent stomped on
+    obj = deepcopy(obj)
+    length(future_prices) < n_timesteps ? error("Not enough future prices to accomidate the given amount of time steps.") : nothing
     
-    # return bank
-end
+    # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
+    holdings = Dict("cash" => cash_injection, "fin_obj_count" => fin_obj_count, "widget_count" => widget_count)
+    ts_holdings = Dict("cash" => [cash_injection], "fin_obj_count" => [fin_obj_count], "widget_count" => [widget_count])
 
+    for step in 1:n_timesteps  # preform a strat for given time steps
+        holdings = strategy(obj, pricing_model, strategy_type, holdings, step; kwargs...)  # do the strategy
+        obj = update_obj(obj, strategy_type, pricing_model, n_timesteps, timesteps_per_period, step)  # if we need to mess around with maturity do it here
+        
+        # updatae the snapshot of holdings for time series analysis
+        for (key, value) in holdings
+            push!(ts_holdings[key], value)
+        end 
 
-function simulate(fin_obj::Option, future_prices, strategy_mode, pricing_mode, trading_profit)
-    # how much money we get/ loose from hedging the position at each time step
-    # assums we are also closing any hedging positions at the end
-    # for buying an option
-    prev_hedging_asset_count = 0
-    hedging_asset_count = 0  # declaring here so for scope reasons
-    for i in 1:lastindex(future_prices)
-        # gives us the "optimal" holding ratio of fin_obj to underlying asset
-        hedging_asset_count = strategy(fin_obj, strategy_mode)
+        # pay / get interest off cash holdings
+        if holdings["cash"] >= 0
+            holdings["cash"] *= exp(hold_return_int_rate / timesteps_per_period)
+        else
+            holdings["cash"] *= exp(-pay_int_rate / timesteps_per_period)
+        end
 
-        # trading_profit += interest(stuff...)
-        trading_profit += (prev_hedging_asset_count - hedging_asset_count) * price!(fin_obj, pricing_mode)  # "sells" and "buys" fin_obj and underlyign asset to get to the holding_ratio
-        prev_hedging_asset_count = hedging_asset_count
-        push!(fin_obj.widget.prices, popfirst!(future_prices))
-        println(trading_profit)
+        # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
+        add_price_value(obj, popfirst!(future_prices))
     end
-    println("\t", hedging_asset_count)
-    # # at end of the time steps sell the hedging object
-    trading_profit += hedging_asset_count * price!(fin_obj.widget, Expiry)
 
-    return trading_profit
+    # unwind the postions
+    holdings["cash"] += unwind(obj, holdings)
+    # update holdings one last time
+    for (key, value) in holdings
+        push!(ts_holdings[key], value)
+    end 
+
+    return holdings["cash"], ts_holdings, obj
 end
 
-#-------strategies----------#
-function strategy(fin_obj, strategy_mode::Type{one_to_one})
-    return 1
+
+"""
+functions Naked strategy_mode
+"""
+function buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] -= number * Models.price!(fin_obj, pricing_model)["value"] + transaction_cost
+    holdings["fin_obj_count"] += number
+
+    return holdings
 end
 
-function strategy(fin_obj, strategy_mode::Type{RatioHedging})
-    rand(Uniform(0.4,0.6))
+function buy(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
+    holdings["cash"] -= number * Models.price!(widget_obj, pricing_model)["value"] + transaction_cost
+    holdings["widget_count"] += number
+
+    return holdings
 end
 
+function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Type{<:Naked}, holdings, step; kwargs...)
+    # this is the naked strategy. So we are not hedging... Just buy one of whatever and let it ride
+    if step == 1
+        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
+    end
+
+    return holdings
+end
+
+function update_obj(obj::Option, _::Type{<:Naked}, pricing_model, _, timesteps_per_period, _)
+     new_obj = typeof(obj)(;widget = obj.widget,
+                          maturity = obj.maturity - (1 / timesteps_per_period),
+                          strike_price = obj.strike_price,
+                          risk_free_rate = obj.risk_free_rate)
+    Models.price!(new_obj, pricing_model)
+
+    return new_obj
+end
+
+function unwind(obj::FinancialInstrument, holdings)
+    profit = holdings["fin_obj_count"] * Models.price!(obj, Expiry)
+    holdings["fin_obj_count"] = 0
+    return profit
+end
+
+function unwind(obj::Widget, holdings)
+    profit = holdings["widget_count"] * obj.prices[end]
+    holdings["widget_count"] = 0
+    return profit
+end
+
+"""
+Extra functions needed to get the hedghing working
+"""
 #-------Custome Price!----------#
 # these are extra... really only used for hedging models
 Models.price!(fin_obj::Stock) = fin_obj.prices[end]
@@ -67,8 +106,8 @@ Models.price!(fin_obj::PutOption, _::Type{Expiry}) = max(0, fin_obj.strike_price
 #-------Helper Functions--------#
 function find_correlation_coeff(obj_a::Union{Stock, Commodity}, obj_b::Union{Stock, Commodity})
     """
-Pearson correlation
-"""
+    Pearson correlation
+    """
     a_average = sum(obj_a.prices) / lastindex(obj_a.prices)
     b_average = sum(obj_b.prices) / lastindex(obj_b.prices)
     cov = sum((obj_a.prices .- a_average) .* (obj_b.prices .- b_average)) / sqrt(sum((obj_a.prices .- a_average) .^ 2)  * sum((obj_b.prices .- b_average) .^ 2))
