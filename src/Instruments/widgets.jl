@@ -224,8 +224,7 @@ function get_volatility(prices)
     length(prices) > 2 ? nothing : return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
     returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)] 
     cont_return = log.(returns)
-    # cont_return = log.(Complex.(returns))
-    std(cont_return) 
+    std(cont_return) * sqrt(length(prices))  
 end
 
 function add_price_value(a_widget::Widget, a_new_price::Real)
