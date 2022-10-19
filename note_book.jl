@@ -35,10 +35,10 @@ df = CSV.read("./examples/AAPL.csv", DataFrame);
 years = groupby(transform(df, :Date => x->year.(x)),:Date_function);
 
 # ╔═╡ 591732c6-daa2-476d-b375-12424e23967b
-historical_data = years[1];
+historical_data = years[5];
 
 # ╔═╡ 1fcab2a1-878d-49c9-b66c-a05e1637f201
-combined_prices = vcat(years[2], years[3], years[4], years[5], years[6], cols = :union);
+combined_prices = vcat(years[6], cols = :union);
 
 # ╔═╡ ae82b8d0-55c9-4ea9-851d-e1453ca384ef
 future_prices = combined_prices[!, "Adj Close"]
@@ -104,7 +104,7 @@ plot(1:length(q_call_holdings["delta"]), q_call_holdings["delta"])
 md"""### Rebalanced Delta Hedge with weekly rebalancing"""
 
 # ╔═╡ 0eb0ff0e-9644-4cd7-be61-900d223eb88c
-w_put_cash, w_put_holdings, w_put_after = strategy_returns(appl_put, BlackScholes, RebalanceDeltaHedge, future_prices, length(future_prices), 252; transaction_cost=0.65, steps_between=5)
+w_put_cash, w_put_holdings, w_put_after = strategy_returns(appl_put, BlackScholes, RebalanceDeltaHedge, future_prices, length(future_prices), 252; transaction_cost=0.65, steps_between=30)
 
 # ╔═╡ 055eadf4-8d4d-4177-b764-e30ebedccd8f
 w_put_cash
@@ -119,7 +119,7 @@ plot(1:length(w_put_holdings["cash"]), w_put_holdings["cash"])
 plot(1:length(w_put_holdings["delta"]), w_put_holdings["delta"])
 
 # ╔═╡ f2621f40-fb8b-42e6-8d83-42164434369b
-w_call_cash, w_call_holdings, w_call_after = strategy_returns(appl_call, BlackScholes, RebalanceDeltaHedge, future_prices, length(future_prices), 252; transaction_cost=0.65, steps_between=5)
+w_call_cash, w_call_holdings, w_call_after = strategy_returns(appl_call, BlackScholes, RebalanceDeltaHedge, future_prices, length(future_prices), 252; transaction_cost=0.65, steps_between=20)
 
 # ╔═╡ a85c1df8-5eb8-4e00-94ad-9d496d15bfde
 w_call_cash

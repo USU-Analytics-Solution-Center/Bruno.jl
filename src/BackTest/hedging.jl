@@ -11,8 +11,8 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
     obj = deepcopy(obj)
 
     # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
-    holdings = Dict("cash" => cash_injection, "fin_obj_count" => fin_obj_count, "widget_count" => widget_count, "delta" => 0.0)
-    ts_holdings = Dict("cash" => [cash_injection], "fin_obj_count" => [fin_obj_count], "widget_count" => [widget_count], "delta" => [0.0])
+    holdings = Dict("cash" => cash_injection, "fin_obj_count" => fin_obj_count, "widget_count" => widget_count, "delta" => 0.0, "premium"=> price!(obj, pricing_model))
+    ts_holdings = Dict("cash" => [cash_injection], "fin_obj_count" => [fin_obj_count], "widget_count" => [widget_count], "delta" => [0.0], "premium" => [holdings["premium"]])
 
     for step in 1:n_timesteps  # preform a strat for given time steps
         holdings = strategy(obj, pricing_model, strategy_type, holdings, step; kwargs...)  # do the strategy
@@ -30,6 +30,7 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
         end
 
         obj = update_obj(obj, strategy_type, pricing_model, future_prices, n_timesteps, timesteps_per_period, step)
+        holdings["premium"] = price!(obj, pricing_model)
     end
 
     # unwind the postions
