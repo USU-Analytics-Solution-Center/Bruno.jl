@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.13
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -13,14 +13,14 @@ Pkg.add("Plots");
 # ╔═╡ 4b13d507-04f3-482c-921b-a48bb0f26269
 Pkg.add("Dates");
 
-# ╔═╡ c5338429-383e-4311-b740-e5390de4cb09
-Pkg.add("Indicators")
-
 # ╔═╡ a7f23bfa-5a3e-4aa4-b124-7705bc3e804f
 using CSV, Plots, DataFrames, Dates
 
 # ╔═╡ 50fa0f8d-bbc6-494a-b92c-eb8f24b93beb
 using Bruno
+
+# ╔═╡ 4fafafd2-7d94-40cb-8d80-8aa3eafbb287
+using Statistics
 
 # ╔═╡ 1eaad207-be7e-4ad7-9677-fb5cd46d2739
 md"""Random code to get julia and Bruno running in environment"""
@@ -50,13 +50,16 @@ md"""Creating the Stock and EuroCallOption and EuroPutOption structs to be used 
 apple_stock = Stock(;prices=historical_data[!, "Adj Close"], name="AAPL")
 
 # ╔═╡ 9f5d02f3-5105-4f8b-bc0a-b31be938149c
-appl_put = EuroPutOption(apple_stock, apple_stock.prices[end]; maturity=5)
+appl_put = EuroPutOption(apple_stock, apple_stock.prices[end]; maturity=6)
 
 # ╔═╡ d5e9e3d8-dc63-426e-a92b-b675268142d7
-appl_call = EuroCallOption(apple_stock, apple_stock.prices[end]; maturity=5)
+appl_call = EuroCallOption(apple_stock, apple_stock.prices[end]; maturity=6)
+
+# ╔═╡ b94ce721-3bca-4e51-bd60-dcab3330ebf0
+price!(appl_put, BlackScholes)
 
 # ╔═╡ e6a900fc-3490-4446-bf0f-32c53fc5f64e
-kwargs = Dict(:steps_between => 91)
+kwargs = Dict(:steps_between => 86)
 
 # ╔═╡ 3a36182a-a2bc-4bbd-a31b-eed651b961a7
 md"""### Running the strategy for a rebalanced delta hedge with quarterly rebalancing"""
@@ -79,11 +82,14 @@ plot(1:length(q_put_holdings["cash"]), q_put_holdings["cash"])
 # ╔═╡ 16c22925-6dbb-442a-8681-0f006730c020
 plot(1:length(q_put_holdings["delta"]), q_put_holdings["delta"])
 
+# ╔═╡ 067f65b1-056e-427d-8901-e6cfb4a0d791
+plot(1:length(q_put_holdings["premium"]), q_put_holdings["premium"])
+
 # ╔═╡ da3f9f17-bbea-4de5-abd4-9daced3e0663
 q_call_cash, q_call_holdings, q_call_after = strategy_returns(appl_call, BlackScholes, RebalanceDeltaHedge, future_prices, length(future_prices), 252; transaction_cost=0.65, kwargs...)
 
 # ╔═╡ bb6a7bd1-c1f1-4897-9745-a21d739c21c8
-q_call_cash
+q_call_cash*100
 
 # ╔═╡ d8c8d4a6-edac-40b1-a5b1-9371c6391376
 plot(1:length(q_call_holdings["widget_count"]), q_call_holdings["widget_count"])
@@ -160,28 +166,65 @@ plot(1:length(d_call_holdings["cash"]), d_call_holdings["cash"])
 # ╔═╡ be636d76-f6b6-46c6-aabe-51ca944dc744
 plot(1:length(d_call_holdings["delta"]), d_call_holdings["delta"])
 
+# ╔═╡ c5338429-383e-4311-b740-e5390de4cb09
+
+
 # ╔═╡ ffe721dd-7a74-4b7d-9d82-c9dba69017e8
-import Indicators
+x, y, z = strategy_returns(appl_call, BlackScholes, Naked, future_prices, length(future_prices), 252; transaction_cost=0.65, steps_between=1)
 
-# ╔═╡ d4766288-6faa-401c-974e-7c09d0d665c0
-fast_moving_avg = Indicators.ema(Array(df[!, "Adj Close"]); n=20)
-
-# ╔═╡ d313b6ac-d3f9-4a45-adcb-6a1da2759d07
-slow_moving_avg = Indicators.ema(Array(df[!, "Adj Close"]); n=60)
-
-# ╔═╡ ac6bd368-20ac-4665-8522-cf17b88175ee
-primitive type StockPriceEMACross 8 end
-
-# ╔═╡ 8c19e038-425e-423a-bdef-f6bf9ab14ada
-function strategy(fin_obj::Stock, pricing_model, strategy_mode::Type{StockPriceEMACross}, holdings, step; kwargs...)
-	nothing
-end
+# ╔═╡ 6b5f5c94-99b1-4a3c-89cc-0181ba0c83fd
+x
 
 # ╔═╡ e833942a-b45e-42f2-8743-d3da9dc12aa3
-
+plot(1:length(y["cash"]), y["cash"])
 
 # ╔═╡ d57ad250-ad79-41b7-9eca-ecbf2fd08265
+plot(1:length(y["cash"]), y["cash"])
 
+# ╔═╡ 69d594d9-b170-4f91-bb41-43885363c5c9
+logSetup = LogDiffInput(length(future_prices), appl_call.widget.prices[1], appl_call.widget.volatility / sqrt(252), log(1.3) * length(future_prices) / 252)
+
+# ╔═╡ 1eb02eb1-8620-4f38-accf-cc75f88891c6
+logData = makedata(logSetup, 1000)
+
+# ╔═╡ af21a288-57fd-468a-9573-b766ca93b3ff
+cash_array = []
+
+# ╔═╡ 60caa01a-a8fb-48bf-b953-5fdcea0112d5
+premiums = []
+
+# ╔═╡ a1eae53a-dcbc-4e95-8dca-003cce86e38c
+for i in 1:5
+	new_values = Array(logData[:,i])
+	anOption = EuroCallOption(apple_stock, apple_stock.prices[end]; maturity=6)
+	loop_cash, holdingsX, xy = strategy_returns(appl_call, BlackScholes, Naked, new_values, length(future_prices), 252; transaction_cost=0.65, steps_between=20)
+	push!(cash_array, loop_cash)
+
+	push!(premiums, holdingsX["premium"])
+end
+
+# ╔═╡ 0a07e5f0-003f-4548-87a9-dcb355ffaa0b
+aa_premium = premiums[1]
+
+# ╔═╡ b65d109b-e548-4973-88eb-1d435b1c8f5a
+begin 
+	plot(x=1:length(premiums[1]), y=premiums[1])
+	for i in premiums[2:end]
+		plot!(1:length(aa_premium), i)
+	end
+end 
+
+# ╔═╡ 430a1e8b-8b1f-4842-a7e7-b68b1569c96c
+cash_array
+
+# ╔═╡ ffac7fb5-eee7-4b06-93b1-4670b664b7f3
+mean(cash_array)
+
+# ╔═╡ b5e82c87-5181-4f50-ae87-28c15e33f22d
+max(cash_array...)
+
+# ╔═╡ 5504ed02-47d8-4f69-be0b-5fc77a552c1d
+min(cash_array...)
 
 # ╔═╡ Cell order:
 # ╟─1eaad207-be7e-4ad7-9677-fb5cd46d2739
@@ -200,6 +243,7 @@ end
 # ╠═032c8e45-9847-48fc-9e86-5ac3f29cb7b4
 # ╠═9f5d02f3-5105-4f8b-bc0a-b31be938149c
 # ╠═d5e9e3d8-dc63-426e-a92b-b675268142d7
+# ╠═b94ce721-3bca-4e51-bd60-dcab3330ebf0
 # ╠═e6a900fc-3490-4446-bf0f-32c53fc5f64e
 # ╟─3a36182a-a2bc-4bbd-a31b-eed651b961a7
 # ╠═5ddc4d13-c484-4a95-8f3b-61c326b9731e
@@ -208,6 +252,7 @@ end
 # ╠═94866539-4213-450a-8a43-003a178ad60d
 # ╠═87eae18c-8174-4443-9372-4f0877fedbce
 # ╠═16c22925-6dbb-442a-8681-0f006730c020
+# ╠═067f65b1-056e-427d-8901-e6cfb4a0d791
 # ╠═da3f9f17-bbea-4de5-abd4-9daced3e0663
 # ╠═bb6a7bd1-c1f1-4897-9745-a21d739c21c8
 # ╠═d8c8d4a6-edac-40b1-a5b1-9371c6391376
@@ -237,9 +282,18 @@ end
 # ╠═be636d76-f6b6-46c6-aabe-51ca944dc744
 # ╠═c5338429-383e-4311-b740-e5390de4cb09
 # ╠═ffe721dd-7a74-4b7d-9d82-c9dba69017e8
-# ╠═d4766288-6faa-401c-974e-7c09d0d665c0
-# ╠═d313b6ac-d3f9-4a45-adcb-6a1da2759d07
-# ╠═ac6bd368-20ac-4665-8522-cf17b88175ee
-# ╠═8c19e038-425e-423a-bdef-f6bf9ab14ada
+# ╠═6b5f5c94-99b1-4a3c-89cc-0181ba0c83fd
 # ╠═e833942a-b45e-42f2-8743-d3da9dc12aa3
 # ╠═d57ad250-ad79-41b7-9eca-ecbf2fd08265
+# ╠═69d594d9-b170-4f91-bb41-43885363c5c9
+# ╠═1eb02eb1-8620-4f38-accf-cc75f88891c6
+# ╠═af21a288-57fd-468a-9573-b766ca93b3ff
+# ╠═60caa01a-a8fb-48bf-b953-5fdcea0112d5
+# ╠═a1eae53a-dcbc-4e95-8dca-003cce86e38c
+# ╠═0a07e5f0-003f-4548-87a9-dcb355ffaa0b
+# ╠═b65d109b-e548-4973-88eb-1d435b1c8f5a
+# ╠═430a1e8b-8b1f-4842-a7e7-b68b1569c96c
+# ╠═4fafafd2-7d94-40cb-8d80-8aa3eafbb287
+# ╠═ffac7fb5-eee7-4b06-93b1-4670b664b7f3
+# ╠═b5e82c87-5181-4f50-ae87-28c15e33f22d
+# ╠═5504ed02-47d8-4f69-be0b-5fc77a552c1d
