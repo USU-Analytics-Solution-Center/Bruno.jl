@@ -1,3 +1,5 @@
+using Distributions
+
 function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_timesteps, timesteps_per_period, 
                             cash_injection=0.0, fin_obj_count=0.0, widget_count=0.0,pay_int_rate=0, hold_return_int_rate=0; kwargs...)
     # Make some checks
@@ -27,11 +29,7 @@ function strategy_returns(obj, pricing_model, strategy_type, future_prices, n_ti
             holdings["cash"] *= exp(-pay_int_rate / timesteps_per_period)
         end
 
-        # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
-        add_price_value(obj, popfirst!(future_prices))
-        popfirst!(get_prices(obj))  # remove the most stale price
-
-        obj = update_obj(obj, strategy_type, pricing_model, n_timesteps, timesteps_per_period, step)
+        obj = update_obj(obj, strategy_type, pricing_model, future_prices, n_timesteps, timesteps_per_period, step)
     end
 
     # unwind the postions
@@ -73,7 +71,7 @@ function strategy(fin_obj::CallOption, pricing_model, strategy_mode::Type{<:Reba
         buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])        
     end
     if (step - 1) % kwargs[:steps_between] == 0
-        delta = (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))
+        delta = cdf(Normal(), (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity)))
         holdings["delta"] = delta
         change = delta - abs(holdings["widget_count"])  # new - old = Change
         if change > 0  # if delta increased we want to increase the hedge
@@ -91,13 +89,13 @@ function strategy(fin_obj::PutOption, pricing_model, strategy_mode::Type{<:Rebal
         buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])        
     end
     if (step - 1) % kwargs[:steps_between] == 0
-        delta = (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))
+        delta = cdf(Normal(), (log(fin_obj.widget.prices[end] / fin_obj.strike_price) + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))) - 1
         holdings["delta"] = delta
-        change = delta - abs(holdings["widget_count"])  # new - old = Change
+        change = delta + holdings["widget_count"]  # new - old = Change
         if change > 0  # if delta increased we want to increase the hedge
-            buy(fin_obj.widget, change, holdings, pricing_model, 0)
+            sell(fin_obj.widget, change, holdings, pricing_model, 0)
         else  # if delta decreased we want to lessen the hedge 
-            sell(fin_obj.widget, -change, holdings, pricing_model, 0)  # assuming no transaction cost for widgets. Note we flip the sign here for ease in buy
+            buy(fin_obj.widget, -change, holdings, pricing_model, 0)  # assuming no transaction cost for widgets. Note we flip the sign here for ease in buy
         end
     end
 
@@ -155,19 +153,27 @@ function unwind(obj::Widget, holdings)
     return profit
 end
 
-function update_obj(obj::Option, _::Type{<:Hedging}, pricing_model, _, timesteps_per_period, _)
-    new_obj = typeof(obj)(;widget = obj.widget,
+function update_obj(obj::Option, _::Type{<:Hedging}, pricing_model, future_prices, _, timesteps_per_period, _)
+
+    # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
+    add_price_value(obj, popfirst!(future_prices))
+    popfirst!(get_prices(obj))  # remove the most stale price
+
+    new_obj = typeof(obj)(;widget = typeof(obj.widget)(obj.widget.prices),
                          maturity = obj.maturity - (1 / timesteps_per_period),
                          risk_free_rate = obj.risk_free_rate,
                          strike_price = obj.strike_price)
-   Models.price!(new_obj, pricing_model)
+    Models.price!(new_obj, pricing_model)
 
-   return new_obj
+    return new_obj
 end
 
-function update_obj(obj::Widget, _::Type{<:Hedging}, _, _, _, _)
-    new_obj = deepcopy(obj)
-   return new_obj
+function update_obj(obj::Widget, _::Type{<:Hedging}, pricing_model, _, _, _, _)
+    add_price_value(obj, popfirst!(future_prices))
+    popfirst!(get_prices(obj))  # remove the most stale price
+
+    new_obj = typeof(obj)(deepcopy(obj.prices))
+    return new_obj
 end
 
 #-------Custome Price!----------#
