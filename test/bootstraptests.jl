@@ -13,10 +13,10 @@
     beta = top / bottom 
 
     # check a set of bootstraps to see if we can recover beta
-    input = BootstrapInput{v}(ar1, 1000, 50, 1)
+    input = BootstrapInput{v}(ar1, 1000, 50)
     results = zeros(1000)
     for i in 1:1000
-        bootstrap = getData(input)
+        bootstrap = makedata(input)
         top = dot(bootstrap[1:end-1], bootstrap[2:end])
         bottom = dot(bootstrap[1:end-1], bootstrap[1:end-1])
         results[i] = top / bottom
@@ -36,8 +36,8 @@ end
     @test ar1ADF.stat < ar1ADF.cv[1]
 
     # bootstrap AR(1) series 
-    input = BootstrapInput{Stationary}(ar1, 1000, 50, 1)
-    bs_data = getData(input)
+    input = BootstrapInput{Stationary}(ar1, 1000, 50)
+    bs_data = makedata(input)
     bootstrap = [bs_data[i] for i in 1:length(bs_data)]
     bsADF = ADFTest(bootstrap, :none, 0)
     
@@ -56,8 +56,8 @@ end
     # test for minimum block lenght value (this should require using b_max in the function, 
     # not b_length) These minimum parameters are from Andrew Patton's matlab code as well
     # as the python arch package by Kevin Sheppard
-    @test opt_block_length(ar, Stationary()) == 7.0
-    @test opt_block_length(ar, CircularBlock())  == 7.0
+    @test opt_block_length(ar, Stationary) == 7.0
+    @test opt_block_length(ar, CircularBlock)  == 7.0
 
     # AR(1) dataset to be used in the larger series 
     ar = [1.0, 1.513150483642114, 1.4372622307759826, 1.4479754825782691, 0.6450704760464047, 
@@ -76,14 +76,14 @@ end
 
     # testing out the block size using the data above against computed values using the 
     # Politis and White paper defining the algorithm.
-    @test isapprox(opt_block_length(ar, Stationary()), 6.3085; atol=.001)
-    @test isapprox(opt_block_length(ar, CircularBlock()), 7.2214; atol = .001)
+    @test isapprox(opt_block_length(ar, Stationary), 6.3085; atol=.001)
+    @test isapprox(opt_block_length(ar, CircularBlock), 7.2214; atol = .001)
 end
 
 @testset "$bstype Dimensional check for nSimulation > 1" for bstype in [Stationary, 
                                                             MovingBlock, CircularBlock]
     n = 10 # number of rows (resample size) in the resulting matrix
     m = 4 # number of columns (runs) in resulting matrix
-    bs_input = BootstrapInput{bstype}([1,2,3,4,5,6,7,8], n, 3, 1)
-    @test size(getData(bs_input, m)) == (n, m)
+    bs_input = BootstrapInput{bstype}([1,2,3,4,5,6,7,8], n, 3)
+    @test size(makedata(bs_input, m)) == (n, m)
 end
