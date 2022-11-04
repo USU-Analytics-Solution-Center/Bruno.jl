@@ -5,21 +5,23 @@ class Stock:
     def __init__(self, prices, name, volatility=None) -> None:
         # make the julia type object
         if volatility is None:
-            self.__stock__ = Main.Instruments.Stock(prices, name)
+            self.__jlObg__ = Main.Instruments.Stock(prices, name)
         else:
-            self.__stock__ = Main.Instruments.Stock(prices, name, volatility)
+            self.__jlObg__ = Main.Instruments.Stock(prices, name, volatility)
 
         self.prices = prices
         self.name = name
-        self.volatility = self.__stock__.volatility
+        self.volatility = self.__jlObg__.volatility
 
     def makeStock(self, prices, name, volatility=None):
-        return Stock(prices, name, volatility)  # have to create a new "Stock" julia objs not mutable
+        self = Stock(prices, name, volatility)  # have to create a new "Stock" julia objs not mutable
+        return self
 
     def set_prices(self, prices):
-        self.__stock__ = self.makeStock(prices, self.name)
-        self.prices = prices
-        self.volatility = self.__stock__.volatility
+        return self.makeStock(prices, self.name)
+
+    def get_jl_object(self):
+        return self.__jlObg__
 
     def __str__(self) -> str:
         return "Type Stock\n\tName = " + self.name + "\n\tvolatility = " + str(self.volatility)
