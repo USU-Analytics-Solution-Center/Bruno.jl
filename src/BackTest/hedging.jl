@@ -6,7 +6,6 @@ function strategy_returns(obj::FinancialInstrument, pricing_model, strategy_type
 
     # Make some checks
     length(future_prices) < n_timesteps ? error("Not enough future prices to accomidate the given amount of time steps.") : nothing
-    # TODO Add A check for     
     
     # Set up the function  
     future_prices = deepcopy(future_prices)  # we do deep copies so the objects out of scope arent stomped on
