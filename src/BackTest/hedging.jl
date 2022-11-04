@@ -1,8 +1,9 @@
 using Distributions
 
 # for a single object strategy
-function strategy_returns(obj::Union{FinancialInstrument, Widget}, pricing_model, strategy_type, future_prices::Vector{T}, n_timesteps, timesteps_per_period, 
+function strategy_returns(obj::FinancialInstrument, pricing_model, strategy_type, future_prices::Vector{T}, n_timesteps, timesteps_per_period, 
                             cash_injection=0.0, fin_obj_count=0.0, widget_count=0.0,pay_int_rate=0, hold_return_int_rate=0; kwargs...) where T<:Real
+
     # Make some checks
     length(future_prices) < n_timesteps ? error("Not enough future prices to accomidate the given amount of time steps.") : nothing
     # TODO Add A check for     
@@ -12,8 +13,8 @@ function strategy_returns(obj::Union{FinancialInstrument, Widget}, pricing_model
     obj = deepcopy(obj)
 
     # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
-    holdings = Dict("cash" => cash_injection, "fin_obj_count" => fin_obj_count, "widget_count" => widget_count, "delta" => 0.0, "premium"=> price!(obj, pricing_model))
-    ts_holdings = Dict("cash" => [cash_injection], "fin_obj_count" => [fin_obj_count], "widget_count" => [widget_count], "delta" => [0.0], "premium" => [holdings["premium"]])
+    holdings = Dict("cash" => cash_injection, "$(obj.label)" => fin_obj_count, "$(obj.widget.name)" => widget_count)
+    ts_holdings = Dict("cash" => [cash_injection], "$(obj.label)" => [fin_obj_count], "$(obj.widget.name)" => [widget_count])
 
     for step in 1:n_timesteps  # preform a strat for given time steps
         holdings = strategy(obj, pricing_model, strategy_type, holdings, step; kwargs...)  # do the strategy
@@ -30,8 +31,7 @@ function strategy_returns(obj::Union{FinancialInstrument, Widget}, pricing_model
             holdings["cash"] *= exp(-pay_int_rate / timesteps_per_period)
         end
 
-        obj = update_obj(obj, strategy_type, pricing_model, future_prices, n_timesteps, timesteps_per_period, step)
-        holdings["premium"] = price!(obj, pricing_model)
+        obj = update_obj(obj, strategy_type, pricing_model, holdings, future_prices, n_timesteps, timesteps_per_period, step)
     end
 
     # unwind the postions
@@ -58,7 +58,25 @@ function strategy_returns(objs::Vector{<:FinancialInstrument},
                             hold_return_int_rate=0; 
                             kwargs...) where T<:Real
     
-    # TODO make checks before the sim starts
+    # checks before the sim starts
+    for fin_obj in objs
+        try 
+            future_prices["$(fin_obj.widget.name)"]
+        catch e
+            if isa(e, KeyError)
+                error("Must provide a vector of future prices for each widget of each FinancialInstrument in objs")
+            else
+                error("Something went wrong. Make sure the future_prices Dict is set up correctly. Check documentation for more information.")
+            end
+        end
+    end
+            
+    for key in keys(future_prices)
+        length(future_prices[key]) < n_timesteps ? error("Not enough future prices for $(key) to accomidate the given amount of time steps.") : nothing
+    end
+
+    timesteps_per_period < 0 ? error("timesteps_per_period must be greater than 0") : nothing
+    
 
     # Set up the needed fin objects (copy them so don't get stomped on)
     obj_array, widget_array = copy_obj(objs)
@@ -164,7 +182,7 @@ Active strategies
 function strategy(fin_obj::FinancialInstrument, pricing_model, strategy_mode::Type{<:Naked}, holdings, step; kwargs...)
     # this is the naked strategy. So we are not hedging... Just buy one of whatever and let it ride
     if step == 1
-        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
+        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost]; kwargs...)
     end
 
     return holdings
@@ -221,7 +239,7 @@ function strategy(obj_array::Vector{<:FinancialInstrument}, pricing_model, strat
     # just buy one of each obj in array
     for obj in obj_array
         if step == 1
-            buy(obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
+            buy(obj, 1, holdings, pricing_model, kwargs[:transaction_cost]; kwargs...)
         end
     end
 
@@ -231,12 +249,12 @@ end
 """
 Extra functions needed to get the hedging working
 """
-function buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
+function buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost=0.0; kwargs...)
     if fin_obj.maturity == 0
         @warn("Unable to buy expired FinancialInstrument")
         return holdings
     end
-    holdings["cash"] -= (number * Models.price!(fin_obj, pricing_model)) + transaction_cost
+    holdings["cash"] -= (number * Models.price!(fin_obj, pricing_model; kwargs...)) + transaction_cost
     holdings["$(fin_obj.label)"] += number
 
     return holdings
@@ -248,12 +266,12 @@ function buy(widget_obj::Widget, number::Real, holdings, pricing_model, transact
     return holdings
 end
 
-function sell(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost)
+function sell(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, transaction_cost; kwargs...)
     if fin_obj.maturity == 0
         @warn("Unable to sell an expired FinancialInstrument")
         return holdings
     end
-    holdings["cash"] += number * Models.price!(fin_obj, pricing_model) - transaction_cost
+    holdings["cash"] += number * Models.price!(fin_obj, pricing_model; kwargs...) - transaction_cost
     holdings["$(fin_obj.label)"] -= number
 
     return holdings
@@ -270,20 +288,20 @@ function unwind(obj::FinancialInstrument, pricing_model, holdings)
     profit = 0
     if obj.maturity == 0 # should have got closed out in update_obj, but this is will catch as well
         profit += holdings["$(obj.label)"] * Models.price!(obj, Expiry)  # close out obj
-        profit += holdings["widget_count"] * obj.widget.prices[end]  # close out hedge
+        profit += holdings["$(obj.widget.name)"] * obj.widget.prices[end]  # close out hedge
         holdings["$(obj.label)"] = 0
-        holdings["widget_count"] = 0
+        holdings["$(obj.widget.name)"] = 0
     elseif obj.maturity > 0
         profit += holdings["$(obj.label)"] * Models.price!(obj, pricing_model)
-        profit += holdings["widget_count"] * obj.widget.prices[end]  # close out hedge
+        profit += holdings["$(obj.widget.name)"] * obj.widget.prices[end]  # close out hedge
     end
 
     return profit
 end
 
 function unwind(obj::Widget, holdings)
-    profit = holdings["widget_count"] * obj.prices[end]
-    holdings["widget_count"] = 0
+    profit = holdings["$(obj.widget.name)"] * obj.prices[end]
+    holdings["$(obj.widget.name)"] = 0
     return profit
 end
 
@@ -308,7 +326,8 @@ function unwind(obj_array::Array{<:FinancialInstrument}, widget_array::Array{Wid
     return holdings
 end
 
-function update_obj(obj::Option, _::Type{<:Hedging}, pricing_model, future_prices, _, timesteps_per_period, _)
+# default update_function for all financial instruments and all pricing/ strategy modes
+function update_obj(obj::FinancialInstrument, _::Type{<:Hedging}, pricing_model, holdings, future_prices, _, timesteps_per_period, _)
 
     # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
     add_price_value(obj, popfirst!(future_prices))
@@ -345,8 +364,8 @@ function update_obj(obj::Widget, _::Type{<:Hedging}, pricing_model, _, _, _, _)
 end
 
 # general update_obj function that will always fall back onto for multi strategy_returns()
-function update_obj(obj_array::Array{<:FinancialInstrument}, widget_array::Array{Widget}, strategy_type, 
-        pricing_model, holdings, future_prices, n_timesteps, timesteps_per_period, step)
+function update_obj(obj_array::Vector{T}, widget_array::Array{Widget}, strategy_type, 
+       pricing_model, holdings, future_prices, n_timesteps, timesteps_per_period, step) where T<:FinancialInstrument
     # update all the widgets first
         for i in 1:length(widget_array)
             widget = widget_array[i]
@@ -389,7 +408,7 @@ end
 
 
 
-#-------Custome Price!----------#
+#-------Custom Price!----------#
 primitive type Expiry <: Model 8 end
 
 # these are extra... really only used for hedging models
