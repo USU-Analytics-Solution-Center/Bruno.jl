@@ -25,11 +25,9 @@ a widget or Financial Instrument to generate new prices.
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration
 
-export LogDiffInput 
-export makedata, getTime, data_gen_input
-export DataGenInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
-export opt_block_length
-export factory
+export BootstrapInput, DataGenInput, data_gen_input, LogDiffInput, TSBootMethod
+export Stationary, MovingBlock, CircularBlock
+export factory, makedata, opt_block_length 
 
 # Models submodule
 """
@@ -40,11 +38,11 @@ should be worth and adds the function call paramters / result to the
 FinancialInstrument.
 """
 include("Models/Models.jl")
+using .Models
 
 export BinomialTree, BlackScholes
-export price!
-using .Models
 export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
+export price!
 
 # BackTest Module
 """
@@ -57,4 +55,4 @@ using .BackTest
 export Naked, RebalanceDeltaHedge, StaticDeltaHedge
 export find_correlation_coeff, strategy_returns
 
-end # module
+end # end Bruno module 
