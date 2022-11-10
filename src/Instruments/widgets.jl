@@ -74,7 +74,7 @@ is given for `prices` volatility must be given.
 ```julia
 Stock([1,2,3,4,5], "Test", .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
 Stock(;kwargs...)
 
 Stock(40; volatility=.05)
@@ -151,7 +151,7 @@ is given for `prices` volatility must be given.
 ```julia
 Commodity([1,2,3,4,5], "Test", .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
 Commodity(;kwargs...)
 
 Commodity(40; volatility=.05)
@@ -207,7 +207,7 @@ Construct a Bond type to use as a base asset for FinancialInstrument.
 ```julia
 Bond([1,2,3,4,5], "Test", .5, .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :time_mat=>.5, :coupon_rate=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :time_mat => .5, :coupon_rate => .05);
 Bond(;kwargs...)
 
 Bond(2; coupon_rate=.05)

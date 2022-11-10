@@ -112,6 +112,7 @@ EuroCallOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 EuroCallOption(
     widget::Widget,
     strike_price::Real,
@@ -123,6 +124,7 @@ EuroCallOption(
     maturity = maturity,
     values_library = values_library,
 )
+
 EuroCallOption(;
     widget,
     strike_price = widget.prices[end],
@@ -222,6 +224,7 @@ AmericanCallOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 AmericanCallOption(
     widget::Widget,
     strike_price::Real,
@@ -235,6 +238,7 @@ AmericanCallOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 AmericanCallOption(;
     widget,
     strike_price = widget.prices[end],
@@ -334,6 +338,7 @@ EuroPutOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 EuroPutOption(
     widget::Widget,
     strike_price::Real,
@@ -347,6 +352,7 @@ EuroPutOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 EuroPutOption(;
     widget,
     strike_price = widget.prices[end],
@@ -448,6 +454,7 @@ AmericanPutOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 AmericanPutOption(
     widget::Widget,
     strike_price::Real,
@@ -461,6 +468,7 @@ AmericanPutOption(
     risk_free_rate = risk_free_rate,
     values_library = values_library,
 )
+
 AmericanPutOption(;
     widget,
     strike_price = widget.prices[end],
