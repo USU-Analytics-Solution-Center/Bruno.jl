@@ -23,43 +23,48 @@ function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidget
     fields = field_exclude(widget)
     # calculating the returns
     # TODO: check if time series Stationary 
-    returns = [(widget.prices[i+1] - widget.prices[i]) / widget.prices[i] for i in 1:(size(widget.prices)[1] - 1)]
+    returns = [
+        (widget.prices[i+1] - widget.prices[i]) / widget.prices[i] for
+        i = 1:(size(widget.prices)[1]-1)
+    ]
     # bootstrap the returns
     input = BootstrapInput{bootstrap_method}(;
-                                input_data = returns,
-                                n = length(returns),
-                                block_size = opt_block_length(widget.prices, bootstrap_method)
-                                )
+        input_data = returns,
+        n = length(returns),
+        block_size = opt_block_length(widget.prices, bootstrap_method),
+    )
     bs_data = makedata(input, nWidgets)
     # Create a vector of widgets
     widget_ar = Vector{Widget}()
     kwargs = Dict(fields .=> getfield.(Ref(widget), fields))
-    for column in 1:nWidgets
+    for column = 1:nWidgets
         # take the returns back to prices
         prices = [widget.prices[1]]
-        for i in 1:length(returns)
+        for i = 1:length(returns)
             val = prices[end] * (bs_data[i, column] + 1)
             push!(prices, val)
         end
         # Add a new widget to the return vector
-        push!(widget_ar, typeof(widget)(;prices = prices, kwargs...))
+        push!(widget_ar, typeof(widget)(; prices = prices, kwargs...))
     end
-    return(widget_ar)
+    return (widget_ar)
 end
 
-function factory(fin_instrument::FinancialInstrument, 
-                bootstrap_method::Type{<:TSBootMethod}, 
-                nInstruments::Signed) 
+function factory(
+    fin_instrument::FinancialInstrument,
+    bootstrap_method::Type{<:TSBootMethod},
+    nInstruments::Signed,
+)
     fields = field_exclude(fin_instrument)
     widget_ar = factory(fin_instrument.widget, bootstrap_method, nInstruments)
 
     # array for all the instruments 
     instr_ar = Vector{FinancialInstrument}()
     kwargs = NamedTuple(fields .=> getfield.(Ref(fin_instrument), fields))
-    for i in 1:nInstruments
-        push!(instr_ar, typeof(fin_instrument)(;widget = widget_ar[i], kwargs...))
+    for i = 1:nInstruments
+        push!(instr_ar, typeof(fin_instrument)(; widget = widget_ar[i], kwargs...))
     end
-    return(instr_ar)
+    return (instr_ar)
 end
 
 # field_exclude functions are used to execlude specific struct attributes

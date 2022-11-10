@@ -4,7 +4,8 @@ using LinearAlgebra: dot
 
 using ..Instruments
 export makedata, getTime, data_gen_input
-export DataGenInput, LogDiffInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
+export DataGenInput,
+    LogDiffInput, BootstrapInput, TSBootMethod, Stationary, MovingBlock, CircularBlock
 export opt_block_length
 
 export factory

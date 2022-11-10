@@ -7,12 +7,14 @@ From there concrete structs are made like Stocks or Commodities. These
 widgets are then put into a Financial Instrument. These Financial 
 Instruments are then used in varius Bruno functions.
 """
+
 include("Instruments/Instruments.jl")
 
 using .Instruments
 export FinancialInstrument, Widget
 export Bond, Commodity, Stock
-export AmericanCallOption, AmericanPutOption, CallOption, EuroCallOption, EuroPutOption, Future, Option, PutOption 
+export AmericanCallOption,
+    AmericanPutOption, CallOption, EuroCallOption, EuroPutOption, Future, Option, PutOption
 
 export get_volatility, add_price_value
 
@@ -22,12 +24,13 @@ DataGeneration.jl is where the data generation functions live. Examples
 include the bootstrap and factory functions. DataGeneration uses either
 a widget or Financial Instrument to generate new prices.
 """
+
 include("DataGeneration/DataGeneration.jl")
 using .DataGeneration
 
 export BootstrapInput, DataGenInput, data_gen_input, LogDiffInput, TSBootMethod
 export Stationary, MovingBlock, CircularBlock
-export factory, makedata, opt_block_length 
+export factory, makedata, opt_block_length
 
 # Models submodule
 """
@@ -37,6 +40,7 @@ the future other pricing methods can live here. As a note
 should be worth and adds the function call paramters / result to the
 FinancialInstrument.
 """
+
 include("Models/Models.jl")
 using .Models
 
@@ -50,6 +54,7 @@ BackTest.jl contains the logic for the hedging strategy framework
 and other simulators. This is where we put code for finding dollar
 returns.
 """
+
 include("BackTest/BackTest.jl")
 using .BackTest
 export Naked, RebalanceDeltaHedge, StaticDeltaHedge

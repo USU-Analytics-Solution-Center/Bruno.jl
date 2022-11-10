@@ -8,6 +8,6 @@ function profit(widget::Stock, _::Type{BollingerBands}, daysout)
     return -1
 end
 
-function profit(widget_a::Stock, widget_b::Stock,_::Type{PairsTrading}, daysout)
+function profit(widget_a::Stock, widget_b::Stock, _::Type{PairsTrading}, daysout)
     return -1
 end
