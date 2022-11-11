@@ -7,7 +7,7 @@ import InteractiveUtils
     # Test the stock widget creation
     # Test ordered argumentes when only price given
     a_widget = Stock([1, 2, 3, 4, 5, 4, 3, 2, 1])
-    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test isapprox(a_widget.volatility, 1.322, atol=.001)
     @test a_widget.name == ""
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 
@@ -30,7 +30,7 @@ end
 
     # Test ordered argumentes when only price given
     a_widget = Commodity([1, 2, 3, 4, 5, 4, 3, 2, 1])
-    @test isapprox(a_widget.volatility, .471, atol=.001)
+    @test isapprox(a_widget.volatility, 1.322, atol=.001)
     @test a_widget.name == ""
     @test a_widget.prices == [1, 2, 3, 4, 5, 4, 3, 2, 1]
 

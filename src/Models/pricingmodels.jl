@@ -23,7 +23,7 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Any, pricing_model::Type{<:Any}) = error("Use a FinancialObject and a Model type")
+price!(fin_obj::Any, pricing_model::Type{<:Any}; _...) = error("Use a FinancialObject and a Model type")
 """
     price!(fin_obj::Option, pricing_model::Type{BinomialTree}; kwargs...)
 
@@ -46,10 +46,10 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BinomialTree}) = 
+price!(fin_obj::Option, pricing_model::Type{BinomialTree}; _...) = 
     error("Something went wrong. Make sure you're using a defined Option subtype")
 
-function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0, _...)
     """ 
     EURO OPTION
     tree_depth = the depth of the tree
@@ -87,7 +87,7 @@ function price!(fin_obj::EuroCallOption, pricing_model::Type{BinomialTree}; tree
     return value
 end
 
-function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+function price!(fin_obj::AmericanCallOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0, _...)
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
@@ -149,7 +149,7 @@ function price!(fin_obj::EuroPutOption, pricing_model::Type{BinomialTree}; tree_
 
 end
 
-function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0)
+function price!(fin_obj::AmericanPutOption, pricing_model::Type{BinomialTree}; tree_depth=3, delta=0, _...)
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)  
@@ -220,10 +220,10 @@ call = EuroCallOption(stock, 40; risk_free_rate=.08, maturity=.25)
 price!(call, BlackScholes)
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BlackScholes}) = 
+price!(fin_obj::Option, pricing_model::Type{BlackScholes}; _...) = 
     error("Use a European call or put option for the Black Scholes pricing method")
 
-function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackScholes}; _...)
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
@@ -235,7 +235,7 @@ function price!(fin_obj::EuroCallOption{<: Widget}, pricing_model::Type{BlackSch
     return value
 end
 
-function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScholes})
+function price!(fin_obj::EuroPutOption{<: Widget}, pricing_model::Type{BlackScholes}; _...)
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
     a1 = fin_obj.widget.volatility * sqrt(fin_obj.maturity)
     d1 = (c1 + (fin_obj.risk_free_rate + (fin_obj.widget.volatility ^ 2 / 2)) * fin_obj.maturity) / a1
@@ -251,13 +251,13 @@ end
 # ----- Price models using Monte Carlo sims
 
 # error out if using an American option 
-price!(fin_obj::AmericanCallOption{<:Widget}, pricing_model::Type{MonteCarlo{LogDiffusion}}) = 
+price!(fin_obj::AmericanCallOption{<:Widget}, pricing_model::Type{MonteCarlo{LogDiffusion}}; _...) = 
     error("Cannot price an American Option using Monte Carlo methods now")
-price!(fin_obj::AmericanPutOption{<:Widget}, pricing_model::Type{MonteCarlo{LogDiffusion}}) = 
+price!(fin_obj::AmericanPutOption{<:Widget}, pricing_model::Type{MonteCarlo{LogDiffusion}}; _...) = 
     error("Cannot price an American Option using Monte Carlo methods now")
-price!(fin_obj::AmericanCallOption{<:Widget}, pricing_model::Type{MonteCarlo{MCBootstrap}}) = 
+price!(fin_obj::AmericanCallOption{<:Widget}, pricing_model::Type{MonteCarlo{MCBootstrap}}; _...) = 
     error("Cannot price an American Option using Monte Carlo methods now")
-price!(fin_obj::AmericanPutOption{<:Widget}, pricing_model::Type{MonteCarlo{MCBootstrap}}) = 
+price!(fin_obj::AmericanPutOption{<:Widget}, pricing_model::Type{MonteCarlo{MCBootstrap}}; _...) = 
     error("Cannot price an American Option using Monte Carlo methods now")
 
 """
@@ -291,7 +291,7 @@ price!(call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=10)
 ```
 """
 function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{LogDiffusion}};
-    n_sims::Int=100, sim_size::Int=100)
+    n_sims::Int=100, sim_size::Int=100, _...)
 
     dt = fin_obj.maturity / sim_size
     # create the data to be used in the analysis 
@@ -308,7 +308,7 @@ end
 
 
 function price!(fin_obj::Option, pricing_model::Type{MonteCarlo{MCBootstrap}}; 
-                 bootstrap_method::Type{<:TSBootMethod}=Stationary, n_sims::Int=100)
+                 bootstrap_method::Type{<:TSBootMethod}=Stationary, n_sims::Int=100, _...)
     
     # create the data to be used in analysis
     returns = [log(1 + (fin_obj.widget.prices[i+1] - fin_obj.widget.prices[i]) / fin_obj.widget.prices[i]) for 

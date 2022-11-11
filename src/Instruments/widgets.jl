@@ -17,10 +17,11 @@ Widget subtype. Used as a base or root asset for FinancialInstrument
 struct Stock <: Widget 
     prices::Array{AbstractFloat}
     name::String
+    timesteps_per_period::Integer
     volatility::AbstractFloat
     
     # constructor for kwargs
-    function Stock(; prices, name="", volatility=get_volatility(prices), _...)
+    function Stock(; prices, name="", timesteps_per_period=length(prices), volatility=get_volatility(prices, timesteps_per_period), _...)
         # allows single price input through kwargs (and ordered arguments)
         if typeof(prices) <: Real 
             prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
@@ -33,11 +34,11 @@ struct Stock <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
-        new(prices, name, volatility)
+        new(prices, name, timesteps_per_period, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Stock(prices, name = "", volatility = get_volatility(prices))  
+    function Stock(prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period))  
         if typeof(prices) <: Real 
             prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
             volatility == nothing ? 
@@ -49,7 +50,7 @@ struct Stock <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
-        new(prices, name, volatility)
+        new(prices, name, timesteps_per_period, volatility)
     end
 end
 
@@ -80,7 +81,7 @@ Stock(40; volatility=.05)
 """
 function Stock(price::Real; name = "", volatility)
     prices = [price]
-    Stock(;prices = prices, name = name , volatility = volatility)
+    Stock(;prices = prices, name = name , volatility = volatility, timesteps_per_period=0)
 end
 
 # ------ Commodities ------
@@ -92,10 +93,11 @@ Widget subtype. Used as a base or root asset for FinancialInstrument
 struct Commodity <: Widget
     prices::Array{AbstractFloat}
     name::String
+    timesteps_per_period::Integer
     volatility::AbstractFloat
 
     # constructor for kwargs
-    function Commodity(; prices, name = "", volatility = get_volatility(prices), _...)
+    function Commodity(; prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period), _...)
         # allows for single number input for prices
         if typeof(prices) <: Real 
             prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
@@ -108,11 +110,11 @@ struct Commodity <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
-        new(prices, name, volatility)
+        new(prices, name, timesteps_per_period, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Commodity(prices, name = "", volatility = get_volatility(prices))  
+    function Commodity(prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period))  
         if typeof(prices) <: Real 
             prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
             volatility == nothing ? 
@@ -124,7 +126,7 @@ struct Commodity <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
-        new(prices, name, volatility)
+        new(prices, name, timesteps_per_period, volatility)
     end
 end
 
@@ -155,7 +157,7 @@ Commodity(40; volatility=.05)
 """
 function Commodity(price::Real; name = "", volatility)
     prices = [price]
-    Commodity(;prices = prices, name = name , volatility = volatility)
+    Commodity(;prices = prices, name = name , volatility = volatility,timesteps_per_period=0)
 end
 
 # ---------- Bonds -----------------
@@ -220,13 +222,14 @@ end
 
 Finds the standard deviation of continuous returns for an array of prices
 """
-function get_volatility(prices)
+function get_volatility(prices, timesteps_per_period)
     length(prices) > 2 ? nothing : return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
     returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)] 
     cont_return = log.(returns)
-    # cont_return = log.(Complex.(returns))
-    std(cont_return) 
+    std(cont_return, corrected=false) * sqrt(timesteps_per_period)  
 end
+
+get_volatility(prices) = get_volatility(prices, length(prices))
 
 function add_price_value(a_widget::Widget, a_new_price::Real)
     a_new_price >= 0 ? nothing : @warn("You are trying to add a negative number to a prices list")
