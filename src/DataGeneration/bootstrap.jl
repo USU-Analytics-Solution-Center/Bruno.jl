@@ -1,7 +1,7 @@
 import Distributions.Geometric
 
 abstract type TSBootMethod end
-primitive type Stationary <: TSBootMethod  8 end
+primitive type Stationary <: TSBootMethod 8 end
 primitive type MovingBlock <: TSBootMethod 8 end
 primitive type CircularBlock <: TSBootMethod 8 end
 
@@ -28,17 +28,20 @@ kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
 input2 = BootstrapInput{MovingBlock}(;kwargs...)
 ```
 """
-struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
+struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
     input_data::Array{<:Real} # array of data to be resampled
     n::Integer # desired size of resampled data
     block_size::Float32 #desired average block size (will add more to this later)
-    
+
     # constructor for kwargs
-    function BootstrapInput{T}(; input_data, n=100, block_size= 
-            opt_block_length(input_data, T)) where {T<:TSBootMethod}
+    function BootstrapInput{T}(;
+        input_data,
+        n = 100,
+        block_size = opt_block_length(input_data, T),
+    ) where {T<:TSBootMethod}
         # check input_data is more than a single data point 
         if length(input_data) < 2
-            error("input_data must have at least 2 elements") 
+            error("input_data must have at least 2 elements")
         end
         # check block_size is smaller than input_data 
         if length(input_data) < block_size
@@ -52,7 +55,7 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
     # constructor for inputing args in exact correct order
     function BootstrapInput{T}(input_data, n, block_size) where {T<:TSBootMethod}
         if length(input_data) < 2
-            error("input_data must have at least 2 elements") 
+            error("input_data must have at least 2 elements")
         end
         # check block_size is smaller than input_data 
         if length(input_data) < block_size
@@ -66,17 +69,20 @@ struct BootstrapInput{T <: TSBootMethod} <: DataGenInput
 end
 
 # outer constructor for just using input_data and the type
-BootstrapInput(input_data::Array{<:Real}, bootstrap_method::Type{<:TSBootMethod};
-    n=100, block_size=opt_block_length(input_data, bootstrap_method)) = 
-    BootstrapInput{bootstrap_method}(input_data, n, block_size)
+BootstrapInput(
+    input_data::Array{<:Real},
+    bootstrap_method::Type{<:TSBootMethod};
+    n = 100,
+    block_size = opt_block_length(input_data, bootstrap_method),
+) = BootstrapInput{bootstrap_method}(input_data, n, block_size)
 
 
-function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
     # check for block_size > 1 so geometric distro doesn't blow up
     param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
     p = 1 / block_size
-    data = zeros((param.n, nSimulation)) 
-    for run_num in 1:nSimulation
+    data = zeros((param.n, nSimulation))
+    for run_num = 1:nSimulation
         # generates block size and starting position for first block
         block = rand(Geometric(p))
         while block == 0 || block > param.n
@@ -84,14 +90,14 @@ function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
         end
         block_counter = 0
         block_index = rand(1:length(param.input_data))
-        for i in 1:param.n
-            if block_counter < block 
+        for i = 1:param.n
+            if block_counter < block
                 # go on indexing in the current block
                 data[i, run_num] = param.input_data[block_index]
                 block_counter += 1
             else
                 # make a new block and sample first index
-                block = rand(Geometric(p)) 
+                block = rand(Geometric(p))
                 while block == 0 || block > param.n
                     block = rand(Geometric(p))
                 end
@@ -110,17 +116,18 @@ function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer=1)
     return data
 end
 
-function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer = 1)
     data = zeros((param.n, nSimulation))
-    for run_num in 1:nSimulation
+    for run_num = 1:nSimulation
         block_counter = 0
         start_index = rand(1:floor(Int, length(param.input_data) - param.block_size))
-        for i in 1:param.n
-            if block_counter < param.block_size 
-                data[i, run_num] = param.input_data[start_index + block_counter]
+        for i = 1:param.n
+            if block_counter < param.block_size
+                data[i, run_num] = param.input_data[start_index+block_counter]
                 block_counter += 1
             else
-                start_index = rand(1:floor(Int, length(param.input_data)- param.block_size))
+                start_index =
+                    rand(1:floor(Int, length(param.input_data) - param.block_size))
                 data[i, run_num] = param.input_data[start_index]
                 block_counter = 1
             end
@@ -129,12 +136,12 @@ function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer=1)
     return data
 end
 
-function makedata(param::BootstrapInput{CircularBlock}, nSimulation::Integer=1)
+function makedata(param::BootstrapInput{CircularBlock}, nSimulation::Integer = 1)
     data = zeros((param.n, nSimulation))
-    for run_num in 1:nSimulation
+    for run_num = 1:nSimulation
         block_counter = 0
         index_num = rand(1:length(param.input_data))
-        for i in 1:param.n
+        for i = 1:param.n
             if block_counter < param.block_size
                 data[i, run_num] = param.input_data[index_num]
                 block_counter += 1
@@ -160,11 +167,11 @@ end
 
 # these are for the block_length parameters, to use with multiple dispatch.
 function D(g_hat, bootstrap_method::Type{Stationary})
-    2 * (g_hat ^ 2)
+    2 * (g_hat^2)
 end
 
 function D(g_hat, bootstrap_method::Type{CircularBlock})
-    (4 / 3) * (g_hat ^ 2)
+    (4 / 3) * (g_hat^2)
 end
 D(g_hat, bootstrap_method::Type{<:TSBootMethod}) = D(g_hat, CircularBlock) # catch all other types
 
@@ -194,11 +201,11 @@ cb_bl = opt_block_length(ar1, CircularBlock)
 """
 function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})
     N = size(array)[1]
-    K_N = max(5,floor(Int, sqrt(log10(N))))
+    K_N = max(5, floor(Int, sqrt(log10(N))))
     # m_max from Kevin Sheppard arch package and Andrew Patton Matlab code
     m_max = ceil(Int, sqrt(N)) + K_N
     # constant to check rho array against 
-    comp = 2 * sqrt( log10(N) / N)
+    comp = 2 * sqrt(log10(N) / N)
     eps = array .- mean(array)
     # array to put autocovariances in so they don't get computed multiple times
     R = zeros(m_max + 1)
@@ -206,29 +213,29 @@ function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})
 
     m = nothing
     # finding the m and M variables from Politis paper
-    for i in 1:m_max
+    for i = 1:m_max
         # compute R(i) the autocovariances
         R[i] = dot(eps[1:end-i], eps[i+1:end]) / N
-        if i > K_N 
+        if i > K_N
             # check rho for m = i - K_N through K_N values
-            if max([abs(R[t]/ R_0) for t in (i - K_N):i]...) < comp && m === nothing
+            if max([abs(R[t] / R_0) for t = (i-K_N):i]...) < comp && m === nothing
                 m = i - K_N
             end
         end
     end
 
     m === nothing ? M = m_max : M = min(2 * max(m, 1), m_max) # check for m > max_m
-    
+
     # figure out G for the equation
     G = 0.0
     g_hat = R_0
-    for k in 1:M 
-        lambda = k/M <= 1 / 2 ? 1 : 2 * (1 - (k/M))
+    for k = 1:M
+        lambda = k / M <= 1 / 2 ? 1 : 2 * (1 - (k / M))
         # G and g_hat are symmetric summations around 0, so we can just multiply each term by 2
-        G += 2 * lambda * k * R[k] 
+        G += 2 * lambda * k * R[k]
         g_hat += 2 * lambda * R[k]
     end
-    b_length = ((2 * G^2)/ D(g_hat, bootstrap_method))^(1/3) * N ^ (1/3)
+    b_length = ((2 * G^2) / D(g_hat, bootstrap_method))^(1 / 3) * N^(1 / 3)
     b_max = ceil(min(3 * sqrt(N), N / 3))
     return min(b_length, b_max)
 end

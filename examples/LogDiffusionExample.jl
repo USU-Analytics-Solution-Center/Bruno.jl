@@ -8,7 +8,7 @@ using Bruno.DataGeneration.LogDiffusion
 
 # Initialize a Log-Diffusion Data-Gen utility
 nTimeStep = 100
-GenParam1 = Bruno.DataGeneration.LogDiffusion.ParamLogDiff(nTimeStep, volatility=0)
+GenParam1 = Bruno.DataGeneration.LogDiffusion.ParamLogDiff(nTimeStep, volatility = 0)
 
 # Generate Data for a single simulation
 data1 = Bruno.DataGeneration.LogDiffusion.getData(GenParam1)
@@ -27,7 +27,7 @@ data2 = Bruno.DataGeneration.LogDiffusion.getData(GenParam2, nSimulation)
 time2 = Bruno.DataGeneration.LogDiffusion.getTime(GenParam2)
 
 # Display Plots
-plt = plot(time2, data2, show=true, color="blue", legend=false)
-plot!(plt, time1, data1,show=true, color="red", legend=false, linewidth=3)
+plt = plot(time2, data2, show = true, color = "blue", legend = false)
+plot!(plt, time1, data1, show = true, color = "red", legend = false, linewidth = 3)
 print("Press Enter to Quit\n")
 readline()

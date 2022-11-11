@@ -3,7 +3,7 @@ using Bruno
 using Distributions: Normal
 using Statistics: mean
 using HypothesisTests: ADFTest
-using LinearAlgebra 
+using LinearAlgebra
 
 include("widgettests.jl")
 include("datagentests.jl")

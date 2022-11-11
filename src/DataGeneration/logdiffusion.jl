@@ -45,31 +45,39 @@ struct LogDiffInput <: DataGenInput
     volatility::Real # volatility as a standard deviation
     drift::Real # 
     # constructor for kwargs
-    function LogDiffInput(;nTimeStep, initial=100, volatility=0.00930, drift=0.000538) 
+    function LogDiffInput(;
+        nTimeStep,
+        initial = 100,
+        volatility = 0.00930,
+        drift = 0.000538,
+    )
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
     # constructor for ordered inputs
-    function LogDiffInput(nTimeStep, initial, volatility, drift)  
+    function LogDiffInput(nTimeStep, initial, volatility, drift)
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
 end
 # outer constructor for passing just nTimeStep
-LogDiffInput(nTimeStep::Int; initial=100, volatility=.00930, drift=.000538) = 
+LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.00930, drift = 0.000538) =
     LogDiffInput(nTimeStep, initial, volatility, drift)
 
 
-function makedata(Input::LogDiffInput, nSimulation::Integer=1)
-    
+function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
+
     # compute array of random values
     nData = Input.nTimeStep + 1
     data = zeros((nData, nSimulation))
-    data[2:nData,:] = rand(Normal(Input.drift / Input.nTimeStep, Input.volatility),
-         (Input.nTimeStep,nSimulation))
-    data = exp.(cumsum(data,dims=1) .+ log(Input.initial))
+
+    data[2:nData, :] = rand(
+        Normal(Input.drift / Input.nTimeStep, Input.volatility),
+        (Input.nTimeStep, nSimulation),
+    )
+    data = exp.(cumsum(data, dims = 1) .+ log(Input.initial))
 
     # export values
     return data
@@ -125,11 +133,11 @@ plot!(plt, time1, data1, show=true, color="red", legend=false, linewidth=3)
 ```
 
 """
-function getTime(Input::LogDiffInput, tStart=DateTime(2000))
-    secondPerDay = (3600*24)
-    nSecondPerStepInt = floor(Input.dt*secondPerDay)
+function getTime(Input::LogDiffInput, tStart = DateTime(2000))
+    secondPerDay = (3600 * 24)
+    nSecondPerStepInt = floor(Input.dt * secondPerDay)
     nSecondPerStepSec = Second(nSecondPerStepInt)
-    nSecondAll = Second(nSecondPerStepInt*Input.nTimeStep)
+    nSecondAll = Second(nSecondPerStepInt * Input.nTimeStep)
 
     tFinal = tStart + nSecondAll
     time = tStart:nSecondPerStepSec:tFinal
