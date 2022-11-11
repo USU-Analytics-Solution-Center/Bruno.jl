@@ -73,9 +73,11 @@ function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
     nData = Input.nTimeStep + 1
     data = zeros((nData, nSimulation))
 
-    data[2:nData,:] = rand(Normal(Input.drift / Input.nTimeStep, Input.volatility),
-         (Input.nTimeStep,nSimulation))
-    data = exp.(cumsum(data,dims=1) .+ log(Input.initial))
+    data[2:nData, :] = rand(
+        Normal(Input.drift / Input.nTimeStep, Input.volatility),
+        (Input.nTimeStep, nSimulation),
+    )
+    data = exp.(cumsum(data, dims = 1) .+ log(Input.initial))
 
     # export values
     return data

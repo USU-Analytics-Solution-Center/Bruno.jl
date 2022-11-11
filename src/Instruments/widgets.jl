@@ -22,7 +22,13 @@ struct Stock <: Widget
 
     # constructor for kwargs
 
-    function Stock(; prices, name="", timesteps_per_period=length(prices), volatility=get_volatility(prices, timesteps_per_period), _...)
+    function Stock(;
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+        _...,
+    )
         # allows single price input through kwargs (and ordered arguments)
         if typeof(prices) <: Real
             prices >= 0 ? prices = [prices] :
@@ -40,12 +46,18 @@ struct Stock <: Widget
     end
 
     # constructor for ordered argumentes 
-    function Stock(prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period))  
-        if typeof(prices) <: Real 
-            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
-            volatility == nothing ? 
-                error("When using single value input for prices must specify volatility") :
-                nothing
+    function Stock(
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+    )
+        if typeof(prices) <: Real
+            prices >= 0 ? prices = [prices] :
+            error("Single price point must be non-negative")
+            volatility == nothing ?
+            error("When using single value input for prices must specify volatility") :
+            nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         # catch nothing volatility from get_volatility()
@@ -83,7 +95,7 @@ Stock(40; volatility=.05)
 """
 function Stock(price::Real; name = "", volatility)
     prices = [price]
-    Stock(;prices = prices, name = name , volatility = volatility, timesteps_per_period=0)
+    Stock(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
 end
 
 # ------ Commodities ------
@@ -99,7 +111,13 @@ struct Commodity <: Widget
     volatility::AbstractFloat
 
     # constructor for kwargs
-    function Commodity(; prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period), _...)
+    function Commodity(;
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+        _...,
+    )
         # allows for single number input for prices
         if typeof(prices) <: Real
             prices >= 0 ? prices = [prices] :
@@ -117,12 +135,18 @@ struct Commodity <: Widget
     end
 
     # constructor for ordered argumentes 
-    function Commodity(prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period))  
-        if typeof(prices) <: Real 
-            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
-            volatility == nothing ? 
-                error("When using single value input for prices must specify volatility") :
-                nothing
+    function Commodity(
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+    )
+        if typeof(prices) <: Real
+            prices >= 0 ? prices = [prices] :
+            error("Single price point must be non-negative")
+            volatility == nothing ?
+            error("When using single value input for prices must specify volatility") :
+            nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         # catch nothing volatility from get_volatility()
@@ -160,7 +184,12 @@ Commodity(40; volatility=.05)
 """
 function Commodity(price::Real; name = "", volatility)
     prices = [price]
-    Commodity(;prices=prices, name=name , volatility=volatility, timesteps_per_period=0)
+    Commodity(;
+        prices = prices,
+        name = name,
+        volatility = volatility,
+        timesteps_per_period = 0,
+    )
 end
 
 # ---------- Bonds -----------------
@@ -227,10 +256,11 @@ Finds the standard deviation of continuous returns for an array of prices
 """
 
 function get_volatility(prices, timesteps_per_period)
-    length(prices) > 2 ? nothing : return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
-    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)] 
+    length(prices) > 2 ? nothing :
+    return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
+    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i = 1:(length(prices)-1)]
     cont_return = log.(returns)
-    std(cont_return, corrected=false) * sqrt(timesteps_per_period)  
+    std(cont_return, corrected = false) * sqrt(timesteps_per_period)
 end
 
 get_volatility(prices) = get_volatility(prices, length(prices))
