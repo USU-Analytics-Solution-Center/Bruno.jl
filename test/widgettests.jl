@@ -106,26 +106,65 @@ end
     @testset "Price size for $widget" for widget in widget_subs
         @test_throws ErrorException widget(; prices =AbstractFloat[])
     end
-
-    @testset "Single price errors for $widget" for widget in [Stock, Commodity]
-        # using kwargs price > 0
-        @test_throws ErrorException widget(; prices = -1)
-        # using kwargs must give volatility
-        @test_throws ErrorException widget(; prices = 1)
-        # using position args price > 0
-        @test_throws ErrorException widget(-1, "", .03)
-        # using position must give volatility
-        @test_throws ErrorException widget(1, "")
     end
 
-    @testset "volatility errors for $widget" for widget in [Stock, Commodity]
-        @test_throws ErrorException widget(; prices = [1,2,3], volatility = -1)
-        @test_throws ErrorException widget(; prices = [1,2,3], volatility = nothing)
+
+    widget_subs = InteractiveUtils.subtypes(Widget)
+    @testset "Kwargs creation tests $widget" for widget in widget_subs
+
+        # Test kwarg creation when only prices is given
+        kwargs = Dict(:prices => [1, 2, 3, 4, 5, 4, 3, 2, 1])
+        a_widget = widget(; kwargs...)
+        fields = [p for p in fieldnames(typeof(a_widget))]
+        iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
+        @test length(findall(Base.isempty, iter)) == 1  # Test all fields in each widget have been filled in. Name defaults to "" and counts as isempty
+
+        # Test kwarg creation when price and name given
+        kwargs = Dict(:prices => [1, 2, 3, 4, 5, 4, 3, 2, 1], :name => "Example")
+        a_widget = widget(; kwargs...)
+        fields = [p for p in fieldnames(typeof(a_widget))]
+        iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
+        @test length(findall(Base.isempty, iter)) == 0
+
+        # Test kwarg creation when obstructing feilds provided
+        kwargs = Dict(
+            :prices => [1, 2, 3, 4, 5, 4, 3, 2, 1],
+            :name => "Example",
+            :time_mat => 1,
+            :volatility => 0.5,
+            :foo => "bar",
+        )
+        a_widget = widget(; kwargs...)
+        fields = [p for p in fieldnames(typeof(a_widget))]
+        iter = Dict(fields .=> getfield.(Ref(a_widget), fields))
+        @test length(findall(Base.isempty, iter)) == 0
     end
 
-    @testset "time_mat error for Bond" begin
-        @test_throws ErrorException Bond(; prices = [1,2,3], time_mat=0)
-    end
+    @testset "Constructor limits" begin
+        widget_subs = InteractiveUtils.subtypes(Widget)
+        @testset "Price size for $widget" for widget in widget_subs
+            @test_throws ErrorException widget(; prices = AbstractFloat[])
+        end
 
-end 
+        @testset "Single price errors for $widget" for widget in [Stock, Commodity]
+            # using kwargs price > 0
+            @test_throws ErrorException widget(; prices = -1)
+            # using kwargs must give volatility
+            @test_throws ErrorException widget(; prices = 1)
+            # using position args price > 0
+            @test_throws ErrorException widget(-1, "", 0.03)
+            # using position must give volatility
+            @test_throws ErrorException widget(1, "")
+        end
+
+        @testset "volatility errors for $widget" for widget in [Stock, Commodity]
+            @test_throws ErrorException widget(; prices = [1, 2, 3], volatility = -1)
+            @test_throws ErrorException widget(; prices = [1, 2, 3], volatility = nothing)
+        end
+
+        @testset "time_mat error for Bond" begin
+            @test_throws ErrorException Bond(; prices = [1, 2, 3], time_mat = 0)
+        end
+
+    end
 end # master testset for Widget constructors

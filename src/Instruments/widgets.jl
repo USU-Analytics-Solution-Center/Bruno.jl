@@ -14,20 +14,22 @@ abstract type Widget end
 
 Widget subtype. Used as a base or root asset for FinancialInstrument
 """
-struct Stock <: Widget 
+struct Stock <: Widget
     prices::Array{AbstractFloat}
     name::String
     timesteps_per_period::Integer
     volatility::AbstractFloat
-    
+
     # constructor for kwargs
+
     function Stock(; prices, name="", timesteps_per_period=length(prices), volatility=get_volatility(prices, timesteps_per_period), _...)
         # allows single price input through kwargs (and ordered arguments)
-        if typeof(prices) <: Real 
-            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
-            volatility == nothing ? 
-                error("When using single value input for prices must specify volatility") :
-                nothing
+        if typeof(prices) <: Real
+            prices >= 0 ? prices = [prices] :
+            error("Single price point must be non-negative")
+            volatility == nothing ?
+            error("When using single value input for prices must specify volatility") :
+            nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         # catch nothing volatility from get_volatility()
@@ -73,7 +75,7 @@ is given for `prices` volatility must be given.
 ```julia
 Stock([1,2,3,4,5], "Test", .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
 Stock(;kwargs...)
 
 Stock(40; volatility=.05)
@@ -99,11 +101,12 @@ struct Commodity <: Widget
     # constructor for kwargs
     function Commodity(; prices, name = "", timesteps_per_period=length(prices), volatility = get_volatility(prices, timesteps_per_period), _...)
         # allows for single number input for prices
-        if typeof(prices) <: Real 
-            prices >= 0 ? prices = [prices] : error("Single price point must be non-negative")
-            volatility == nothing ? 
-                error("When using single value input for prices must specify volatility") :
-                nothing
+        if typeof(prices) <: Real
+            prices >= 0 ? prices = [prices] :
+            error("Single price point must be non-negative")
+            volatility == nothing ?
+            error("When using single value input for prices must specify volatility") :
+            nothing
         end
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         # catch nothing volatility from get_volatility()
@@ -149,7 +152,7 @@ is given for `prices` volatility must be given.
 ```julia
 Commodity([1,2,3,4,5], "Test", .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :volatility=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
 Commodity(;kwargs...)
 
 Commodity(40; volatility=.05)
@@ -157,7 +160,7 @@ Commodity(40; volatility=.05)
 """
 function Commodity(price::Real; name = "", volatility)
     prices = [price]
-    Commodity(;prices = prices, name = name , volatility = volatility,timesteps_per_period=0)
+    Commodity(;prices=prices, name=name , volatility=volatility, timesteps_per_period=0)
 end
 
 # ---------- Bonds -----------------
@@ -173,14 +176,14 @@ struct Bond <: Widget
     coupon_rate::AbstractFloat
 
     # constructor for kwargs
-    function Bond(; prices, name="", time_mat=1, coupon_rate=.03, _...)
+    function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         time_mat > 0 ? nothing : error("time_mat must be positive")
         new(prices, name, time_mat, coupon_rate)
     end
 
     # constructor for ordered argumentes 
-    function Bond(prices, name="", time_mat=1, coupon_rate=.03)  
+    function Bond(prices, name = "", time_mat = 1, coupon_rate = 0.03)
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         time_mat > 0 ? nothing : error("time_mat must be positive")
         new(prices, name, time_mat, coupon_rate)
@@ -205,15 +208,15 @@ Construct a Bond type to use as a base asset for FinancialInstrument.
 ```julia
 Bond([1,2,3,4,5], "Test", .5, .05)
 
-kwargs = Dict(:prices=>[1,2,3,4,5], :name=>"Test", :time_mat=>.5, :coupon_rate=>.05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :time_mat => .5, :coupon_rate => .05);
 Bond(;kwargs...)
 
 Bond(2; coupon_rate=.05)
 ```
 """
-function Bond(price::Real; name="", time_mat=1, coupon_rate=.03)
+function Bond(price::Real; name = "", time_mat = 1, coupon_rate = 0.03)
     prices = [price]
-    Bond(;prices=prices, name=name , time_mat=time_mat, coupon_rate=coupon_rate)
+    Bond(; prices = prices, name = name, time_mat = time_mat, coupon_rate = coupon_rate)
 end
 
 # Helpers 
@@ -222,6 +225,7 @@ end
 
 Finds the standard deviation of continuous returns for an array of prices
 """
+
 function get_volatility(prices, timesteps_per_period)
     length(prices) > 2 ? nothing : return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
     returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i in 1:(length(prices) - 1)] 
@@ -232,8 +236,9 @@ end
 get_volatility(prices) = get_volatility(prices, length(prices))
 
 function add_price_value(a_widget::Widget, a_new_price::Real)
-    a_new_price >= 0 ? nothing : @warn("You are trying to add a negative number to a prices list")
-    push!(a_widget.prices, a_new_price) 
+    a_new_price >= 0 ? nothing :
+    @warn("You are trying to add a negative number to a prices list")
+    push!(a_widget.prices, a_new_price)
 end
 
 function get_prices(a_widget::Widget)
