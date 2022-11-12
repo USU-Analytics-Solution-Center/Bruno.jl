@@ -12,7 +12,9 @@ import Distributions.Normal
 contains parameters that are used by `makedata()` to synthesize data
 from a log-normal diffusion process of the form
 
-``P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}``
+```math 
+P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}
+```
 
 where P_t is the value of the data at timestep t. The drift and 
 volatility represent the mean and standard deviation of a normal 

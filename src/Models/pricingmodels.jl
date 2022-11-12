@@ -378,7 +378,7 @@ function price!(
     pricing_model::Type{MonteCarlo{MCBootstrap}};
     bootstrap_method::Type{<:TSBootMethod} = Stationary,
     n_sims::Int = 100,
-    _...,
+    _...
 )
 
     # create the data to be used in analysis
