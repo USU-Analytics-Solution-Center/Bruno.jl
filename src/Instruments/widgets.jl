@@ -27,7 +27,7 @@ struct Stock <: Widget
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
-        _...,
+        _...
     )
         # allows single price input through kwargs (and ordered arguments)
         if typeof(prices) <: Real
@@ -42,6 +42,9 @@ struct Stock <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
+        # catch negative timesteps_per_period
+        timesteps_per_period >= 0 ? nothing : 
+        error("timesteps_per_period cannot be negative")
         new(prices, name, timesteps_per_period, volatility)
     end
 
@@ -50,7 +53,7 @@ struct Stock <: Widget
         prices,
         name = "",
         timesteps_per_period = length(prices),
-        volatility = get_volatility(prices, timesteps_per_period),
+        volatility = get_volatility(prices, timesteps_per_period)
     )
         if typeof(prices) <: Real
             prices >= 0 ? prices = [prices] :
@@ -64,6 +67,9 @@ struct Stock <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
+        timesteps_per_period >= 0 ? nothing : 
+        # catch negative timesteps_per_period
+        error("timesteps_per_period cannot be negative")
         new(prices, name, timesteps_per_period, volatility)
     end
 end
@@ -126,7 +132,7 @@ struct Commodity <: Widget
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
-        _...,
+        _...
     )
         # allows for single number input for prices
         if typeof(prices) <: Real
@@ -141,6 +147,10 @@ struct Commodity <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
+        # catch negative timesteps_per_period
+        timesteps_per_period >= 0 ? nothing : 
+        error("timesteps_per_period cannot be negative")
+
         new(prices, name, timesteps_per_period, volatility)
     end
 
@@ -149,7 +159,7 @@ struct Commodity <: Widget
         prices,
         name = "",
         timesteps_per_period = length(prices),
-        volatility = get_volatility(prices, timesteps_per_period),
+        volatility = get_volatility(prices, timesteps_per_period)
     )
         if typeof(prices) <: Real
             prices >= 0 ? prices = [prices] :
@@ -163,6 +173,10 @@ struct Commodity <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
+        # catch negative timesteps_per_period
+        timesteps_per_period >= 0 ? nothing : 
+        error("timesteps_per_period cannot be negative")
+
         new(prices, name, timesteps_per_period, volatility)
     end
 end
@@ -209,7 +223,7 @@ function Commodity(price::Real; name = "", volatility)
         prices = prices,
         name = name,
         volatility = volatility,
-        timesteps_per_period = 0,
+        timesteps_per_period = 0
     )
 end
 
