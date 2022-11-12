@@ -1,3 +1,6 @@
+using Distributions
+
+
 function strategy_returns(
     obj::FinancialInstrument,
     pricing_model,

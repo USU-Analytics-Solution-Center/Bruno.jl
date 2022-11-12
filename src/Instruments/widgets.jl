@@ -70,7 +70,7 @@ end
 
 # outer constructor to make a stock with a (static) single price
 """
-    Stock(prices, name, volatility)
+    Stock(prices, name, timesteps_per_period, volatility)
     Stock(;kwargs)
     Stock(price; kwargs)
 
@@ -79,15 +79,25 @@ Construct a Stock type to use as a base asset for FinancialInstrument.
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the stock or stock ticker symbol. Default "".
+- `timesteps_per_period::Integer`: For the size of a timestep in the data, the number of 
+time steps for a given period of time. For example, if the period of interest is a year, and
+daily stock data is used, `timesteps_per_period=252`. Defualt 0. Note: If `timesteps_per_period=0`, 
+the Stock represents a 'static' element and cannot be used in the `strategy_returns()` method.
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
 is given for `prices` volatility must be given.
 
 ## Examples
 ```julia
-Stock([1,2,3,4,5], "Test", .05)
+Stock([1,2,3,4,5], "Test", 252, .05)
 
-kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
+kwargs = Dict(
+    :prices => [1, 2, 3, 4, 5], 
+    :name => "Test", 
+    :timesteps_per_period => 252, 
+    :volatility => .05
+);
+
 Stock(;kwargs...)
 
 Stock(40; volatility=.05)
@@ -159,7 +169,7 @@ end
 
 # outer constructor to make a Commodity with a (static) single price
 """
-    Commodity(prices, name, volatility)
+    Commodity(prices, name, timesteps_per_period, volatility)
     Commodity(;kwargs)
     Commodity(price; kwargs)
 
@@ -171,12 +181,23 @@ Construct a Commodity type to use as a base asset for FinancialInstrument.
 - `volatility`: Return volatility, measured in the standard deviation of continuous returns.
 Defaults to using `get_volatility()` on the input `prices` array. Note: if a single number 
 is given for `prices` volatility must be given.
+- `timesteps_per_period::Integer`: For the size of a timestep in the data, the number of 
+time steps for a given period of time, used in calculating volatility in simulations. 
+For example, if the period of interest is a year, and daily stock data is used, 
+`timesteps_per_period=252`. Defualt 0. Note: If `timesteps_per_period=0`, the Commodity represents 
+a 'static' element and cannot be used in the `strategy_returns()` method.
 
 ## Examples
 ```julia
-Commodity([1,2,3,4,5], "Test", .05)
+Commodity([1,2,3,4,5], "Test", 252, .05)
 
-kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :volatility => .05);
+kwargs = Dict(
+    :prices => [1, 2, 3, 4, 5], 
+    :name => "Test", 
+    :timesteps_per_period => 252, 
+    :volatility => .05
+);
+
 Commodity(;kwargs...)
 
 Commodity(40; volatility=.05)
