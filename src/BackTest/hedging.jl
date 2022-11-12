@@ -13,7 +13,7 @@ function strategy_returns(
     widget_count = 0.0,
     pay_int_rate = 0,
     hold_return_int_rate = 0;
-    kwargs...,
+    kwargs...
 ) where {T<:Real}
     # Make some checks
     length(future_prices) < n_timesteps ?
@@ -62,7 +62,7 @@ function strategy_returns(
             future_prices,
             n_timesteps,
             timesteps_per_period,
-            step,
+            step
         )
     end
 
@@ -89,7 +89,7 @@ function strategy_returns(
     widget_count = Dict{String,AbstractFloat}(),
     pay_int_rate = 0,
     hold_return_int_rate = 0;
-    kwargs...,
+    kwargs...
 ) where {T<:Real}
 
     # checks before the sim starts
@@ -177,7 +177,7 @@ function strategy_returns(
             future_prices,
             n_timesteps,
             timesteps_per_period,
-            step,
+            step
         )
     end
 
@@ -238,7 +238,7 @@ function strategy(
     strategy_mode::Type{<:Naked},
     holdings,
     step;
-    kwargs...,
+    kwargs...
 )
     # this is the naked strategy. So we are not hedging... Just buy one of whatever and let it ride
     if step == 1
@@ -254,7 +254,7 @@ function strategy(
     strategy_mode::Type{<:StaticDeltaHedge},
     holdings,
     step;
-    kwargs...,
+    kwargs...
 )
     if step == 1
         buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
@@ -279,7 +279,7 @@ function strategy(
     strategy_mode::Type{<:RebalanceDeltaHedge},
     holdings,
     step;
-    kwargs...,
+    kwargs...
 )
 
     if step == 1
@@ -366,7 +366,7 @@ function buy(
     holdings,
     pricing_model,
     transaction_cost = 0.0;
-    kwargs...,
+    kwargs...
 )
     if fin_obj.maturity == 0
         @warn("Unable to buy expired FinancialInstrument")
@@ -469,7 +469,7 @@ function update_obj(
     future_prices,
     _,
     timesteps_per_period,
-    _,
+    _
 )
 
     # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
@@ -517,7 +517,7 @@ function update_obj(
     future_prices,
     n_timesteps,
     timesteps_per_period,
-    step,
+    step
 ) where {T<:FinancialInstrument}
     # update all the widgets first
     for i = 1:length(widget_array)
@@ -591,7 +591,7 @@ Models.price!(fin_obj::PutOption, _::Type{Expiry}) =
 #-------Helper Functions--------#
 function find_correlation_coeff(
     obj_a::Union{Stock,Commodity},
-    obj_b::Union{Stock,Commodity},
+    obj_b::Union{Stock,Commodity}
 )
     """
     Pearson correlation

@@ -1,3 +1,4 @@
+@testset "BinomialTree price! test" begin
 @testset "Euro Call Price Test 'price'" begin
     """
     Using "Book Name"
@@ -106,6 +107,7 @@ end
     @test 18.592 <= value <= 18.594
 
 end
+end # test for BinomialTree
 
 @testset verbose = true "BlackSholes price tests" begin
     @testset "EuroCallOption" begin

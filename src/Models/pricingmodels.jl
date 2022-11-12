@@ -56,7 +56,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     """ 
     EURO OPTION
@@ -98,7 +98,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -143,7 +143,7 @@ function price!(
     fin_obj::EuroPutOption,
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
-    delta = 0,
+    delta = 0
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -177,7 +177,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -351,7 +351,7 @@ function price!(
     pricing_model::Type{MonteCarlo{LogDiffusion}};
     n_sims::Int = 100,
     sim_size::Int = 100,
-    _...,
+    _...
 )
 
     dt = fin_obj.maturity / sim_size
