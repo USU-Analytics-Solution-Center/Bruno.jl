@@ -149,3 +149,17 @@ end # test for BinomialTree
     end
 
 end
+
+@testset verbose = true "MonteCarlo price test" begin
+    Random.seed!(78)
+
+    @testset "LogDiffusion price test" begin
+        test_stock = Stock(100; volatility = .3)
+        test_call = EuroCallOption(test_stock, 110; maturity=.5)
+        @test true
+    end
+
+    @testset "MCBootstrap price tests" begin
+        @test true
+    end
+end

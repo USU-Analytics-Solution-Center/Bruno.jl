@@ -359,8 +359,8 @@ function price!(
     data_input = LogDiffInput(
         sim_size;
         initial = fin_obj.widget.prices[end],
-        volatility = fin_obj.widget.volatility * sqrt(dt),
-        drift = fin_obj.risk_free_rate * dt,
+        volatility = fin_obj.widget.volatility * sqrt(fin_obj.maturity),
+        drift = fin_obj.risk_free_rate * fin_obj.maturity,
     )
     final_prices = makedata(data_input, n_sims)[end, :]
     # check for exercise or not

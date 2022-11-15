@@ -24,10 +24,12 @@ then shifted and scaled by the drift and volatility terms
 
 ## Arguments
 
-- `nTimeStep::Integer`: nTimeStep is the number of time steps to synthesize.
-- `initial::Real`: initial is the assumed value at the 0th time step. Default: 100.
-- `volatility::Real`: volatility expresses the price volatility as a standard deviation per time step. Default: 9.3e-3
-- `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process. Default 5.38e-4
+- `nTimeStep::Integer`:  the number of time steps to synthesize.
+- `initial::Real`:  the assumed value at the 0th time step. Default: 100.
+- `volatility::Real`:  the price volatility as a standard deviation in terms of implied time period. Default: 0.3
+- `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process 
+given in terms of the entire implied time period (if simulating a year, drift would be annual 
+expected return). Default 0.02
 
 ## Example
 ```julia
@@ -50,8 +52,8 @@ struct LogDiffInput <: DataGenInput
     function LogDiffInput(;
         nTimeStep,
         initial = 100,
-        volatility = 0.00930,
-        drift = 0.000538,
+        volatility = 0.3,
+        drift = 0.02,
     )
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
@@ -65,7 +67,7 @@ struct LogDiffInput <: DataGenInput
     end
 end
 # outer constructor for passing just nTimeStep
-LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.00930, drift = 0.000538) =
+LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.3, drift = 0.02) =
     LogDiffInput(nTimeStep, initial, volatility, drift)
 
 
@@ -75,10 +77,18 @@ function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
     nData = Input.nTimeStep + 1
     data = zeros((nData, nSimulation))
 
+    nudt = (Input.drift - Input.volatility ^ 2 / 2) / nData
+    sigma = Input.volatility / sqrt(nData)
     data[2:nData, :] = rand(
-        Normal(Input.drift / Input.nTimeStep, Input.volatility),
+        Normal(),
         (Input.nTimeStep, nSimulation),
-    )
+    ) .* sigma .+ nudt
+    # data[2:nData,:] = rand(
+    #     Normal(Input.drift/nData ,Input.volatility/ sqrt(nData)), 
+    #             (Input.nTimeStep,nSimulation)
+    # )
+
+    # bring back into price
     data = exp.(cumsum(data, dims = 1) .+ log(Input.initial))
 
     # export values
