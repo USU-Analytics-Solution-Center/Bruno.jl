@@ -381,6 +381,13 @@ function price!(
     n_sims::Int = 100,
     _...
 )
+    length(fin_obj.widget.prices) >= 2 ? 
+    nothing : 
+    error("Must have multiple historical prices to bootstrap from")
+
+    fin_obj.widget.timesteps_per_period > 0 ? 
+    nothing : 
+    error("Cannot have a static base asset. timesteps_per_period must be positive")
 
     # create the data to be used in analysis
     returns = [
