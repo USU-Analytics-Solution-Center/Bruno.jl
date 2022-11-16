@@ -391,17 +391,11 @@ function price!(
         ) for i = 1:(size(fin_obj.widget.prices)[1]-1)
     ]
 
-    # create the data to be used in analysis
-    returns = [
-        log(
-            1 +
-            (fin_obj.widget.prices[i+1] - fin_obj.widget.prices[i]) /
-            fin_obj.widget.prices[i],
-        ) for i = 1:(size(fin_obj.widget.prices)[1]-1)
-    ]
 
     data_input =
-        BootstrapInput{bootstrap_method}(; input_data = returns, n = size(returns)[1])
+        BootstrapInput{bootstrap_method}(; input_data=returns, 
+            n=fin_obj.widget.timesteps_per_period - 1
+        )
     data = makedata(data_input, n_sims)
     final_prices = [
         fin_obj.widget.prices[end] * exp(sum(data[:, i]) * fin_obj.maturity) for
@@ -413,7 +407,7 @@ function price!(
         exp(-fin_obj.risk_free_rate * fin_obj.maturity)
 
     fin_obj.values_library["MC_Bootstrap{$(bootstrap_method)}"] =
-        Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
+        Dict("value" => value, "n_sims" => n_sims)
     return value
 end
 

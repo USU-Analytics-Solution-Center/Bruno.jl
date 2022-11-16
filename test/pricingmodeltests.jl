@@ -173,7 +173,28 @@ end
     end
 
     @testset "MCBootstrap price tests" begin
-        @test true
+        Random.seed!(78)
+        test_stock = Stock([99, 97, 90, 83, 83, 88, 88, 89, 97, 100])
+        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=3),
+            1.50, 
+            atol=.01
+        )
+        @test price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=MovingBlock, n_sims=3) == 0
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=MovingBlock, n_sims=30),
+            .064, 
+            atol=.01
+        )
+        @test price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=Stationary, n_sims=3) == 0
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=Stationary, n_sims=7),
+            0.19, 
+            atol=.01
+        )
+
     end
 end
 
