@@ -370,6 +370,7 @@ function price!(
 
     fin_obj.values_library["MC_LogDiffusion"] =
         Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
+    return value
 end
 
 
@@ -413,6 +414,7 @@ function price!(
 
     fin_obj.values_library["MC_Bootstrap{$(bootstrap_method)}"] =
         Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
+    return value
 end
 
 function payoff(type::CallOption, final_prices, strike_price)

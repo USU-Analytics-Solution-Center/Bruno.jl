@@ -1,5 +1,6 @@
 import InteractiveUtils
 
+@testset verbose = true "Factory tests" begin
 
 @testset "Widget factory" begin
     # Create a data set. The data itself doesnt matter that should be tested in data gen test
@@ -44,3 +45,5 @@ end
     @test length(list_of_fins) == length(unique(list_of_fins))
     @test length(list_of_fins) == 5
 end
+
+end # factory testset

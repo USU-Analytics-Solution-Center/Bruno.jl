@@ -77,16 +77,12 @@ function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
     nData = Input.nTimeStep + 1
     data = zeros((nData, nSimulation))
 
-    nudt = (Input.drift - Input.volatility ^ 2 / 2) / nData
-    sigma = Input.volatility / sqrt(nData)
+    nudt = (Input.drift - Input.volatility ^ 2 / 2) / Input.nTimeStep
+    sigma = Input.volatility / sqrt(Input.nTimeStep)
     data[2:nData, :] = rand(
         Normal(),
         (Input.nTimeStep, nSimulation),
     ) .* sigma .+ nudt
-    # data[2:nData,:] = rand(
-    #     Normal(Input.drift/nData ,Input.volatility/ sqrt(nData)), 
-    #             (Input.nTimeStep,nSimulation)
-    # )
 
     # bring back into price
     data = exp.(cumsum(data, dims = 1) .+ log(Input.initial))
