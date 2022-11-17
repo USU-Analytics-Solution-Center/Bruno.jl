@@ -99,11 +99,13 @@ function strategy_returns(
         catch e
             if isa(e, KeyError)
                 error(
-                    "Must provide a vector of future prices for each widget of each FinancialInstrument in objs",
+                    "Must provide a vector of future prices for each widget of each \
+                    FinancialInstrument in objs",
                 )
             else
                 error(
-                    "Something went wrong. Make sure the future_prices Dict is set up correctly. Check documentation for more information.",
+                    "Something went wrong. Make sure the future_prices Dict is set up \
+                    correctly. Check documentation for more information.",
                 )
             end
         end
@@ -112,7 +114,8 @@ function strategy_returns(
     for key in keys(future_prices)
         length(future_prices[key]) < n_timesteps ?
         error(
-            "Not enough future prices for $(key) to accomidate the given amount of time steps.",
+            "Not enough future prices for $(key) to accomidate the given amount of \
+            time steps.",
         ) : nothing
     end
 
@@ -365,13 +368,20 @@ function buy(
     number::Real,
     holdings,
     pricing_model,
-    transaction_cost = 0.0;
+    transaction_cost::Real = 0.0;
     kwargs...
 )
+    # checks for non sensical buying
     if fin_obj.maturity == 0
-        @warn("Unable to buy expired FinancialInstrument")
+        @warn("unable to buy expired FinancialInstrument")
         return holdings
     end
+
+    if number < 0
+        @warn(raw"unable to buy negative amounts. Use sell instead")
+        return holdings
+    end
+ 
     holdings["cash"] -=
         (number * Models.price!(fin_obj, pricing_model; kwargs...)) + transaction_cost
     holdings["$(fin_obj.label)"] += number
@@ -379,7 +389,19 @@ function buy(
     return holdings
 end
 
-function buy(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
+function buy(
+    widget_obj::Widget, 
+    number::Real, 
+    holdings, 
+    pricing_model, 
+    transaction_cost::Real=0.0,
+    kwargs...
+)
+    if number < 0
+        @warn("unable to buy negative amounts. Use sell instead")
+        return holdings
+    end
+
     holdings["cash"] -= (number * widget_obj.prices[end]) + transaction_cost
     holdings["$(widget_obj.name)"] += number
     return holdings
@@ -391,11 +413,16 @@ function sell(
     number::Real,
     holdings,
     pricing_model,
-    transaction_cost;
+    transaction_cost::Real = 0.0;
     kwargs...,
 )
+    if number < 0
+        @warn("unable to sell negative amounts. Use buy instead")
+        return holdings
+    end
+
     if fin_obj.maturity == 0
-        @warn("Unable to sell an expired FinancialInstrument")
+        @warn("unable to sell expired FinancialInstrument")
         return holdings
     end
     holdings["cash"] +=
@@ -405,7 +432,22 @@ function sell(
     return holdings
 end
 
-function sell(widget_obj::Widget, number::Real, holdings, pricing_model, transaction_cost)
+function sell(
+    widget_obj::Widget, 
+    number::Real, 
+    holdings, 
+    pricing_model, 
+    transaction_cost::Real = 0.0;
+    kwargs...
+)
+    
+    # checks for negative number
+    if number < 0
+        @warn("unable to sell negative amounts. Use buy instead")
+        return holdings
+    end
+
+
     holdings["cash"] += number * widget_obj.prices[end] - transaction_cost
     holdings["$(widget_obj.name)"] -= number
 

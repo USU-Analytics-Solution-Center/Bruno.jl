@@ -13,3 +13,5 @@ include("bootstraptests.jl")
 include("factorytest.jl")
 
 include("pricingmodeltests.jl")
+
+include("hedgingtests.jl")
