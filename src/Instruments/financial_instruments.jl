@@ -104,7 +104,6 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 EuroCallOption(;kwargs...)
 ```
 """
-
 EuroCallOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];

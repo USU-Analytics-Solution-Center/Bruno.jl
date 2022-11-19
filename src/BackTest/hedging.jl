@@ -502,24 +502,33 @@ function unwind(
     return holdings
 end
 
+# single strategy_returns()
 # default update_function for all financial instruments and all pricing/ strategy modes
 function update_obj(
     obj::FinancialInstrument,
-    _::Type{<:Hedging},
+    strategy_type::Type{<:Hedging},
     pricing_model,
     holdings,
     future_prices,
-    _,
+    n_timesteps,
     timesteps_per_period,
-    _
+    step
 )
-
-    # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
-    add_price_value(obj, popfirst!(future_prices))
-    popfirst!(get_prices(obj))  # remove the most stale price
-
+    
     fields = [p for p in fieldnames(typeof(obj)) if p ∉ [:values_library]]
     kwargs = Dict(fields .=> getfield.(Ref(obj), fields))
+    
+    # update the widget first
+    kwargs[:widget] = update_obj(
+        obj.widget,
+        strategy_type,
+        pricing_model,
+        holdings,
+        future_prices,
+        n_timesteps,
+        timesteps_per_period,
+        step
+    )
     # if the option has expired do cash settlement
     if (obj.maturity - (1 / timesteps_per_period)) < 0
         if holdings["$(obj.label)"] != 0
@@ -534,25 +543,42 @@ function update_obj(
     else
         kwargs[:maturity] = obj.maturity - (1 / timesteps_per_period)
     end
+    
     new_obj = typeof(obj)(; kwargs...)
     Models.price!(new_obj, pricing_model)
 
     return new_obj
 end
 
-function update_obj(obj::Widget, _::Type{<:Hedging}, pricing_model, _, _, _, _)
+function update_obj(
+    obj::Widget, 
+    strategy_type::Type{<:Hedging}, 
+    pricing_model, 
+    holdings, 
+    future_prices, 
+    n_timesteps, 
+    timesteps_per_period,
+    step
+)
+    # advance prices to next time step (the top of the future_prices now becomes the bottom of historical_prices)
     add_price_value(obj, popfirst!(future_prices))
     popfirst!(get_prices(obj))  # remove the most stale price
 
-    new_obj = typeof(obj)(deepcopy(obj.prices))
+    # changes volatility inside the widget
+    fields = [p for p in fieldnames(typeof(obj))]
+    kwargs = Dict(fields .=> getfield.(Ref((obj)), fields))
+    kwargs[:volatility] = get_volatility(obj.prices, timesteps_per_period)
+
+    new_obj = typeof(obj)(; kwargs...)
 
     return new_obj
 end
 
+# for multi strategy_returns()
 # general update_obj function that will always fall back onto for multi strategy_returns()
 function update_obj(
     obj_array::Vector{T},
-    widget_array::Array{Widget},
+    widget_array::Vector{<:Widget},
     strategy_type,
     pricing_model,
     holdings,
@@ -561,6 +587,7 @@ function update_obj(
     timesteps_per_period,
     step
 ) where {T<:FinancialInstrument}
+
     # update all the widgets first
     for i = 1:length(widget_array)
         widget = widget_array[i]
@@ -570,7 +597,7 @@ function update_obj(
         # make a new widget and replace the old (so volatility updates)
         fields = [p for p in fieldnames(typeof(widget_array[i]))]
         kwargs = Dict(fields .=> getfield.(Ref(widget_array[i]), fields))
-        kwargs[:volatility] = get_volatility(widget.prices)
+        kwargs[:volatility] = get_volatility(widget.prices, timesteps_per_period)
 
         widget_array[i] = typeof(widget)(; kwargs...)
     end
