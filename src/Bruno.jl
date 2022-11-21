@@ -57,7 +57,7 @@ returns.
 
 include("BackTest/BackTest.jl")
 using .BackTest
-export Naked, RebalanceDeltaHedge, StaticDeltaHedge
-export find_correlation_coeff, strategy_returns
+export Hedging, Naked, RebalanceDeltaHedge, StaticDeltaHedge
+export find_correlation_coeff, strategy_returns, strategy
 
 end # end Bruno module 

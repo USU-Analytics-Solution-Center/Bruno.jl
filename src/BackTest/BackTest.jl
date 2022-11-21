@@ -20,7 +20,9 @@ primitive type RebalanceDeltaHedge <: Hedging 8 end
 primitive type StaticDeltaHedge <: Hedging 8 end
 include("hedging.jl")
 
-export Naked, RebalanceDeltaHedge, StaticDeltaHedge
-export find_correlation_coeff, strategy_returns
+include("strategy.jl")
+
+export Hedging, Naked, RebalanceDeltaHedge, StaticDeltaHedge
+export find_correlation_coeff, strategy_returns, strategy
 
 end # module 

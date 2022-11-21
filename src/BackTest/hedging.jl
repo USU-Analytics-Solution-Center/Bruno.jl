@@ -8,25 +8,23 @@ function strategy_returns(
     future_prices,
     n_timesteps,
     timesteps_per_period,
-    cash_injection = 0.0,
-    fin_obj_count = 0.0,
-    widget_count = 0.0,
-    pay_int_rate = 0,
-    hold_return_int_rate = 0;
+    cash_injection::AbstractFloat = 0,
+    fin_obj_count::AbstractFloat = 0,
+    widget_count::AbstractFloat = 0,
+    pay_int_rate::AbstractFloat = 0,
+    hold_return_int_rate::AbstractFloat = 0;
     kwargs...
-) where {T<:Real}
-    # Make some checks
+) 
+    # make some checks
     length(future_prices) < n_timesteps ?
-    error("Not enough future prices to accomidate the given amount of time steps.") :
+    error("not enough future prices to accomidate the given amount of time steps.") :
     nothing
-    # TODO Add A check for     
 
-
-    # Set up the function  
+    # set up the function  
     future_prices = deepcopy(future_prices)  # we do deep copies so the objects out of scope arent stomped on
     obj = deepcopy(obj)
 
-    # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
+    # set up holdings dictionary. holdings is the active holdings of the program while ts_holdings produces a history
 
     holdings = Dict(
         "cash" => cash_injection,
@@ -51,7 +49,7 @@ function strategy_returns(
         if holdings["cash"] >= 0
             holdings["cash"] *= exp(hold_return_int_rate / timesteps_per_period)
         else
-            holdings["cash"] *= exp(-pay_int_rate / timesteps_per_period)
+            holdings["cash"] *= exp(pay_int_rate / timesteps_per_period)
         end
 
         obj = update_obj(
@@ -67,13 +65,51 @@ function strategy_returns(
     end
 
     # unwind the postions
-    holdings["cash"] += unwind(obj, pricing_model, holdings)
+    holdings = unwind(obj, pricing_model, holdings)
     # update holdings one last time
     for (key, value) in holdings
         push!(ts_holdings[key], value)
     end
 
     return holdings["cash"], ts_holdings, obj
+end
+
+# converter function to let users imput whatever type of number they want
+function strategy_returns(
+    obj::FinancialInstrument,
+    pricing_model,
+    strategy_type,
+    future_prices,
+    n_timesteps,
+    timesteps_per_period,
+    cash_injection::Real = 0,
+    fin_obj_count::Real = 0,
+    widget_count::Real = 0,
+    pay_int_rate::Real = 0,
+    hold_return_int_rate::Real = 0;
+    kwargs...
+)  
+
+    cash_injection = convert(AbstractFloat, cash_injection)
+    fin_obj_count = convert(AbstractFloat,fin_obj_count)
+    widget_count= convert(AbstractFloat, widget_count)
+    pay_int_rate = convert(AbstractFloat, pay_int_rate)
+    hold_return_int_rate= convert(AbstractFloat, hold_return_int_rate)
+
+    strategy_returns(
+        obj,
+        pricing_model,
+        strategy_type,
+        future_prices,
+        n_timesteps,
+        timesteps_per_period,
+        cash_injection,
+        fin_obj_count,
+        widget_count,
+        pay_int_rate,
+        hold_return_int_rate;
+        kwargs...
+    )  
 end
 
 # for an array of fin objs
@@ -105,7 +141,7 @@ function strategy_returns(
             else
                 error(
                     "Something went wrong. Make sure the future_prices Dict is set up \
-                    correctly. Check documentation for more information.",
+                    correctly. See documentation for more information.",
                 )
             end
         end
@@ -130,25 +166,29 @@ function strategy_returns(
 
 
     # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
-    holdings = Dict("cash" => cash_injection)
-    ts_holdings = Dict("cash" => [cash_injection])
+   holdings = Dict{String, AbstractFloat}(
+        "cash" => cash_injection, 
+        fin_obj_count..., 
+        widget_count...
+    ) 
+    ts_holdings = Dict("cash" => AbstractFloat[cash_injection])
 
     for widget in widget_array
-        holdings["$(widget.name)"] = 0
         try
-            holdings["$(widget.name)"] += widget_count["$(widget.name)"]
+            holdings["$(widget.name)"]
         catch
             @warn("No starting amount for $(widget.name) given. Using default = 0.0")
+            holdings["$(widget.name)"] = 0
         end
         ts_holdings["$(widget.name)"] = [holdings["$(widget.name)"]]
     end
 
     for obj in obj_array
-        holdings["$(obj.label)"] = 0
         try
-            holdings["$(obj.label)"] += widget_count["$(obj.label)"]
+            holdings["$(obj.label)"] 
         catch
             @warn("No starting amount for $(obj.label) given. Using default = 0.0")
+            holdings["$(obj.label)"] = 0
         end
         ts_holdings["$(obj.label)"] = [holdings["$(obj.label)"]]
     end
@@ -231,135 +271,6 @@ function copy_obj(objs::Vector{<:FinancialInstrument})
     return typeof(objs)(new_obj_arr), Vector{Widget}(widget_arr)
 end
 
-
-"""
-Active strategies
-"""
-function strategy(
-    fin_obj::FinancialInstrument,
-    pricing_model,
-    strategy_mode::Type{<:Naked},
-    holdings,
-    step;
-    kwargs...
-)
-    # this is the naked strategy. So we are not hedging... Just buy one of whatever and let it ride
-    if step == 1
-        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost]; kwargs...)
-    end
-
-    return holdings
-end
-
-function strategy(
-    fin_obj::FinancialInstrument,
-    pricing_model,
-    strategy_mode::Type{<:StaticDeltaHedge},
-    holdings,
-    step;
-    kwargs...
-)
-    if step == 1
-        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
-
-        delta =
-            (
-                log(fin_obj.widget.prices[end] / fin_obj.strike_price) +
-                (fin_obj.risk_free_rate + (fin_obj.widget.volatility^2 / 2)) *
-                fin_obj.maturity
-            ) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity))
-        holdings["delta"] = delta
-        sell(fin_obj.widget, delta, holdings, pricing_model, 0)  # assuming transaction_cost == 0 for stocks
-    end
-
-    return holdings
-end
-
-
-function strategy(
-    fin_obj::CallOption,
-    pricing_model,
-    strategy_mode::Type{<:RebalanceDeltaHedge},
-    holdings,
-    step;
-    kwargs...
-)
-
-    if step == 1
-        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
-    end
-    if (step - 1) % kwargs[:steps_between] == 0
-        delta = cdf(
-            Normal(),
-            (
-                log(fin_obj.widget.prices[end] / fin_obj.strike_price) +
-                (fin_obj.risk_free_rate + (fin_obj.widget.volatility^2 / 2)) *
-                fin_obj.maturity
-            ) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity)),
-        )
-        holdings["delta"] = delta
-        change = delta - abs(holdings["widget_count"])  # new - old = Change
-        if change > 0  # if delta increased we want to increase the hedge
-            sell(fin_obj.widget, change, holdings, pricing_model, 0)
-        else  # if delta decreased we want to lessen the hedge 
-            buy(fin_obj.widget, -change, holdings, pricing_model, 0)  # assuming no transaction cost for widgets. Note we flip the sign here for ease in buy
-        end
-    end
-
-    return holdings
-end
-
-function strategy(
-    fin_obj::PutOption,
-    pricing_model,
-    strategy_mode::Type{<:RebalanceDeltaHedge},
-    holdings,
-    step;
-    kwargs...,
-)
-    if step == 1
-        buy(fin_obj, 1, holdings, pricing_model, kwargs[:transaction_cost])
-    end
-    if (step - 1) % kwargs[:steps_between] == 0
-        delta =
-            cdf(
-                Normal(),
-                (
-                    log(fin_obj.widget.prices[end] / fin_obj.strike_price) +
-                    (fin_obj.risk_free_rate + (fin_obj.widget.volatility^2 / 2)) *
-                    fin_obj.maturity
-                ) / (fin_obj.widget.volatility * sqrt(fin_obj.maturity)),
-            ) - 1
-        holdings["delta"] = delta
-        change = delta + holdings["widget_count"]  # new - old = Change
-        if change > 0  # if delta increased we want to increase the hedge
-            sell(fin_obj.widget, change, holdings, pricing_model, 0)
-        else  # if delta decreased we want to lessen the hedge 
-            buy(fin_obj.widget, -change, holdings, pricing_model, 0)  # assuming no transaction cost for widgets. Note we flip the sign here for ease in buy
-        end
-    end
-
-    return holdings
-end
-
-function strategy(
-    obj_array::Vector{<:FinancialInstrument},
-    pricing_model,
-    strategy_mode::Type{<:Naked},
-    holdings,
-    step;
-    kwargs...,
-)
-    # just buy one of each obj in array
-    for obj in obj_array
-        if step == 1
-            buy(obj, 1, holdings, pricing_model, kwargs[:transaction_cost]; kwargs...)
-        end
-    end
-
-    return holdings
-end
-
 """
 Extra functions needed to get the hedging working
 """
@@ -414,7 +325,7 @@ function sell(
     holdings,
     pricing_model,
     transaction_cost::Real = 0.0;
-    kwargs...,
+    kwargs...
 )
     if number < 0
         @warn("unable to sell negative amounts. Use buy instead")
@@ -459,43 +370,52 @@ function unwind(obj::FinancialInstrument, pricing_model, holdings)
     if obj.maturity == 0 # should have got closed out in update_obj, but this is will catch as well
         profit += holdings["$(obj.label)"] * Models.price!(obj, Expiry)  # close out obj
         profit += holdings["$(obj.widget.name)"] * obj.widget.prices[end]  # close out hedge
-        holdings["$(obj.label)"] = 0
-        holdings["$(obj.widget.name)"] = 0
     elseif obj.maturity > 0
         profit += holdings["$(obj.label)"] * Models.price!(obj, pricing_model)
         profit += holdings["$(obj.widget.name)"] * obj.widget.prices[end]  # close out hedge
     end
 
-    return profit
+    holdings["$(obj.label)"] = 0
+    holdings["$(obj.widget.name)"] = 0
+    holdings["cash"] += profit
+    return holdings
 end
 
-function unwind(obj::Widget, holdings)
-    profit = holdings["$(obj.widget.name)"] * obj.prices[end]
-    holdings["$(obj.widget.name)"] = 0
-    return profit
-end
+# function unwind(obj::Widget, holdings)
+#     profit = holdings["$(obj.widget.name)"] * obj.prices[end]
+#     holdings["$(obj.widget.name)"] = 0
+# 
+#     holdings["cash"] += profit
+#     return holdings
+# end
 
 function unwind(
     obj_array::Array{<:FinancialInstrument},
-    widget_array::Array{Widget},
+    widget_array::Array{<:Widget},
     pricing_model,
-    holdings,
+    holdings
 )
     # assums no transaction costs for unwinding the position
     for fin_obj in obj_array
+        model_used = pricing_model
+        # checks for expired fin instruments just in case 
+        # (should have been found in update_obj())
+        if fin_obj.maturity <= 0
+            model_used = Expiry
+        end
         if holdings["$(fin_obj.label)"] > 0
             holdings =
-                sell(fin_obj, holdings["$(fin_obj.label)"], holdings, pricing_model, 0)
+                sell(fin_obj, holdings["$(fin_obj.label)"], holdings, model_used, 0)
         elseif holdings["$(fin_obj.label)"] < 0
             holdings =
-                buy(fin_obj, holdings["$(fin_obj.label)"], holdings, pricing_model, 0)
+                buy(fin_obj, -holdings["$(fin_obj.label)"], holdings, model_used, 0)
         end
     end
     for widget in widget_array
         if holdings["$(widget.name)"] > 0
-            holdings = sell(fin_obj, holdings["$(widget.name)"], holdings, pricing_model, 0)
+            holdings = sell(widget, holdings["$(widget.name)"], holdings, pricing_model, 0)
         elseif holdings["$(widget.name)"] < 0
-            holdings = buy(fin_obj, holdings["$(widget.name)"], holdings, pricing_model, 0)
+            holdings = buy(widget, -holdings["$(widget.name)"], holdings, pricing_model, 0)
         end
     end
 
