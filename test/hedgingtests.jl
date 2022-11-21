@@ -189,13 +189,13 @@ end
         
         obj_array = [test_call, test_put, test_call2]
         obj_array2 = [test_put2] # one that should throw a warning
-        widget_array = [test_stock, test_stock2]
+        widget_dict = Dict("stock" => test_stock, "stock2" => test_stock2)
         future_prices = Dict("stock" => [1,2,3], "stock2" => [4,5,6])
         holdings = Dict("cash" => 0, "stock" => 1, "stock2" => 2, "call" => 1, "put" => 1, "call2" => 1, "put2" => 1)
         
-        new_obj_arr, new_widget_arr = update_obj(
+        new_obj_arr, new_widget_dict = update_obj(
             obj_array, 
-            widget_array, 
+            widget_dict, 
             Naked, 
             BlackScholes, 
             holdings, 
@@ -206,31 +206,34 @@ end
         )
 
         # test widgets
-        @test new_widget_arr[1].prices == [97, 90, 83, 83, 88, 88, 89, 97, 100, 1]
-        @test new_widget_arr[2].prices == [61, 70, 55, 65, 63, 57, 55, 53, 68, 4]
-        @test isapprox(new_widget_arr[1].volatility, 23.008, atol=.01) 
-        @test isapprox(new_widget_arr[2].volatility, 14.378, atol=.01) 
-        @test new_widget_arr[1].name == "stock"
-        @test new_widget_arr[2].name == "stock2"
+        @test new_widget_dict["stock"].prices == [97, 90, 83, 83, 88, 88, 89, 97, 100, 1]
+        @test new_widget_dict["stock2"].prices == [61, 70, 55, 65, 63, 57, 55, 53, 68, 4]
+        @test isapprox(new_widget_dict["stock"].volatility, 23.008, atol=.01) 
+        @test isapprox(new_widget_dict["stock2"].volatility, 14.378, atol=.01) 
+        @test new_widget_dict["stock"].name == "stock"
+        @test new_widget_dict["stock2"].name == "stock2"
 
         #test obj array
         @test isapprox(new_obj_arr[1].maturity , 0.496, atol=.01)
         @test new_obj_arr[1].strike_price == 110
+        @test new_obj_arr[1].widget == new_widget_dict["stock"]
         @test new_obj_arr[1].label == "call"
         @test new_obj_arr[1].risk_free_rate == .02
         @test isapprox(new_obj_arr[2].maturity , 0.496, atol=.01)
         @test new_obj_arr[2].strike_price == 110
+        @test new_obj_arr[2].widget == new_widget_dict["stock"]
         @test new_obj_arr[2].label == "put"
         @test new_obj_arr[2].risk_free_rate == .02
         @test isapprox(new_obj_arr[3].maturity , 0.996, atol=.01)
         @test new_obj_arr[3].strike_price == 70
+        @test new_obj_arr[3].widget == new_widget_dict["stock2"]
         @test new_obj_arr[3].label == "call2"
         @test new_obj_arr[3].risk_free_rate == .02
 
         # test warning for expiring object 
         @test_logs (:warn, "put2 has expired, it will not be able to be bought or sold") update_obj(
             obj_array2, 
-            widget_array, 
+            widget_dict, 
             Naked, 
             BlackScholes, 
             holdings, 
@@ -247,7 +250,7 @@ end
         obj_array2 = [test_put2]
         @test_logs min_level=Logging.Warn update_obj(
             obj_array2, 
-            widget_array, 
+            widget_dict, 
             Naked, 
             BlackScholes, 
             holdings, 
@@ -285,7 +288,7 @@ end
         test_put2 = EuroPutOption(test_stock2, 70; maturity=0.001, label="put2", risk_free_rate=.02)
         
         obj_array = [test_call, test_put, test_call2] # doesn't have test_put2
-        widget_array = [test_stock, test_stock2] # doesnt' have stock3
+        widget_dict = Dict("stock" => test_stock, "stock2" => test_stock2) # doesnt' have stock3
         holdings = Dict{String, AbstractFloat}(
             "cash" => 0,
             "stock" => 1, 
@@ -297,11 +300,11 @@ end
             "put2" => 1
         )
 
-        unwind(obj_array, widget_array, BlackScholes, holdings) 
+        unwind(obj_array, widget_dict, BlackScholes, holdings) 
         for fin_inst in obj_array
             @test holdings["$(fin_inst.label)"] == 0
         end
-        for widget in widget_array
+        for (name, widget) in widget_dict
             @test holdings["$(widget.name)"] == 0
         end
         @test isapprox(holdings["cash"], -38.1598, atol=.01)
@@ -468,6 +471,68 @@ end
         @test ts_holdings["call"] == [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0]
         @test ts_holdings["call2"] == [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
 
+        @test isapprox(ts_holdings["cash"][2], -70.571, atol=.01)
+        @test isapprox(test_ret, 479.664, atol=.01)
+
+        # test multi strat returns checks
+        # check negative timesteps_per_period
+        @test_throws ErrorException test_ret, ts_holdings, obj_array = strategy_returns(
+            objs, 
+            BlackScholes,
+            Naked,
+            future_prices,
+            10,
+            -252,
+            0,
+            fin_obj_count,
+            widget_count
+        )
+
+        #check negative n_timesteps
+        @test_throws ErrorException test_ret, ts_holdings, obj_array = strategy_returns(
+            objs, 
+            BlackScholes,
+            Naked,
+            future_prices,
+            -10,
+            252,
+            0,
+            fin_obj_count,
+            widget_count
+        )
+        future_prices = Dict(
+            "stock" => [100, 104, 109, 105, 108, 101, 101, 104, 110],
+            "stock2" => [67, 74, 73, 67, 67, 75, 69, 71, 69, 70]
+        )   
+        @test_throws ErrorException test_ret, ts_holdings, obj_array = strategy_returns(
+            objs, 
+            BlackScholes,
+            Naked,
+            future_prices,
+            10,
+            252,
+            0,
+            fin_obj_count,
+            widget_count
+        )
+        future_prices = Dict(
+            "not_a_key" => [100, 104, 109, 105, 108, 101, 101, 104, 110],
+            "stock2" => [67, 74, 73, 67, 67, 75, 69, 71, 69, 70]
+        )   
+        @test_throws ErrorException test_ret, ts_holdings, obj_array = strategy_returns(
+            objs, 
+            BlackScholes,
+            Naked,
+            future_prices,
+            10,
+            252,
+            0,
+            fin_obj_count,
+            widget_count
+        )
+
+        
+        
     end
 end
 end # master hedging/ strategy testset 
