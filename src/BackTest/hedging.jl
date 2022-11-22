@@ -1,6 +1,44 @@
 using Distributions
 
+"""
+    strategy_returns(
+        obj::FinancialInstrument,
+        pricing_model,
+        strategy_type,
+        future_prices,
+        n_timesteps::Int,
+        timesteps_per_period::Int,
+        cash_injection::Real= 0,
+        fin_obj_count::Real= 0,
+        widget_count::Real= 0,
+        pay_int_rate::Real= 0,
+        hold_return_int_rate::Real= 0;
+        kwargs...
+    )
 
+a simulating environment to test trading or hedging strategies for given interest rates and 
+and prices. To be used by providing a new method for the `strategy()` function which defines 
+the trading strategy. 
+
+## Arguments
+- `obj::FinancialInstrument`: financial instrument the trading or hedging strategy runs on
+- `pricing_model`: `Model` subtype that defines how to price the `obj`
+- `strategy_type`: `Hedging` subtype that the `strategy()` function dispatches off. Must provide a new subtype for new `strategy()` methods
+- `future_prices`: vector of future prices for the underlying `Widget` asset of obj to run strategy on
+- `n_timesteps`: number of timesteps to test the strategy on
+- `timesteps_per_period`: for the size of a timestep in the data, the number of 
+time steps for a given period of time, cannot be negative. For example, if the period of 
+interest is a year, and daily stock data is used, `timesteps_per_period=252`. Must be positive.
+- `cash_injection`: amount of cash owned when starting the strategy 
+- `fin_obj_count`: amount of financial instruments owned when starting the strategy
+- `widget_count`: amount of underlying `Widget` owned when starting the strategy
+- `pay_int_rate`: the continuous interest rate payed on negative cash balances
+- `hold_return_int_rate`: the continous interest rate earned on positive cash balances
+- `kwargs`: pass through for keyword arguments needed by `price!()` or `strategy()` functions
+
+## Examples
+Put an example here. 
+"""
 function strategy_returns(
     obj::FinancialInstrument,
     pricing_model,
@@ -113,6 +151,48 @@ function strategy_returns(
 end
 
 # for an array of fin objs
+"""
+    strategy_returns(
+        objs::Vector{<:FinancialInstrument},
+        pricing_model,
+        strategy_type,
+        future_prices::Dict{String, Vector{Real}},
+        n_timesteps::Int,
+        timesteps_per_period::Int,
+        cash_injection::Real = 0,
+        fin_obj_count::Dict{String, Real},
+        widget_count::Dict{String, Real},
+        pay_int_rate::Real= 0,
+        hold_return_int_rate::Real= 0;
+        kwargs...
+    )
+
+a simulating environment to test trading or hedging strategies for multiple financial instruments
+for given interest rates and prices. To be used by providing a new method for the 
+`strategy()` function which defines the trading strategy. 
+
+## Arguments
+- `objs::Vector{<:FinancialInstrument}`: vector of financial instruments the trading or hedging strategy runs on
+- `pricing_model`: `Model` subtype that defines how to price the `obj`
+- `strategy_type`: `Hedging` subtype that the `strategy()` function dispatches off. Must provide a new subtype for new `strategy()` methods
+- `future_prices`: dictionary of vectors of future prices for underlying `Widget` assets used in financial instruments in `objs`
+Note: dictionary keys must be the `widget.name` field string for each base asset
+- `n_timesteps`: number of timesteps to test the strategy on
+- `timesteps_per_period`: for the size of a timestep in the data, the number of 
+time steps for a given period of time, cannot be negative. For example, if the period of 
+interest is a year, and daily stock data is used, `timesteps_per_period=252`. Must be positive.
+- `cash_injection`: amount of cash owned when starting the strategy 
+- `fin_obj_count`: dictionary of amounts of financial instruments owned when starting the strategy
+Note: dictionary keys must be the `FinancialInstrument.label` field string for each financial instrument
+- `widget_count`: dictionary of amounts of base assets used in financial instruments owned when starting the strategy
+Note: dictionary keys must be the `Widget.name` field string for each base asset
+- `pay_int_rate`: the continuous interest rate payed on negative cash balances
+- `hold_return_int_rate`: the continous interest rate earned on positive cash balances
+- `kwargs`: pass through for keyword arguments needed by `price!()` or `strategy()` functions
+
+## Examples
+Put an example here. 
+"""
 function strategy_returns(
     objs::Vector{<:FinancialInstrument},
     pricing_model,
@@ -312,8 +392,21 @@ function copy_obj(objs::Vector{<:FinancialInstrument})
     return typeof(objs)(new_obj_arr), widget_dict
 end
 
+# Extra functions needed to get the hedging working
 """
-Extra functions needed to get the hedging working
+    buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
+    buy(fin_obj::Widget, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
+
+Records buying a specified number of fin_obj in a holdings dictionary based on the given 
+pricing_model. To be used in `strategy()` functions to define trading and hedging strategies.
+
+## Arguments
+- `fin_obj`: the financial object to be bought. Can be a subtype of FinancialInstrument or Widget
+- `number`: number of objects to be bought
+- `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
+- `pricing_model`: Model subtype to be used to define buy price
+- `transaction_cost::Real`: total transaction costs for the transaction
+- `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
 """
 function buy(
     fin_obj::FinancialInstrument,
@@ -359,7 +452,21 @@ function buy(
     return holdings
 end
 
+"""
+    sell(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
+    sell(fin_obj::Widget, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
 
+Records selling a specified number of fin_obj in a holdings dictionary based on the given 
+pricing_model. To be used in `strategy()` functions to define trading and hedging strategies.
+
+## Arguments
+- `fin_obj`: the financial object to be sold. Can be a subtype of FinancialInstrument or Widget
+- `number`: number of objects to be sold
+- `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
+- `pricing_model`: Model subtype to be used to define sell price
+- `transaction_cost::Real`: total transaction costs for the transaction
+- `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
+"""
 function sell(
     fin_obj::FinancialInstrument,
     number::Real,
