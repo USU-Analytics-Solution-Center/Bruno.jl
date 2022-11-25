@@ -1,6 +1,6 @@
 name = "Bruno"
 uuid = "2c64e276-ffac-4684-a264-d42a389bacb2"
-authors = ["Mitchell Pound <mitchell.pound@usu.edu>"]
+authors = ["Mitchell Pound <mitchell.pound@usu.edu>", "Spencer Clemens <soclemens@gmail.com>"]
 version = "0.1.0"
 
 [deps]

@@ -1,4 +1,4 @@
-# Type System
+# [Type System](@id Type_system)
 
 ## Types
 

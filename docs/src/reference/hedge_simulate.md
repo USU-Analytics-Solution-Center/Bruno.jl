@@ -1,3 +1,10 @@
 # Hedging Simulations
 
-Still in development. Documentation to come soon.
+## Some subtitle
+
+```@docs
+Bruno.BackTest.buy
+Bruno.BackTest.sell
+strategy
+strategy_returns
+```

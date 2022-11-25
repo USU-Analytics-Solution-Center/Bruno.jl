@@ -56,7 +56,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     """ 
     EURO OPTION
@@ -98,7 +98,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -143,7 +143,7 @@ function price!(
     fin_obj::EuroPutOption,
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
-    delta = 0,
+    delta = 0
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -177,7 +177,7 @@ function price!(
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
     delta = 0,
-    _...,
+    _...
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
@@ -351,7 +351,7 @@ function price!(
     pricing_model::Type{MonteCarlo{LogDiffusion}};
     n_sims::Int = 100,
     sim_size::Int = 100,
-    _...,
+    _...
 )
 
     dt = fin_obj.maturity / sim_size
@@ -359,8 +359,8 @@ function price!(
     data_input = LogDiffInput(
         sim_size;
         initial = fin_obj.widget.prices[end],
-        volatility = fin_obj.widget.volatility * sqrt(dt),
-        drift = fin_obj.risk_free_rate * dt,
+        volatility = fin_obj.widget.volatility * sqrt(fin_obj.maturity),
+        drift = fin_obj.risk_free_rate * fin_obj.maturity,
     )
     final_prices = makedata(data_input, n_sims)[end, :]
     # check for exercise or not
@@ -370,6 +370,7 @@ function price!(
 
     fin_obj.values_library["MC_LogDiffusion"] =
         Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
+    return value
 end
 
 
@@ -378,8 +379,15 @@ function price!(
     pricing_model::Type{MonteCarlo{MCBootstrap}};
     bootstrap_method::Type{<:TSBootMethod} = Stationary,
     n_sims::Int = 100,
-    _...,
+    _...
 )
+    length(fin_obj.widget.prices) >= 2 ? 
+    nothing : 
+    error("Must have multiple historical prices to bootstrap from")
+
+    fin_obj.widget.timesteps_per_period > 0 ? 
+    nothing : 
+    error("Cannot have a static base asset. timesteps_per_period must be positive")
 
     # create the data to be used in analysis
     returns = [
@@ -390,17 +398,11 @@ function price!(
         ) for i = 1:(size(fin_obj.widget.prices)[1]-1)
     ]
 
-    # create the data to be used in analysis
-    returns = [
-        log(
-            1 +
-            (fin_obj.widget.prices[i+1] - fin_obj.widget.prices[i]) /
-            fin_obj.widget.prices[i],
-        ) for i = 1:(size(fin_obj.widget.prices)[1]-1)
-    ]
 
     data_input =
-        BootstrapInput{bootstrap_method}(; input_data = returns, n = size(returns)[1])
+        BootstrapInput{bootstrap_method}(; input_data=returns, 
+            n=fin_obj.widget.timesteps_per_period - 1
+        )
     data = makedata(data_input, n_sims)
     final_prices = [
         fin_obj.widget.prices[end] * exp(sum(data[:, i]) * fin_obj.maturity) for
@@ -412,7 +414,8 @@ function price!(
         exp(-fin_obj.risk_free_rate * fin_obj.maturity)
 
     fin_obj.values_library["MC_Bootstrap{$(bootstrap_method)}"] =
-        Dict("value" => value, "n_sims" => n_sims, "sim_size" => sim_size)
+        Dict("value" => value, "n_sims" => n_sims)
+    return value
 end
 
 function payoff(type::CallOption, final_prices, strike_price)

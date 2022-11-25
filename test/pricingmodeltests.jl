@@ -1,3 +1,8 @@
+using Random
+
+@testset verbose=true "Pricing model tests" begin
+
+@testset "BinomialTree price! test" begin
 @testset "Euro Call Price Test 'price'" begin
     """
     Using "Book Name"
@@ -106,6 +111,7 @@ end
     @test 18.592 <= value <= 18.594
 
 end
+end # test for BinomialTree
 
 @testset verbose = true "BlackSholes price tests" begin
     @testset "EuroCallOption" begin
@@ -147,3 +153,49 @@ end
     end
 
 end
+
+@testset verbose = true "MonteCarlo price tests" begin
+    # This test may break with future Julia updates, just redo test with new RNG
+
+    @testset "LogDiffusion price test" begin
+        Random.seed!(78)
+        test_stock = Stock(100; volatility = .3)
+        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+
+        # testing with a simulation that ends with all paths out of the money
+        @test price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=3) == 0.0
+        # testing with simulations that have a path that works
+        @test isapprox(
+            price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=5), 
+            5.35; 
+            atol = .1
+        )
+    end
+
+    @testset "MCBootstrap price tests" begin
+        Random.seed!(78)
+        test_stock = Stock([99, 97, 90, 83, 83, 88, 88, 89, 97, 100])
+        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=3),
+            1.50, 
+            atol=.01
+        )
+        @test price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=MovingBlock, n_sims=3) == 0
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=MovingBlock, n_sims=30),
+            .064, 
+            atol=.01
+        )
+        @test price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=Stationary, n_sims=3) == 0
+        @test isapprox(
+            price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=Stationary, n_sims=7),
+            0.19, 
+            atol=.01
+        )
+
+    end
+end
+
+end # pricing model master testset

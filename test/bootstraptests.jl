@@ -1,5 +1,8 @@
 # testing for statistical consistency. TEST IS NOT DETERMINISTIC. 
 # MAY PASS EVEN IF CODE IS BROKEN 
+@testset verbose=true "Bootstrap tests" begin
+
+@testset verbose=true "Bootstrap Statistical consistency checks" begin
 @testset "Statistical consistency check for $v" for v in
                                                     (MovingBlock, CircularBlock, Stationary)
     # create AR(1) data set
@@ -44,6 +47,8 @@ end
     # check stationarity of bootstrap
     @test bsADF.stat < bsADF.cv[1]
 end
+
+end #bootstrap consistency testset
 
 @testset "Optimal Block Length test" begin
     # using this AR(1) data set
@@ -146,3 +151,5 @@ end
     bs_input = BootstrapInput{bstype}([1, 2, 3, 4, 5, 6, 7, 8], n, 3)
     @test size(makedata(bs_input, m)) == (n, m)
 end
+
+end # bootstrap tests testset

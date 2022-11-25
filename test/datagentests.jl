@@ -1,5 +1,5 @@
 # test data gen type constructor 
-@testset verbose = true "type constructor tests" begin
+@testset verbose = true "input type constructor tests" begin
     @testset "test kwargs for $v" for v in (Stationary, MovingBlock, CircularBlock)
         kwargs = Dict(:input_data => [1, 2, 3, 4, 5], :n => 10, :block_size => 4)
         input = BootstrapInput{v}(; kwargs...)
