@@ -47,7 +47,6 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-
 price!(fin_obj::Option, pricing_model::Type{BinomialTree}; _...) =
     error("Something went wrong. Make sure you're using a defined Option subtype")
 

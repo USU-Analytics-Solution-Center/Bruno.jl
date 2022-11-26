@@ -15,6 +15,7 @@ include("hedging.jl")
 include("strategy.jl")
 
 export Hedging, Naked, RebalanceDeltaHedge, StaticDeltaHedge
+export buy, sell
 export find_correlation_coeff, strategy_returns, strategy
 
 end # module 

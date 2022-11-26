@@ -2,7 +2,7 @@
 
 ## Types
 
-### Base Assets (Widgets)
+### [Base Assets (Widgets)](@id Widgets)
 
 ```@docs
 Widget
@@ -11,7 +11,7 @@ Commodity
 Bond
 ```
 
-### Financial Instruments (Derivatives)
+### [Financial Instruments (Derivatives)](@id Fin_instruments)
 
 #### Abstract types
 
@@ -31,9 +31,9 @@ EuroPutOption
 AmericanPutOption
 ```
 
-## Constructors
+## [Constructors](@id Constructors)
 
-### Base Asset Constructors
+### [Base Asset Constructors](@id Widget_constructors)
 
 ```@docs
 Stock(::Real)
@@ -41,7 +41,7 @@ Commodity(::Real)
 Bond(::Real)
 ```
 
-### Financial Instrument Constructors
+### [Financial Instrument Constructors](@id Fin_inst_constructors)
 
 ```@docs
 EuroCallOption(::Widget, ::Real)

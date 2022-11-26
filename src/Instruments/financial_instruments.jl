@@ -226,7 +226,6 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 AmericanCallOption(;kwargs...)
 ```
 """
-
 AmericanCallOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];
@@ -352,7 +351,6 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 EuroPutOption(;kwargs...)
 ```
 """
-
 EuroPutOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];
@@ -481,7 +479,6 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 AmericanPutOption(;kwargs...)
 ```
 """
-
 AmericanPutOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];

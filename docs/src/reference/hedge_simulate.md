@@ -1,10 +1,10 @@
 # Hedging Simulations
 
-## Some subtitle
+## [Backtesting and Trading/Hedging simulation](@id trading_strategies)
 
 ```@docs
-Bruno.BackTest.buy
-Bruno.BackTest.sell
+Bruno.buy
+Bruno.sell
 strategy
 strategy_returns
 ```

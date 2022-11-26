@@ -2,23 +2,16 @@ using Documenter
 using Bruno
 
 const _PAGES = [
-    "Introduction" => ["index.md", "installation.md"],
+    "Introduction" => ["index.md"],
     "Tutorials" => [
-        "Getting started" => [
-            "tutorials/getting_started/introduction.md",
-            "tutorials/getting_started/getting_started_with_julia.md",
-            "tutorials/getting_started/getting_started_with_Bruno.md",
-        ],
-        "Simulating data" =>
-            ["tutorials/get_data/inputs.md", "tutorials/get_data/output.md"],
-        "Making financial instruments" => [
+        "Simulating Data" =>
+            ["tutorials/get_data/get_data.md"],
+        "Making Financial Instruments" => [
             "tutorials/fin_inst/base_asset.md",
             "tutorials/fin_inst/derivatives.md",
         ],
-        "Pricing instruments" =>
-            ["tutorials/pricing/derivatives.md", "tutorials/pricing/futures.md"],
-        "Simulating hedges" =>
-            ["tutorials/hedge/options.md", "tutorials/hedge/futures.md"],
+        "Strategy Testing" =>
+            ["tutorials/strategy/options.md", "tutorials/strategy/widgets.md"],
     ],
     "Manual" => [
         "manual/types.md",
