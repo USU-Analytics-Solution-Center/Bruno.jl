@@ -11,7 +11,7 @@ const _PAGES = [
             "tutorials/fin_inst/derivatives.md",
         ],
         "Strategy Testing" =>
-            ["tutorials/strategy/options.md", "tutorials/strategy/widgets.md"],
+            ["tutorials/strategy/trading_strategy.md"],
     ],
     "Manual" => [
         "manual/types.md",
@@ -29,9 +29,9 @@ const _PAGES = [
 
 
 makedocs(
-    sitename = "Bruno",
+    sitename = "Bruno.jl",
     modules = [Bruno],
-    doctest = true,
+    doctest = false,
     pages = _PAGES,
     format = Documenter.HTML(
         sidebar_sitename = true,

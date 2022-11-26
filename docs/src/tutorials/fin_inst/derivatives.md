@@ -17,7 +17,7 @@ call = EuroCallOption(a_widget, 60)
 ```
 
 ## Interacting with a FinancialInstrument (Asset Pricing)
-One of the more interesting things that can be done with FinancialInstruments is asset pricing with several models. Not all of the models work with all the FinancialInstruments, so check the [manual](@ref creating_widget_manual) to see if it is supported and a method is written for each model.
+One of the more interesting things that can be done with FinancialInstruments is asset pricing with several models. Not all of the models work with all the FinancialInstruments, so check the [manual](@ref pricing_fin_inst) to see if it is supported and a method is written for each model.
 
 ```
 # pricing the EuroCallOption from above
