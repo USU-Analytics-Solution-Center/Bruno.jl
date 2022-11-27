@@ -12,6 +12,8 @@ This tutorial shows how to create a simple trading strategy simulation. It demon
 Each new strategy will need a new type to allow for dispatch. Use this type for `strategy_mode` argument in `strategy_returns`
 
 ```
+using Bruno
+
 # creating a new subtype for dispatch
 primitive type ExampleStrategy <: Hedging 8 end
 ```
@@ -20,7 +22,10 @@ primitive type ExampleStrategy <: Hedging 8 end
 `strategy` is the core function in `strategy_returns`. It will need a new method for each different strategy. `strategy` and `strategy_returns` both work for a single `FinancialInstrument` or for a `vector{<:FinancialInstrument}`, but it needs to be explicit in the function definition. `buy` and `sell` functions are provided to make writing strategies easier.
 For example, if you wanted to buy a single call option and the underlying stock every Friday for a month this could be a suitable `strategy` (assuming trading starts on a Monday on business days only):
 ```
-function strategy(fin_obj, 
+using Bruno: buy, sell
+import Bruno: strategy
+
+function Bruno.strategy(fin_obj, 
                 pricing_model, 
                 strategy_mode::Type{ExampleStrategy},
                 holdings,
