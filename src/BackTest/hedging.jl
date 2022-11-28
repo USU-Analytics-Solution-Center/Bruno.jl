@@ -20,6 +20,9 @@ a simulating environment to test trading or hedging strategies for given interes
 and prices. To be used by providing a new method for the `strategy()` function which defines 
 the trading strategy. 
 
+Returns the dollar cumulative return from the strategy, the time-series of all holdings 
+the strategy, and the updated object array. 
+
 ## Arguments
 - `obj::FinancialInstrument`: financial instrument the trading or hedging strategy runs on
 - `pricing_model`: `Model` subtype that defines how to price the `obj`
@@ -203,6 +206,9 @@ end
 a simulating environment to test trading or hedging strategies for multiple financial instruments
 for given interest rates and prices. To be used by providing a new method for the 
 `strategy()` function which defines the trading strategy. 
+
+Returns the dollar cumulative return from the strategy, the time-series of all holdings 
+the strategy, and the updated object array. 
 
 ## Arguments
 - `objs::Vector{<:FinancialInstrument}`: vector of financial instruments the trading or hedging strategy runs on
