@@ -355,7 +355,7 @@ end
             transaction_cost = 0.0
         )
 
-        @test isapprox(test_ret, 375.7989, atol=.01)
+        @test isapprox(test_ret, 26.128, atol=.01)
         @test ts_holdings["call"] == [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
         @test ts_holdings["stock"] == [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
  
@@ -374,7 +374,7 @@ end
             transaction_cost = 0.0
         )
          
-        @test isapprox(test_ret, 8.6782, atol=.01)
+        @test isapprox(test_ret, -1.322, atol=.01)
         
         test_ret, ts_holdings, obj = strategy_returns(
             test_call, 
@@ -390,7 +390,7 @@ end
             .08;
             transaction_cost = 0.0
         )
-        @test isapprox(test_ret, 28.7418, atol=.01)
+        @test isapprox(test_ret, -1.258, atol=.01)
 
         # test that it works for user defining their own strategy
         primitive type TestStrategy <: Hedging 8 end
@@ -472,7 +472,7 @@ end
         @test ts_holdings["call2"] == [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
 
         @test isapprox(ts_holdings["cash"][2], -70.571, atol=.01)
-        @test isapprox(test_ret, 479.664, atol=.01)
+        @test isapprox(test_ret, -45.643, atol=.01)
 
         # test multi strat returns checks
         # check negative timesteps_per_period

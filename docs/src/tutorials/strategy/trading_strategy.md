@@ -18,11 +18,12 @@ using Bruno
 primitive type ExampleStrategy <: Hedging 8 end
 ```
 
-## Create a new `strategy` method
-`strategy` is the core function in `strategy_returns`. It will need a new method for each different strategy. `strategy` and `strategy_returns` both work for a single `FinancialInstrument` or for a `vector{<:FinancialInstrument}`, but it needs to be explicit in the function definition. `buy` and `sell` functions are provided to make writing strategies easier.
+## [Create a new `strategy` method](@id strategy_method_tutorial)
+`strategy` is the core function in `strategy_returns`. It will need a new method for each different strategy. `strategy` and `strategy_returns` both work for a single `FinancialInstrument` or for a `Vector{<:FinancialInstrument}`, but it needs to be explicit in the function definition. `buy` and `sell` functions are provided to make writing strategies easier.
 For example, if you wanted to buy a single call option and the underlying stock every Friday for a month this could be a suitable `strategy` (assuming trading starts on a Monday on business days only):
 ```
 using Bruno: buy, sell
+# import strategy to extend the function
 import Bruno: strategy
 
 function Bruno.strategy(fin_obj, 
@@ -44,7 +45,7 @@ end
 ```
 
 ## Running the `strategy` using `strategy_returns`
-All FinancialInstruments and prices to be used must be initialized prior to running the trading strategy. 
+All FinancialInstruments and historic and future prices for the underlying Widgets must be initialized prior to running the trading strategy. 
 
 ```
 # create a random array to act as historic prices
@@ -74,4 +75,7 @@ cumulative_returns, holdings = strategy_returns(
 )
 ```
 
-`strategy_returns` returns the cumulative returns that would have been earned after selling any remaining `Widget` or `FinancialInstrument` holdings left over after the strategy runs for the specified length and a time series of how much of each object was owned during simulation.
+`strategy_returns` returns:
+* the cumulative returns that would have been earned after selling any remaining `Widget` or `FinancialInstrument` holdings left over after the strategy runs for the specified length 
+* a time series of how much of each object was owned during simulation.
+* the updated financial objects after the strategy (maturity and volatilities will likely be different)

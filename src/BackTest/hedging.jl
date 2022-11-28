@@ -36,8 +36,35 @@ interest is a year, and daily stock data is used, `timesteps_per_period=252`. Mu
 - `hold_return_int_rate`: the continous interest rate earned on positive cash balances
 - `kwargs`: pass through for keyword arguments needed by `price!()` or `strategy()` functions
 
-## Examples
-Put an example here. 
+## Example
+```
+# make the Widget and FinancialInstrument to be used
+test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
+test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+
+# make future_prices array
+future_prices = [100, 104, 109, 105, 108, 108, 101, 101, 104, 110]
+
+fin_obj_count = 2
+widget_count = 3
+pay_int_rate = .05
+hold_return_int_rate = .02
+
+cumulative_return, ts_holdings, obj = strategy_returns(
+    test_call, 
+    BlackScholes,
+    Naked,
+    future_prices,
+    10,
+    252, 
+    10, 
+    fin_obj_count, 
+    widget_count,
+    pay_int_rate, 
+    hold_return_int_rate;
+    transaction_cost = 0.0
+)
+```
 """
 function strategy_returns(
     obj::FinancialInstrument,
@@ -75,6 +102,12 @@ function strategy_returns(
         "$(obj.widget.name)" => [widget_count],
     )
 
+    # find initial value of portfolio
+    initial_value = 0.0
+    initial_value += cash_injection
+    initial_value += holdings["$(obj.label)"] * price!(obj, pricing_model; kwargs...)
+    initial_value += holdings["$(obj.widget.name)"] * obj.widget.prices[end]
+
     for step = 1:n_timesteps  # preform a strat for given time steps
         holdings = strategy(obj, pricing_model, strategy_type, holdings, step; kwargs...)  # do the strategy
 
@@ -109,10 +142,10 @@ function strategy_returns(
         push!(ts_holdings[key], value)
     end
 
-    return holdings["cash"], ts_holdings, obj
+    return holdings["cash"] - initial_value, ts_holdings, obj
 end
 
-# converter function to let users imput whatever type of number they want
+# converter function to let users input whatever type of number they want
 function strategy_returns(
     obj::FinancialInstrument,
     pricing_model,
@@ -190,8 +223,43 @@ Note: dictionary keys must be the `Widget.name` field string for each base asset
 - `hold_return_int_rate`: the continous interest rate earned on positive cash balances
 - `kwargs`: pass through for keyword arguments needed by `price!()` or `strategy()` functions
 
-## Examples
-Put an example here. 
+## Example
+```
+# make the widgets and FinancialInstruments to be used
+test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
+test_stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
+test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+test_call2 = EuroCallOption(test_stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
+objs = [test_call, test_call2]
+
+# make a Dict with future_prices for each widget
+future_prices = Dict(
+    "stock" => [100, 104, 109, 105, 108, 108, 101, 101, 104, 110],
+    "stock2" => [67, 74, 73, 67, 67, 75, 69, 71, 69, 70]
+)
+
+# make dictionaries for the starting amounts held of each Widget and FinancialInstrument
+fin_obj_count = Dict("call" => 1.0, "call2" => 2)
+widget_count = Dict("stock" => 2.0, "stock2" => 3)
+cash_injection = 0
+
+pay_int_rate = 0.08
+hold_return_int_rate = 0.02
+
+cumulative_return, ts_holdings, obj_array = strategy_returns(
+    objs, 
+    BlackScholes,
+    Naked,
+    future_prices,
+    10,
+    252,
+    cash_injection,
+    fin_obj_count,
+    widget_count, 
+    pay_int_rate, 
+    hold_return_int_rate
+)
+```
 """
 function strategy_returns(
     objs::Vector{<:FinancialInstrument},
@@ -275,6 +343,15 @@ function strategy_returns(
         ts_holdings["$(obj.label)"] = [holdings["$(obj.label)"]]
     end
 
+    # finding initial value
+    initial_value = cash_injection
+    for fin_obj in obj_array
+        initial_value += holdings["$(fin_obj.label)"] * price!(fin_obj, pricing_model)
+    end
+    for (name, widget) in widget_dict
+        initial_value += holdings[name] * widget.prices[end]
+    end
+
     # now do the strategy for each loop
     for step = 1:n_timesteps  # preform a strat for given time steps
         holdings =
@@ -314,7 +391,7 @@ function strategy_returns(
         push!(ts_holdings[key], value)
     end
 
-    return holdings["cash"], ts_holdings, obj_array, widget_dict
+    return holdings["cash"] - initial_value, ts_holdings, obj_array, widget_dict
 end
 
 # function to convert all to float so can input whatever numeric type
@@ -394,10 +471,24 @@ end
 
 # Extra functions needed to get the hedging working
 """
-    buy(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
-    buy(fin_obj::Widget, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
+    buy(
+        fin_obj::FinancialInstrument, 
+        number::Real, 
+        holdings, 
+        pricing_model, 
+        trasaction_cost::Real; 
+        kwargs...
+    )
+    buy(
+        fin_obj::Widget, 
+        number::Real, 
+        holdings, 
+        pricing_model, 
+        trasaction_cost::Real; 
+        kwargs...
+    )
 
-Records buying a specified number of fin_obj in a holdings dictionary based on the given 
+Records buying a specified number of `fin_obj` in a holdings dictionary based on the given 
 pricing_model. To be used in `strategy()` functions to define trading and hedging strategies.
 
 ## Arguments
@@ -453,10 +544,24 @@ function buy(
 end
 
 """
-    sell(fin_obj::FinancialInstrument, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
-    sell(fin_obj::Widget, number::Real, holdings, pricing_model, trasaction_cost::Real; kwargs...)
+    sell(
+        fin_obj::FinancialInstrument, 
+        number::Real, 
+        holdings, 
+        pricing_model, 
+        trasaction_cost::Real; 
+        kwargs...
+    )
+    sell(
+        fin_obj::Widget, 
+        number::Real,
+        holdings, 
+        pricing_model, 
+        trasaction_cost::Real; 
+        kwargs...
+    )
 
-Records selling a specified number of fin_obj in a holdings dictionary based on the given 
+Records selling a specified number of `fin_obj` in a holdings dictionary based on the given 
 pricing_model. To be used in `strategy()` functions to define trading and hedging strategies.
 
 ## Arguments

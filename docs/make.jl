@@ -25,6 +25,7 @@ const _PAGES = [
         "reference/pricing_models.md",
         "reference/hedge_simulate.md",
     ],
+    "Contributors Guide" => ["contributing.md"]
 ]
 
 
