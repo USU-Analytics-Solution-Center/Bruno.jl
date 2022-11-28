@@ -3,23 +3,64 @@
 ## Base Assets (Widgets)
 
 ### [Creating Widgets](@id creating_widget_manual)
-Base assets (`Widgets`) are the building blocks for the rest of the Bruno package. Base assets can be used as stand alone structs or as an underlying asset in a `FinancialInstrument` like an `AmericanCallOption`
+Base assets (`Widgets`) are the building blocks for the rest of the Bruno package. Base assets can be used as stand alone structs or as an underlying asset in a `FinancialInstrument` like an `AmericanCallOption`.
+
 Current `Widget` types Bruno supports are [`Stock`](@ref),  [`Commodity`](@ref) and [`Bond`](@ref). 
 
 #### [`Stock`](@ref Stock(::Real))
 Stocks are stock equity issued by a company. 
 
-When constructing a [`Stock`](@ref Stock(::Real)):
+Stocks can be instantiated using a `Vector` of historic prices, or as a static Stock with a single price (assumed to be the current price)
+Note: When using testing trading strategies with `strategy_returns` the Stock struct cannot be static and must have at least 3 historic prices. 
+
+When constructing a [`Stock`](@ref Stock(::Real)): 
+
 The `name` field is optional, and only necessary for trading strategy testing using `strategy_returns`.
 
 `timesteps_per_period` reflects the size of time that passes between each price in `Stock.prices` compared to the implicit time period. For example, if daily data is used assuming yearly interest rates and rates of return -as is common- `timesteps_per_period=252`. This is to allow the pricing and strategy testing functions to be as generic as possible. Yearly, biyearly, or even hourly time window are possible depending on the nature of the data used. 
 
+Examples:
+```
+# creating an array of prices
+historic_prices = collect(40:60)
+
+# creating a Stock with historic prices
+# volatility will be automatically calculated
+a_stock = Stock(;
+    prices=historic_prices, 
+    name="stock_1", 
+    timesteps_per_period=252
+)
+
+# creating a 'static' Stock with a single price
+static_stock = Stock(60; volatility=.3, name="static_stock")
+```
+
 #### [`Commodity`](@ref Commodity(::Real))
 Commodities are raw materials or primary products that can be bought or sold.
 
+Commodity can be instantiated using a `Vector` of historic prices, or as a static Commodity with a single price (assumed to be the current price)
+Note: When using testing trading strategies with `strategy_returns` the Commodity struct cannot be static and must have at least 3 historic prices.
 The `name` field is optional, and only necessary for trading strategy testing using `strategy_returns`.
 
 `timesteps_per_period` is identical to the usage described in the `Stock` struct
+
+Examples:
+```
+# creating an array to represent prices
+historic_prices = collect(40:60)
+
+# creating a Commodity with historic prices
+# volatility will be automatically calculated
+a_commodity = Commodity(;
+    prices=historic_prices, 
+    name="stock_1", 
+    timesteps_per_period=252
+)
+
+# creating a 'static' Commodity with a single price
+static_commodity = Commodity(60; volatility=.3, name="static_stock")
+```
 
 #### [`Bond`](@ref Bond(::Real))
 Bonds are long term loans issued by companies.

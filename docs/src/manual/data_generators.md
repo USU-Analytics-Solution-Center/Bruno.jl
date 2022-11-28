@@ -2,7 +2,7 @@
 All data generation methods use the [`makedata`](@ref) function with different structs containing input parameters. 
 
 ## Parametric data generation
-### Log Diffusion
+### [Log Diffusion](@id log_diff_manual)
 Creating a time series with the [log diffusion model](https://en.wikipedia.org/wiki/Geometric_Brownian_motion) for asset prices (also known as Geometric Brownian Motion) uses the [`LogDiffInput`](@ref) struct.
 
 Note that drift (expected value of returns) and volatility are in terms of the implicit time period for the whole simulated data set. For example, when simulating a year of prices, drift represents the yearly expected return. 
@@ -32,7 +32,7 @@ hourly_timeseries = makedata(hourly_input, 2)
 
 ### Non-parametric data generation
 
-#### Time-series bootstrapping
+#### [Time-series bootstrapping](@id ts_bootstrap_manual)
 Time-series bootstrapping samples with replacement from blocks of the original time-series dataset. The three bootstraps included in Bruno are `Stationary`, `MovingBlock`, and `CircularBlock`. 
 
 All time series bootstraps use the [`BootstrapInput`](@ref) struct with parameters. 
