@@ -1,4 +1,4 @@
-# Welcome to the Bruno contributing guide <!-- omit in toc -->
+# Welcome to the Bruno contributing guide 
 
 Thank you for taking time to learn how to contribute to this project. Since Bruno is a finicial package the sky is the limit for what Bruno can do and we are looking for community members to help us grow. In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
 
@@ -9,7 +9,7 @@ Here are some usefull resources:
 
 We suggest before you dive to deep into the contribution file that you read over the Bruno Docs to familirize yourself with the flow of the package.
 
-#### Issues:
+### Issues:
 
 #### Create a new issue
 
@@ -26,4 +26,4 @@ When you're finished with the changes, create a pull request, also known as a PR
 - Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) if you are solving one.
 - Enable the checkbox to allow maintainer edits so the branch can be updated for a merge.
 Once you submit your PR, a team member will review your proposal. We may ask questions or request additional information.
-- We may ask for changes to be made before a PR can be merged, either using suggested changes] or pull request comments.
+- We may ask for changes to be made before a PR can be merged, either using suggested changes or pull request comments.
