@@ -44,7 +44,8 @@ FinancialInstrument.
 include("Models/Models.jl")
 using .Models
 
-export BinomialTree, BlackScholes
+export Model
+export BinomialTree, BlackScholes, StockPrice
 export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 export price!
 

@@ -16,12 +16,13 @@ abstract type Model end
 primitive type BlackScholes <: Model 8 end
 primitive type BinomialTree <: Model 8 end
 abstract type MonteCarlo{T<:MonteCarloModel} <: Model end
+primitive type StockPrice <: Model 8 end
 
 
 include("pricingmodels.jl")
 
 export price!, b_tree
-export BinomialTree, BlackScholes, Model
+export BinomialTree, BlackScholes, Model, StockPrice
 export MonteCarlo, MonteCarloModel, LogDiffusion, MCBootstrap
 
 end #module

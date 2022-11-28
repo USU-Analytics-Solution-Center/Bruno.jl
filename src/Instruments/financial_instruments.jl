@@ -89,7 +89,7 @@ Construct a EuroCallOption with underlying asset `T`
 ## Arguments
 - `widget::Widget`: underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity
-- `maturity`: time to maturity of the option in years. Default 1.
+- `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: A dictionary of values returned from pricing functions. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices.
@@ -211,7 +211,7 @@ Construct a AmericanCallOption with underlying asset `T`
 ## Arguments
 - `widget::Widget`: underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity
-- `maturity`: time to maturity of the option in years. Default 1.
+- `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
@@ -226,7 +226,6 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 AmericanCallOption(;kwargs...)
 ```
 """
-
 AmericanCallOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];
@@ -337,7 +336,7 @@ Construct a EuroPutOption with underlying asset `T`
 ## Arguments
 - `widget::Widget`: underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity
-- `maturity`: time to maturity of the option in years. Default 1.
+- `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
@@ -352,7 +351,6 @@ kwargs= Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>.
 EuroPutOption(;kwargs...)
 ```
 """
-
 EuroPutOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];
@@ -466,7 +464,7 @@ Construct an AmericanPutOption with underlying asset `T`
 ## Arguments
 - `widget::Widget`: underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity
-- `maturity`: time to maturity of the option in years. Default 1.
+- `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
 to an empty dictionary. use `price!()` function to load theoretical option prices
@@ -481,7 +479,6 @@ kwargs = Dict(:widget=>stock, :strike_price=>10, :maturity=>1, :risk_free_rate=>
 AmericanPutOption(;kwargs...)
 ```
 """
-
 AmericanPutOption(
     widget::Widget,
     strike_price::Real = widget.prices[end];

@@ -31,9 +31,9 @@ price!(fin_obj::Any, pricing_model::Type{<:Any}; _...) =
 price a call or put option using the binomial tree pricing method
 
 # Arguments
-`fin_obj::Option`: the call or put option to be priced 
-`tree_depth`: number of levels to the binomial tree
-`delta`: the continous dividend rate
+- `fin_obj::Option`: the call or put option to be priced 
+- `tree_depth`: number of levels to the binomial tree. Defualt 3.
+- `delta`: the continous dividend rate. Defualt 0.
 
 # Example
 ```julia
@@ -47,7 +47,6 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-
 price!(fin_obj::Option, pricing_model::Type{BinomialTree}; _...) =
     error("Something went wrong. Make sure you're using a defined Option subtype")
 
@@ -143,7 +142,8 @@ function price!(
     fin_obj::EuroPutOption,
     pricing_model::Type{BinomialTree};
     tree_depth = 3,
-    delta = 0
+    delta = 0,
+    _...
 )
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price

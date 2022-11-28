@@ -2,23 +2,16 @@ using Documenter
 using Bruno
 
 const _PAGES = [
-    "Introduction" => ["index.md", "installation.md"],
+    "Introduction" => ["index.md"],
     "Tutorials" => [
-        "Getting started" => [
-            "tutorials/getting_started/introduction.md",
-            "tutorials/getting_started/getting_started_with_julia.md",
-            "tutorials/getting_started/getting_started_with_Bruno.md",
-        ],
-        "Simulating data" =>
-            ["tutorials/get_data/inputs.md", "tutorials/get_data/output.md"],
-        "Making financial instruments" => [
+        "Simulating Data" =>
+            ["tutorials/get_data/get_data.md"],
+        "Making Financial Instruments" => [
             "tutorials/fin_inst/base_asset.md",
             "tutorials/fin_inst/derivatives.md",
         ],
-        "Pricing instruments" =>
-            ["tutorials/pricing/derivatives.md", "tutorials/pricing/futures.md"],
-        "Simulating hedges" =>
-            ["tutorials/hedge/options.md", "tutorials/hedge/futures.md"],
+        "Strategy Testing" =>
+            ["tutorials/strategy/trading_strategy.md"],
     ],
     "Manual" => [
         "manual/types.md",
@@ -32,13 +25,14 @@ const _PAGES = [
         "reference/pricing_models.md",
         "reference/hedge_simulate.md",
     ],
+    "Contributors Guide" => ["CONTRIBUTING.md"]
 ]
 
 
 makedocs(
-    sitename = "Bruno",
+    sitename = "Bruno.jl",
     modules = [Bruno],
-    doctest = true,
+    doctest = false,
     pages = _PAGES,
     format = Documenter.HTML(
         sidebar_sitename = true,
