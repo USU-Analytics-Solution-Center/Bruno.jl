@@ -97,11 +97,11 @@ is given for `prices` volatility must be given.
 
 ## Examples
 ```julia
-Stock([1,2,3,4,5], "Test", 252, .05)
+Stock([1,2,3,4,5], "Example", 252, .05)
 
 kwargs = Dict(
     :prices => [1, 2, 3, 4, 5], 
-    :name => "Test", 
+    :name => "Example", 
     :timesteps_per_period => 252, 
     :volatility => .05
 );
@@ -206,11 +206,11 @@ is given for `prices` volatility must be given.
 
 ## Examples
 ```julia
-Commodity([1,2,3,4,5], "Test", 252, .05)
+Commodity([1,2,3,4,5], "Example", 252, .05)
 
 kwargs = Dict(
     :prices => [1, 2, 3, 4, 5], 
-    :name => "Test", 
+    :name => "Example", 
     :timesteps_per_period => 252, 
     :volatility => .05
 );
@@ -273,9 +273,9 @@ Construct a Bond type to use as a base asset for FinancialInstrument.
 
 ## Examples
 ```julia
-Bond([1,2,3,4,5], "Test", .5, .05)
+Bond([1,2,3,4,5], "Example", .5, .05)
 
-kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Test", :time_mat => .5, :coupon_rate => .05);
+kwargs = Dict(:prices => [1, 2, 3, 4, 5], :name => "Example", :time_mat => .5, :coupon_rate => .05);
 Bond(;kwargs...)
 
 Bond(2; coupon_rate=.05)
@@ -295,7 +295,8 @@ Finds the standard deviation of continuous returns for an array of prices
 
 function get_volatility(prices, timesteps_per_period)
     length(prices) > 2 ? nothing :
-    return error("Must have at least three values to calculate the volatility")  # need at least three values so std can work
+    # need at least three values so std can work
+    return error("Must have at least three values to calculate the volatility")  
     returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i = 1:(length(prices)-1)]
     cont_return = log.(returns)
     std(cont_return, corrected = false) * sqrt(timesteps_per_period)
