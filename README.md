@@ -35,10 +35,10 @@ call = EuroCallOption(stock, 55; maturity=.5)
 price!(call, BlackScholes)
 ```
 
-Check out the documentation (LINK TO DOCUMENTATION COMING SOON...) for more examples and tutorials. 
+Check out [the documentation](https://usu-analytics-solution-center.github.io/Bruno.jl/) for more examples and tutorials. 
 
 ## Citing
-If you use Oceananigans.jl as part of your research, teaching, or other activities, we would be grateful if you could cite our work and mention Oceananigans.jl by name.
+If you use Bruno.jl as part of your research, teaching, or other activities, we would be grateful if you could cite our work and mention Bruno.jl by name.
 
 ```
 @misc{Bruno.jlPackage,
