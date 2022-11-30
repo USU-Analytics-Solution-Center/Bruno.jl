@@ -42,8 +42,8 @@ interest is a year, and daily stock data is used, `timesteps_per_period=252`. Mu
 ## Example
 ```
 # make the Widget and FinancialInstrument to be used
-test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
-test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
+call = EuroCallOption(stock, 110; maturity=.5, label="call", risk_free_rate=.02)
 
 # make future_prices array
 future_prices = [100, 104, 109, 105, 108, 108, 101, 101, 104, 110]
@@ -54,7 +54,7 @@ pay_int_rate = .05
 hold_return_int_rate = .02
 
 cumulative_return, ts_holdings, obj = strategy_returns(
-    test_call, 
+    call, 
     BlackScholes,
     Naked,
     future_prices,
@@ -89,10 +89,12 @@ function strategy_returns(
     nothing
 
     # set up the function  
-    future_prices = deepcopy(future_prices)  # we do deep copies so the objects out of scope arent stomped on
+    # we do deep copies so the objects out of scope arent stomped on
+    future_prices = deepcopy(future_prices)  
     obj = deepcopy(obj)
 
-    # set up holdings dictionary. holdings is the active holdings of the program while ts_holdings produces a history
+    # set up holdings dictionary. 
+    # holdings is the active holdings of the program while ts_holdings produces a history
 
     holdings = Dict(
         "cash" => cash_injection,
@@ -232,11 +234,11 @@ Note: dictionary keys must be the `Widget.name` field string for each base asset
 ## Example
 ```
 # make the widgets and FinancialInstruments to be used
-test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
-test_stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
-test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
-test_call2 = EuroCallOption(test_stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
-objs = [test_call, test_call2]
+stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
+stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
+call = EuroCallOption(stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+call2 = EuroCallOption(stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
+objs = [call, call2]
 
 # make a Dict with future_prices for each widget
 future_prices = Dict(
