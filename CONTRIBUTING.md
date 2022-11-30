@@ -1,11 +1,8 @@
-# Welcome to the Bruno contributing guide <!-- omit in toc -->
+# Welcome to the Bruno contributing guide 
 
 Thank you for taking time to learn how to contribute to this project. Since Bruno is a finicial package the sky is the limit for what Bruno can do and we are looking for community members to help us grow. In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
 
-Here are some usefull resources:
-  * To get an overview of the project, read the [README](README.md).
-  * [Progress Bar](google.com) tells you where we are.
-  * [Road Map](google.com) is the plan for future releases.
+**To get an overview of the project, read the [README](README.md).**
 
 We suggest before you dive to deep into the contribution file that you read over the Bruno Docs to familirize yourself with the flow of the package.
 

@@ -11,8 +11,6 @@ Bruno is written and maintained by the [Analytics Solution Center](https://hunts
 
 ## Installation Instructions
 
-Bruno is a [registered Julia package](https://julialang.org/packages/). So to install it,
-
 1. [Download Julia](https://julialang.org/downloads/).
 
 2. Launch Julia and type
@@ -20,7 +18,7 @@ Bruno is a [registered Julia package](https://julialang.org/packages/). So to in
 ```julia
 julia> using Pkg
 
-julia> Pkg.add("Bruno")
+julia> Pkg.add("https://github.com/USU-Analytics-Solution-Center/Bruno.jl")
 ```
 ## What Bruno can do
 Bruno's four main functions are 
