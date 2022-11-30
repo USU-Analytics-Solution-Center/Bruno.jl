@@ -41,7 +41,7 @@ Check out the documentation (LINK TO DOCUMENTATION COMING SOON...) for more exam
 If you use Oceananigans.jl as part of your research, teaching, or other activities, we would be grateful if you could cite our work and mention Oceananigans.jl by name.
 
 ```
-@misc{Bruno.jlPackage
+@misc{Bruno.jlPackage,
   author = {Mitchell Pound and Spencer Clemens and The Analytics Solution Center at Utah State University}
   title = {Bruno.jl}
   year = {2022}
