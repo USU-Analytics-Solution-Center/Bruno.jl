@@ -29,4 +29,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ssh: ${{ secrets.SSH_KEY }}
+          ssh_password: ${{ secrets.SSH_PASSWORD }}
           
