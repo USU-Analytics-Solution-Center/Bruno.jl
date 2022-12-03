@@ -11,10 +11,12 @@ Bruno is written and maintained by the [Analytics Solution Center](https://hunts
 
 2. Launch Julia and type
 
+is a [registered Julia package](https://julialang.org/packages/). So to install it,
+
 ```julia
 julia> using Pkg
 
-julia> Pkg.add("https://github.com/USU-Analytics-Solution-Center/Bruno.jl")
+julia> Pkg.add("Bruno")
 ```
 
 !!! compat "Julia 1.6 or newer"
