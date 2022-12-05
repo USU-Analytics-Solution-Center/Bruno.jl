@@ -28,7 +28,7 @@ julia> Pkg.add("Bruno")
 Whether you need help getting started with Bruno, found a bug, want Bruno to be even better, or just want to chat about computational economics and finance, you've got a few options for getting in touch:
 
 * [Start a discussion](https://github.com/USU-Analytics-Solution-Center/Bruno.jl/discussions). This is great for general questions about numerics, computation finance, experimental or under-documented features, and for getting help setting up a cool new trading strategy simulation.
-* [Open an issue](https://github.com/USU-Analytics-Solution-Center/Bruno.jl/issues). Issues are best if you think the Bruno source code needs attention: a bug, a type inconsidtency error (😱), an important missing feature, or a typo in this documentation 👀.
+* [Open an issue](https://github.com/USU-Analytics-Solution-Center/Bruno.jl/issues). Issues are best if you think the Bruno source code needs attention: a bug, a type inconsistency error (😱), an important missing feature, or a typo in this documentation 👀.
 
 ## Citing
 

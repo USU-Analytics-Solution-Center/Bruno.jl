@@ -118,7 +118,15 @@ function strategy_returns(
 
         # updatae the snapshot of holdings for time series analysis
         for (key, value) in holdings
-            push!(ts_holdings[key], value)
+            try
+                push!(ts_holdings[key], value)
+            catch e
+                if isa(e, KeyError)
+                    ts_holdings[key] = [value]
+                else
+                    throw(e)
+                end
+            end
         end
 
         # pay / get interest off cash holdings
@@ -367,7 +375,15 @@ function strategy_returns(
 
         # update the snapshot of holdings for time series analysis
         for (key, value) in holdings
-            push!(ts_holdings[key], value)
+            try
+                push!(ts_holdings[key], value)
+            catch e
+                if isa(e, KeyError)
+                    ts_holdings[key] = [value]
+                else
+                    throw(e)
+                end
+            end
         end
 
         # pay / get interest off cash holdings
