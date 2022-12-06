@@ -84,7 +84,7 @@ end
     EuroCallOption{T<:Widget}(;kwargs...)
     EuroCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroCallOption with underlying asset `T` 
+Construct a EuroCallOption with underlying asset `T`.
 
 ## Arguments
 - `widget::Widget`: underlying asset
@@ -206,15 +206,15 @@ end
     AmericanCallOption{T<:Widget}(;kwargs...)
     AmericanCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a AmericanCallOption with underlying asset `T` 
+Construct a AmericanCallOption with underlying asset `T`.
 
 ## Arguments
-- `widget::Widget`: underlying asset
-- `strike_price`: Contracted price to buy underlying asset at maturity
+- `widget::Widget`: The underlying asset
+- `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
-to an empty dictionary. use `price!()` function to load theoretical option prices
+to an empty dictionary. use `price!()` function to load theoretical option prices.
 
 ## Examples
 ```julia
@@ -331,15 +331,15 @@ end
     EuroPutOption{T<:Widget}(;kwargs...)
     EuroPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroPutOption with underlying asset `T` 
+Construct a EuroPutOption with underlying asset `T`. 
 
 ## Arguments
-- `widget::Widget`: underlying asset
-- `strike_price`: Contracted price to buy underlying asset at maturity
+- `widget::Widget`: The underlying asset.
+- `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
-to an empty dictionary. use `price!()` function to load theoretical option prices
+to an empty dictionary. use `price!()` function to load theoretical option prices.
 
 ## Examples
 ```julia

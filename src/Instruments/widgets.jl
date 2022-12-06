@@ -120,7 +120,7 @@ end
 """ 
     Commodity <: Widget
 
-Widget subtype. Used as a base or root asset for FinancialInstrument
+Widget subtype. Used as a base or root asset for FinancialInstrument.
 """
 struct Commodity <: Widget
     prices::Array{AbstractFloat}
@@ -234,7 +234,7 @@ end
 """ 
     Bond <: Widget
 
-Widget subtype. Used as a base or root asset for FinancialInstrument
+Widget subtype. Used as a base or root asset for FinancialInstrument.
 """
 struct Bond <: Widget
     prices::Array{AbstractFloat}
@@ -290,7 +290,7 @@ end
 """
     get_volatility(prices)
 
-Finds the standard deviation of continuous returns for an array of prices
+Finds the standard deviation of continuous returns for an array of prices.
 """
 
 function get_volatility(prices, timesteps_per_period)

@@ -8,10 +8,7 @@ The [Analytics Solution Center](https://huntsman.usu.edu/asc/index) at Utah Stat
 ## Quick Install
 
 1. [Download Julia](https://julialang.org/downloads/).
-
-2. Launch Julia and type:
-
-is a [registered Julia package](https://julialang.org/packages/). So to install it,
+2. Bruno is a [registered Julia package](https://julialang.org/packages/). So to install it, Launch Julia and type:
 
 ```julia
 julia> using Pkg
