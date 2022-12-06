@@ -1,10 +1,10 @@
 # Data Generation
 
 ## Overview
-Data generation or simulation is a way to get more timeseries data from either a small data set or a parametric simulating model. Data generation in Bruno uses a [DataGenInput](@ref data_gen_inputs) subtype as an input into the [makedata](@ref makedata) function.
+Data generation or simulation is a way to get more time series data from either a small data set or a parametric simulating model. Data generation in Bruno uses a [DataGenInput](@ref data_gen_inputs) subtype as an input into the [makedata](@ref makedata) function.
 
-## Creating a simulated timeseries 
-This example shows how to make a julia `matrix` with two simulated time series using the log diffusion parameteric model (discrete geometric Brownian motion). To use other data generation models check the reference for all current [data generation inputs](@ref data_gen_inputs)
+## Creating a Simulated Time Series 
+This example shows how to make a Julia `matrix` with two simulated time series using the log diffusion parameteric model (discrete geometric Brownian motion). To use other data generation models check the reference for all current [data generation inputs.](@ref data_gen_inputs)
 ```
 # creating a LogDiffInput struct with input parameters
 input = LogDiffInput(; 

@@ -2,9 +2,9 @@ using Statistics: std
 # place to put all widgets, or assets that don't need a model for the base value. 
 # examples: oil, stocks, etc.
 """
-Widgets are the root asset at the heart of the package. A 'Widget' can be any 
-real world finicial object such as a stock, or commodity. For a list of possible subtypes 
-use `subtypes(Widget)`
+Widgets are the root asset at the heart of the package. A 'widget' can be any 
+real world financial object such as a stock or commodity. For a list of possible subtypes 
+use `subtypes(Widget)`.
 """
 abstract type Widget end
 
@@ -12,7 +12,7 @@ abstract type Widget end
 """ 
     Stock <: Widget
 
-Widget subtype. Used as a base or root asset for FinancialInstrument
+Widget subtype. Used as a base or root asset for financial instrument.
 """
 struct Stock <: Widget
     prices::Array{AbstractFloat}

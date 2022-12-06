@@ -1,14 +1,14 @@
 # financial instruments that can be passed to simulate. They house underlying widgets as part
 # of the insturment. Ex: Stock call options house an underlying stock
 """FinancialInstrument is the supertype for any instrument that uses a base asset
-(widget) in its definition (like a financial derivative)"""
+(widget) in its definition (like a financial derivative)."""
 abstract type FinancialInstrument end
 
 # ----- Type system for options: subtype of FinancialInstrument ------
 """
     Option <: FinancialInstrument
 
-abstract FinancialInstrument subtype. Supertype of all options contract types
+Abstract FinancialInstrument subtype. Supertype of all options contract types.
 """
 abstract type Option <: FinancialInstrument end
 
@@ -16,13 +16,13 @@ abstract type Option <: FinancialInstrument end
 """
     CallOption{T <: Widget} <: Option
 
-abstract Option subtype. Super type for all call options types
+Abstract option subtype. Super type for all call options types.
 """
 abstract type CallOption{T<:Widget} <: Option end
 """
     PutOption{T <: Widget} <: Option
 
-abstract Option subtype. Super type for all put options types
+Abstract option subtype. Super type for all put options types.
 """
 abstract type PutOption{T<:Widget} <: Option end
 
@@ -532,7 +532,7 @@ AmericanPutOption(;
 """
     Future{T <: Widget} <: FinancialInstrument
 
-Future contract with underlying asset T.
+Future contract with underlying asset 'T'.
 """
 struct Future{T<:Widget} <: FinancialInstrument
     widget::T

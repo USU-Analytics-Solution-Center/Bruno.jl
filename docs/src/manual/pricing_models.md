@@ -1,21 +1,21 @@
 # Pricing Models
-Pricing models used with the [`price!`](@ref) function all have a corresponding `Model` subtype. Current pricing models supported are `BlackScholes`, `BinomialTree`, `MonteCarlo{<:MonteCarloModel}`, and `StockPrice`
+Pricing models used with the [`price!`](@ref) function all have a corresponding `Model` subtype. Current pricing models supported are `BlackScholes`, `BinomialTree`, `MonteCarlo{<:MonteCarloModel}`, and `StockPrice`.
 
 ## [Pricing Base Assets (`Widgets`)](@id pricing_widgets)
-All `Widget` subtypes can be priced with any pricing model subtype of `Model`. [`price!`](@ref) returns the last price in the array of the `prices` field. To make code more explicit, the `StockPrice` type may be used which does not have a method for any `FinancialInstrument`.  
+All `Widget` subtypes can be priced with any pricing model subtype of `Model`. [`price!`](@ref) returns the last price in the array of the `prices` field. To make code more explicit, the `StockPrice` type may be used which does not have a method for any `Financial Instrument`.  
 
 ## [Pricing FinancialInstruments](@id pricing_fin_inst)
 Pricing a `FinancialInstrument` with the [`price!`](@ref) function returns the theoretical price and mutates the `values_library` field of the `FinancialInstrument`. `values_library` contains all theoretical prices for the Financial Instrument that have been calculated with the function arguments used in the calculation. 
 
-### Black Scholes model
+### Black Scholes Model
 The [Black-Scholes-Merton](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model) model for pricing European options. 
 
-Use `BlackScholes` with the [`price!`](@ref price!(::Option, ::Type{BlackScholes})) 
+Use `BlackScholes` with the [`price!`](@ref price!(::Option, ::Type{BlackScholes})). 
 
-Only defined for [`EuroCallOption`](@ref) and [`EuroPutOption`](@ref) 
+Only defined for [`EuroCallOption`](@ref) and [`EuroPutOption`](@ref). 
 
 Example:
-Pricing a 3 month European call option
+pricing a three month European call option
 ```
 # creating a stock
 stock = Stock(50; volatility=.32)
@@ -27,19 +27,19 @@ call_price = price!(call, BlackScholes)
 call_price == call.values_library["BlackScholes"]["value"]
 ```
 
-### Binomial pricing model
+### Binomial Pricing Model
 The [Binomial options pricing model](https://en.wikipedia.org/wiki/Binomial_options_pricing_model). 
 
-Use `BinomialTree` with the [`price!`](@ref price!(::Option, ::Type{BinomialTree}))
+Use `BinomialTree` with the [`price!`](@ref price!(::Option, ::Type{BinomialTree})).
 
 Defined for all `Option` subtypes. 
 
 Extra function arguments:
-* `tree_depth`: The number of levels or time steps included in the tree. Default is 3.
-* `delta`: The continuous dividend rate of the underlying stock (or other base asset). Default is 0.
+* `tree_depth`: The number of levels or time steps included in the tree. Default is three.
+* `delta`: The continuous dividend rate of the underlying stock (or other base asset). Default is zero.
 
 Example:
-Pricing a 3 month American call option
+pricing a three month American call option.
 ```
 # creating a stock
 stock = Stock(50; volatility=.32)
@@ -52,29 +52,28 @@ call_price = price!(call, BinomialTree; tree_depth=5)
 call_price == call.values_library["BinomialTree"]["value"]
 ```
 
-### Monte Carlo pricing model
-[Monte Carlo simulation](https://en.wikipedia.org/wiki/Monte_Carlo_methods_in_finance) valuation for options. Returns the average discounted payoff of the option at the end of the stochasticly simulated time-series. Current possible simulation methods are 
+### Monte Carlo Pricing Model
+[Monte Carlo simulation](https://en.wikipedia.org/wiki/Monte_Carlo_methods_in_finance) valuation for options. Returns the average discounted payoff of the option at the end of the stochasticly simulated time-series. Current possible simulation methods are:
 
 * [Log diffusion model](@ref log_diff_manual) for asset prices. Assumes `Option.risk_free_rate` to be the period drift.
-* [Time-series bootstrap](@ref ts_bootstrap_manual) of historic asset returns
+* [Time-series bootstrap](@ref ts_bootstrap_manual) of historic asset returns.
 
 Use `MonteCarlo{T}` with [`price!`](@ref price!(::Option, ::Type{MonteCarlo{LogDiffusion}})) where T is either `LogDiffusion` or `MCBootstrap` type.
 
-Only defined for [`EuroCallOption`](@ref) and [`EuroPutOption`](@ref). For `MCBootstrap`, a static `Widget` cannot be used, `Widget.prices` field must have at least 3 prices, and `timesteps_per_period` cannot be 0.
+Only defined for [`EuroCallOption`](@ref) and [`EuroPutOption`](@ref). For `MCBootstrap`, a static `Widget` cannot be used, `Widget.prices` field must have at least three prices, and `timesteps_per_period` cannot be zero.
 
-Extra function arguments:
-For `LogDiffusion` 
+Extra function arguments for `LogDiffusion` :
 * `n_sims`: The number of simulations to run in the Monte Carlo analysis. Default 100.
 * `sim_size`: The number of generated steps in each simulation. Defualt 100. 
 
-For `MCBootstrap`
+For `MCBootstrap`:
 * `n_sims`: The number of simulations to run in the Monte Carlo analysis. Default 100.
 * `bootstrap_method`: The type of time-series bootstrap to be used. Possiple types are `Stationary`, `CircularBlock`, and `MovingBlock`. Default is `Stationary`. 
 
 Note: values are stored in the `Option.values_library` field with the keys `"MC_LogDiffusion"` and `"MC_Bootstrap{bootstrap_method}"`.
 
 Example:
-Pricing a 3 month European call option
+pricing a three month European call option
 ```
 # creating a stock with a random array for historic prices
 historic_prices = rand(45:50, 20)
