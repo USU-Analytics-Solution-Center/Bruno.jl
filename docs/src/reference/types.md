@@ -13,7 +13,7 @@ Bond
 
 ### [Financial Instruments (Derivatives)](@id Fin_instruments)
 
-#### Abstract types
+#### Abstract Types
 
 ```@docs
 FinancialInstrument
@@ -21,7 +21,7 @@ Option
 CallOption
 PutOption
 ```
-#### Concrete types
+#### Concrete Types
 
 ```@docs
 Future

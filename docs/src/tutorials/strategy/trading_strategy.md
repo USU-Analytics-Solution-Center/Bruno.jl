@@ -1,15 +1,15 @@
-# Hedging/ Trading strategy testing
+# Hedging/Trading Strategy Testing
 
 ## Overview
 `strategy_returns()` can back test a trading strategy or test a strategy on simulated future data. 
 
-This tutorial shows how to create a simple trading strategy simulation. It demonstrates 
-* How to create a new type to allow for julia's [multiple dispatch](https://docs.julialang.org/en/v1/manual/methods/) on the `strategy()` function
+This tutorial shows how to create a simple trading strategy simulation. It demonstrates: 
+* How to create a new type to allow for Julia's [multiple dispatch](https://docs.julialang.org/en/v1/manual/methods/) on the `strategy()` function
 * How to create a new method for the `strategy` function
 * How to use `strategy_returns` to run the strategy on randomly simulated data
 
-## Create new `Hedging` type
-Each new strategy will need a new type to allow for dispatch. Use this type for `strategy_mode` argument in `strategy_returns`
+## Create New `Hedging` Type
+Each new strategy will need a new type to allow for dispatch. Use this type for `strategy_mode` argument in `strategy_returns`.
 
 ```
 using Bruno
@@ -18,7 +18,7 @@ using Bruno
 primitive type ExampleStrategy <: Hedging 8 end
 ```
 
-## [Create a new `strategy` method](@id strategy_method_tutorial)
+## [Create a New `strategy` Method](@id strategy_method_tutorial)
 `strategy` is the core function in `strategy_returns`. It will need a new method for each different strategy. `strategy` and `strategy_returns` both work for a single `FinancialInstrument` or for a `Vector{<:FinancialInstrument}`, but it needs to be explicit in the function definition. `buy` and `sell` functions are provided to make writing strategies easier.
 For example, if you wanted to buy a single call option and the underlying stock every Friday for a month this could be a suitable `strategy` (assuming trading starts on a Monday on business days only):
 ```
@@ -44,8 +44,8 @@ function Bruno.strategy(fin_obj,
 end
 ```
 
-## Running the `strategy` using `strategy_returns`
-All FinancialInstruments and historic and future prices for the underlying Widgets must be initialized prior to running the trading strategy. 
+## Running the `strategy` Using `strategy_returns`
+All financial instruments and historic and future prices for the underlying widgets must be initialized prior to running the trading strategy. 
 
 ```
 # create a random array to act as historic prices
@@ -76,6 +76,6 @@ cumulative_returns, holdings = strategy_returns(
 ```
 
 `strategy_returns` returns:
-* the cumulative returns that would have been earned after selling any remaining `Widget` or `FinancialInstrument` holdings left over after the strategy runs for the specified length 
-* a time series of how much of each object was owned during simulation.
-* the updated financial objects after the strategy (maturity and volatilities will likely be different)
+* The cumulative returns that would have been earned after selling any remaining `Widget` or `FinancialInstrument` holdings left over after the strategy runs for the specified length.
+* A time series of how much of each object was owned during simulation.
+* The updated financial objects after the strategy (maturity and volatilities will likely be different).

@@ -7,27 +7,27 @@ import Distributions.Normal
     LogDiffInput(nTimeStep; kwargs...)
     LogDiffInput(;kwargs...)
 
-contains parameters that are used by `makedata()` to synthesize data
-from a log-normal diffusion process of the form
+Contains parameters that are used by `makedata()` to synthesize data
+from a log-normal diffusion process of the form.
 
 ```math 
 P_{t+1} = P_t \\cdot e^{drift + volatility \\cdot v}
 ```
 
-where P_t is the value of the data at timestep t. The drift and 
+Where P_t is the value of the data at timestep t. The drift and 
 volatility represent the mean and standard deviation of a normal 
 distribution. The equation given above expresses them as such by 
 letting v be a draw from a standard normal distribution which is 
-then shifted and scaled by the drift and volatility terms
+then shifted and scaled by the drift and volatility terms.
 
 ## Arguments
 
-- `nTimeStep::Integer`:  the number of time steps to synthesize.
-- `initial::Real`:  the assumed value at the 0th time step. Default: 100.
-- `volatility::Real`:  the price volatility as a standard deviation in terms of implied time period. Default: 0.3
+- `nTimeStep::Integer`:  The number of time steps to synthesize.
+- `initial::Real`:  The assumed value at the 0th time step. Default: 100.
+- `volatility::Real`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
 - `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process 
 given in terms of the entire implied time period (if simulating a year, drift would be annual 
-expected return). Default 0.02
+expected return). Defaults to 0.02.
 
 ## Example
 ```julia

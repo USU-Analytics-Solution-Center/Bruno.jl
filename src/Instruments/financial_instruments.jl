@@ -1,14 +1,14 @@
 # financial instruments that can be passed to simulate. They house underlying widgets as part
 # of the insturment. Ex: Stock call options house an underlying stock
 """FinancialInstrument is the supertype for any instrument that uses a base asset
-(widget) in its definition (like a financial derivative)"""
+(widget) in its definition (like a financial derivative)."""
 abstract type FinancialInstrument end
 
 # ----- Type system for options: subtype of FinancialInstrument ------
 """
     Option <: FinancialInstrument
 
-abstract FinancialInstrument subtype. Supertype of all options contract types
+Abstract FinancialInstrument subtype. Supertype of all options contract types.
 """
 abstract type Option <: FinancialInstrument end
 
@@ -16,13 +16,13 @@ abstract type Option <: FinancialInstrument end
 """
     CallOption{T <: Widget} <: Option
 
-abstract Option subtype. Super type for all call options types
+Abstract option subtype. Super type for all call options types.
 """
 abstract type CallOption{T<:Widget} <: Option end
 """
     PutOption{T <: Widget} <: Option
 
-abstract Option subtype. Super type for all put options types
+Abstract option subtype. Super type for all put options types.
 """
 abstract type PutOption{T<:Widget} <: Option end
 
@@ -84,7 +84,7 @@ end
     EuroCallOption{T<:Widget}(;kwargs...)
     EuroCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroCallOption with underlying asset `T` 
+Construct a EuroCallOption with underlying asset `T`.
 
 ## Arguments
 - `widget::Widget`: underlying asset
@@ -206,15 +206,15 @@ end
     AmericanCallOption{T<:Widget}(;kwargs...)
     AmericanCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a AmericanCallOption with underlying asset `T` 
+Construct a AmericanCallOption with underlying asset `T`.
 
 ## Arguments
-- `widget::Widget`: underlying asset
-- `strike_price`: Contracted price to buy underlying asset at maturity
+- `widget::Widget`: The underlying asset
+- `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
-to an empty dictionary. use `price!()` function to load theoretical option prices
+to an empty dictionary. use `price!()` function to load theoretical option prices.
 
 ## Examples
 ```julia
@@ -331,15 +331,15 @@ end
     EuroPutOption{T<:Widget}(;kwargs...)
     EuroPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroPutOption with underlying asset `T` 
+Construct a EuroPutOption with underlying asset `T`. 
 
 ## Arguments
-- `widget::Widget`: underlying asset
-- `strike_price`: Contracted price to buy underlying asset at maturity
+- `widget::Widget`: The underlying asset.
+- `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
 - `values_library`: The values returned from pricing models. Default initializes
-to an empty dictionary. use `price!()` function to load theoretical option prices
+to an empty dictionary. use `price!()` function to load theoretical option prices.
 
 ## Examples
 ```julia
@@ -532,7 +532,7 @@ AmericanPutOption(;
 """
     Future{T <: Widget} <: FinancialInstrument
 
-Future contract with underlying asset T.
+Future contract with underlying asset 'T'.
 """
 struct Future{T<:Widget} <: FinancialInstrument
     widget::T
