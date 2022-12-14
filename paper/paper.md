@@ -1,4 +1,3 @@
-```
 ---
 title: 'Bruno: A Julia package for simulation, financial asset pricing and delta hedging'
 tags:
@@ -14,7 +13,6 @@ authors:
   - name: Spencer Clemens
     equal-contrib: true 
     affiliation: 1
-
   - name: Tyler Brough
     equal-contrib: false
     affiliation: 1
@@ -24,18 +22,12 @@ authors:
   - name: Janette Goodridge
     equal-contrib: false
     affiliation: 1
-
-   
-
 affiliations:
  - name: Utah State University
    index: 1
-
 date: 10 December 2022
-bibliography: Bruno.bib
-
+bibliography: paper.bib
 ---
-```
 
 # Summary
 
