@@ -7,7 +7,7 @@ tags:
   - Options
   - Simulation
 authors:
-  - name: Mitch Pound
+  - name: Mitchell Pound
     equal-contrib: true
     affiliation: 1
   - name: Spencer Clemens
