@@ -33,7 +33,7 @@ end
 
 @testset "Euro Put Price Test 'price'" begin
     """
-    Using "Book Name"
+    Using "Derivatives Markets" by Robert McDonald
     Assumptions
         Euro Call Option
         S = 41
@@ -60,7 +60,7 @@ end
 
 @testset "American Put Price Test 'price'" begin
     """
-    Using "Book Name"
+    Using "Derivatives Markets" by Robert McDonald
     Assumptions
         Euro Call Option
         S = 41
@@ -87,7 +87,7 @@ end
 
 @testset "American Call Price Test 'price'" begin
     """
-    Using "Book Name"
+    Using "Derivatives Markets" by Robert McDonald
     Assumptions
         Euro Call Option
         S = 110
