@@ -33,7 +33,7 @@ bibliography: paper.bib
 
 When engaging in activities in financial markets, market makers and other financial practitioners face a variety of risks. Many attempt to offset these risks by hedging. Hedging involves taking an offsetting position in an investment or asset, allowing potential risks to be mitigated. Hedging is often accomplished using financial derivatives. Derivatives are financial instruments that derive their value from an underlying asset. Some popular examples of financial derivatives include futures, forwards, options, and swaps.
 
-Bruno is a Julia package that allows for comparison of different hedging and trading strategies, many of which are based on financial derivatives.
+Bruno is a Julia [bezanson2017julia] package that allows for comparison of different hedging and trading strategies, many of which are based on financial derivatives.
 
 # Statement of need
 
