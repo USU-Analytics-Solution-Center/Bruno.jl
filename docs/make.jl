@@ -32,7 +32,7 @@ const _PAGES = [
 makedocs(
     sitename = "Bruno.jl",
     modules = [Bruno],
-    doctest = false,
+    doctest = true,
     pages = _PAGES,
     format = Documenter.HTML(
         sidebar_sitename = true,
