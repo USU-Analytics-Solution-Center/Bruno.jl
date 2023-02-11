@@ -36,7 +36,7 @@ Bruno allows users to compare different financial derivatives hedging and tradin
 
 Another key feature of Bruno is that it has the ability to produce a distribution of maximum loss that could result from a trading or hedging strategy. This information would be valuable to financial practitioners and market makers as it would help to quantify the risk of a potential strategy before putting the strategy into place. Furthermore, it would allow for comparison of different trading and hedging strategies. Creation of these distributions is facilitated by Bruno’s data generating processes. These processes include non-parametric methods, such as the stationary bootstrap [@politis1994stationary] with automatic block-length selection [@politis2004automatic][@patton2009correction] as well as parametric methods such as log diffusion.
 
-Bruno was designed to be used by finance professionals and academics alike. Financial analysis of trading and hedging strategies can be intensive. This package is intended to make this type of investigation more straightforward and accessible. There are many other software packages that have the capacity to calculate derivative prices, simulate hedging, and generate data. For example, in Julia, FinancialDerivatives.jl, FinancialMonteCarlo.jl, and Strategems.jl are packages that can be used for derivative asset pricing, data simulation, and strategy testing, respectively. However, none of them have been compiled in a manner that allows for integrated analysis. Rather, each package performs one part of the process independently, and must be assembled by the software user. In contrast, Bruno is novel because it provides a replacement to these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner. Bruno was recently used in a conference publication[@pound_2022], with several other publications nearing completion.
+Bruno was designed to be used by finance professionals and academics alike. Financial analysis of trading and hedging strategies can be intensive. This package is intended to make this type of investigation more straightforward and accessible. There are many other software packages that have the capacity to calculate derivative prices, simulate hedging, and generate data. For example, in Julia, FinancialDerivatives.jl [@financialderivativesjl], FinancialMonteCarlo.jl [@financialmontecarlojl], and Strategems.jl [@strategemsjl] are packages that can be used for derivative asset pricing, data simulation, and strategy testing, respectively. However, none of them have been compiled in a manner that allows for integrated analysis. Rather, each package performs one part of the process independently, and must be assembled by the software user. In contrast, Bruno is novel because it provides a replacement to these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner. Bruno was recently used in a conference publication[@pound_2022], with several other publications nearing completion.
 
 # Example usage
 
@@ -65,7 +65,7 @@ function Bruno.strategy(fin_obj,
         # buy one Stock every 5 days
         buy(fin_obj.widget, 1, holdings, pricing_model, 0) 
     end
-
+\url{
     return holdings
 end
 ```
