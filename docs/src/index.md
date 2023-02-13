@@ -5,6 +5,16 @@ Bruno is a modular, flexible package for simulating financial data, asset pricin
 
 The [Analytics Solution Center](https://huntsman.usu.edu/asc/index) at Utah State University is responsible for writing and maintaining Bruno.
 
+## What Bruno can do
+Bruno's four main functions are 
+* Describe financial tools like stock options and commodity futures with an intuitive type system
+* Generate simulated time-series data with parametric and non-parametric models
+* Price complex assets
+* Test trading or hedging strategies with historical or simulated prices
+
+## Why Bruno?
+Financial analysis of trading and hedging strategies can be intensive. This package is intended to make this type of investigation more straightforward and accessible. There are many other software packages that have the capacity to calculate derivative prices, simulate hedging, or generate data. However, none of them have been compiled in a manner that allows for integrated analysis. Rather, each package performs one part of the process independently, and must be assembled by the software user. In contrast, Bruno is novel because it provides a replacement to these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner in Julia.
+
 ## Installation Instructions
 
 1. [Download Julia](https://julialang.org/downloads/).
@@ -19,13 +29,6 @@ julia> Pkg.add("Bruno")
 !!! compat "Julia 1.6 or newer"
     The latest version of Bruno strongly suggests _at least_ Julia 1.8 or later to run.
     While most scripts will run on Julia 1.6 or 1.7, Bruno is _only_ tested on Julia 1.8.
-
-## What Bruno can do
-Bruno's four main functions are 
-* Describe financial tools like stock options and commodity futures with an intuitive type system
-* Generate simulated time-series data with parametric and non-parametric models
-* Price complex assets
-* Test trading or hedging strategies with historical or simulated prices
 
 ## Pricing your first asset
 ```julia
