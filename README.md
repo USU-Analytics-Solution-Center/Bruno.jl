@@ -15,13 +15,6 @@ Bruno's four main functions are
 ## Why Bruno?
 Financial analysis of trading and hedging strategies can be intensive. This package is intended to make this type of investigation more straightforward and accessible. There are many other software packages that have the capacity to calculate derivative prices, simulate hedging, or generate data. However, none of them have been compiled in a manner that allows for integrated analysis. Rather, each package performs one part of the process independently, and must be assembled by the software user. In contrast, Bruno is novel because it provides a replacement to these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner in Julia.
 
-## Contents
-* [Installation Instructions](#installation-instructions)
-* [Pricing Your First Asset](#pricing-your-first-asset)
-* [Getting In Touch](#getting-in-touch)
-* [Citing](#citing)
-* [Contributing](#contributing)
-
 ## Installation Instructions
 
 1. [Download Julia](https://julialang.org/downloads/).
