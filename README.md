@@ -16,9 +16,9 @@ Bruno's four main functions are
 Financial analysis of trading and hedging strategies can be intensive. This package is intended to make this type of investigation more straightforward and accessible. There are many other software packages that have the capacity to calculate derivative prices, simulate hedging, or generate data. However, none of them have been compiled in a manner that allows for integrated analysis. Rather, each package performs one part of the process independently, and must be assembled by the software user. In contrast, Bruno is novel because it provides a replacement to these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner in Julia.
 
 ## Contents
-* [Installation instructions](#installation-instructions)
-* [What Bruno can do](#what-bruno-can-do)
-* [Creating FinancialInstruments](#creating-fiancialinstruments)
+* [Installation Instructions](#installation-instructions)
+* [Pricing Your First Asset](#pricing-your-first-asset)
+* [Getting In Touch](#getting-in-touch)
 * [Citing](#citing)
 * [Contributing](#contributing)
 
@@ -35,7 +35,8 @@ julia> Pkg.add("Bruno")
 
 Note: The latest version of Bruno strongly suggests _at least_ Julia 1.8 or later to run.
 While most scripts will run on Julia 1.6 or 1.7, Bruno is _only_ tested on Julia 1.8.
-## Pricing your first asset
+
+## Pricing Your First Asset
 ```julia
 using Bruno
 stock = Stock(50; volatility=0.3)
