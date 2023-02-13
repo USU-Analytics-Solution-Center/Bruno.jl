@@ -23,8 +23,9 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Any, pricing_model::Type{<:Any}; _...) =
-    error("Use a FinancialObject and a Model type")
+price!(fin_obj, pricing_model; _...) = 
+    error("Cannon price $(typeof(fin_obj)) with $(typeof(pricing_model))")
+
 """
     price!(fin_obj::Option, pricing_model::Type{BinomialTree}; kwargs...)
 
@@ -47,8 +48,6 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BinomialTree}; _...) =
-    error("Something went wrong. Make sure you're using a defined Option subtype")
 
 function price!(
     fin_obj::EuroCallOption,
@@ -251,8 +250,6 @@ call = EuroCallOption(stock, 40; risk_free_rate=.08, maturity=.25)
 price!(call, BlackScholes)
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BlackScholes}; _...) =
-    error("Use a European call or put option for the Black Scholes pricing method")
 
 function price!(fin_obj::EuroCallOption{<:Widget}, pricing_model::Type{BlackScholes}; _...)
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
@@ -294,28 +291,6 @@ end
 
 
 # ----- Price models using Monte Carlo sims
-
-# error out if using an American option 
-price!(
-    fin_obj::AmericanCallOption{<:Widget},
-    pricing_model::Type{MonteCarlo{LogDiffusion}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanPutOption{<:Widget},
-    pricing_model::Type{MonteCarlo{LogDiffusion}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanCallOption{<:Widget},
-    pricing_model::Type{MonteCarlo{MCBootstrap}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanPutOption{<:Widget},
-    pricing_model::Type{MonteCarlo{MCBootstrap}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
 """
     price!(fin_obj::Option, MonteCarlo{MonteCarloModel}; kwargs...)
 
