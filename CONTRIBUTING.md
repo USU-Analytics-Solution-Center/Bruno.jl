@@ -23,4 +23,4 @@ When you're finished with the changes, create a pull request, also known as a PR
 - Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) if you are solving one.
 - Enable the checkbox to allow maintainer edits so the branch can be updated for a merge.
 Once you submit your PR, a team member will review your proposal. We may ask questions or request additional information.
-- We may ask for changes to be made before a PR can be merged, either using suggested changes] or pull request comments.
+- We may ask for changes to be made before a PR can be merged, either using suggested changes or pull request comments.
