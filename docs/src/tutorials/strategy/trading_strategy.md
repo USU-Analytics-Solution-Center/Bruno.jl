@@ -11,17 +11,20 @@ This tutorial shows how to create a simple trading strategy simulation. It demon
 ## Create New `Hedging` Type
 Each new strategy will need a new type to allow for dispatch. Use this type for `strategy_mode` argument in `strategy_returns`.
 
-```
+```jldoctest strategy; output = false
 using Bruno
 
 # creating a new subtype for dispatch
 primitive type ExampleStrategy <: Hedging 8 end
+
+# output
+
 ```
 
 ## [Create a New `strategy` Method](@id strategy_method_tutorial)
 `strategy` is the core function in `strategy_returns`. It will need a new method for each different strategy. `strategy` and `strategy_returns` both work for a single `FinancialInstrument` or for a `Vector{<:FinancialInstrument}`, but it needs to be explicit in the function definition. `buy` and `sell` functions are provided to make writing strategies easier.
 For example, if you wanted to buy a single call option and the underlying stock every Friday for a month this could be a suitable `strategy` (assuming trading starts on a Monday on business days only):
-```
+```jldoctest strategy; output = false
 using Bruno: buy, sell
 # import strategy to extend the function
 import Bruno: strategy
@@ -42,12 +45,22 @@ function Bruno.strategy(fin_obj,
 
     return holdings
 end
+
+# output
+
 ```
 
 ## Running the `strategy` Using `strategy_returns`
 All financial instruments and historic and future prices for the underlying widgets must be initialized prior to running the trading strategy. 
 
+```@meta
+DocTestSetup = quote
+    using Random
+    Random.seed!(7)
+end
 ```
+
+```jldoctest strategy; output = false
 # create a random array to act as historic prices
 historic_prices = rand(50:75, 40)
 
@@ -73,6 +86,14 @@ cumulative_returns, holdings = strategy_returns(
     20, 
     252
 )
+
+# output
+
+(0.3370435884062317, Dict("example_stock" => [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0  …  2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 0.0], "" => [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0  …  2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 0.0], "cash" => [0.0, 0.0, 0.0, 0.0, 0.0, -140.4561293636026, -140.4561293636026, -140.4561293636026, -140.4561293636026, -140.4561293636026  …  -265.320912818288, -265.320912818288, -265.320912818288, -401.866828586304, -401.866828586304, -401.866828586304, -401.866828586304, -401.866828586304, -533.5286447658507, 0.3370435884062317]), EuroCallOption{Stock}(Stock(AbstractFloat[57.0, 75.0, 65.0, 75.0, 53.0, 53.0, 54.0, 67.0, 57.0, 51.0  …  75.0, 80.0, 79.0, 77.0, 76.0, 76.0, 80.0, 73.0, 75.0, 76.0], "example_stock", 252, 2.2609836569660278), 60.0, 0.9206349206349209, 0.02, "", Dict{String, Dict{String, AbstractFloat}}("BlackScholes" => Dict("value" => 57.466422088564244))))
+```
+
+```@meta
+DocTestSetup = nothing
 ```
 
 `strategy_returns` returns:
