@@ -21,7 +21,7 @@ The `name` field is optional, and only necessary for trading strategy testing us
 `timesteps_per_period` reflects the size of time that passes between each price in `Stock.prices` compared to the implicit time period. For example, if daily data is used assuming yearly interest rates and rates of return (as is common) `timesteps_per_period=252`. This is to allow the pricing and strategy testing functions to be as generic as possible. Yearly, biyearly, or even hourly time windows are possible depending on the nature of the data used. 
 
 Examples:
-```
+```jldoctest; output = false, setup = :(using Bruno)
 # creating an array of prices
 historic_prices = collect(40:60)
 
@@ -35,6 +35,10 @@ a_stock = Stock(;
 
 # creating a 'static' Stock with a single price
 static_stock = Stock(60; volatility=.3, name="static_stock")
+
+# output
+
+Stock(AbstractFloat[60.0], "static_stock", 0, 0.3)
 ```
 
 #### [`Commodity`](@ref Commodity(::Real))
@@ -47,7 +51,7 @@ The `name` field is optional, and only necessary for trading strategy testing us
 `timesteps_per_period` is identical to the usage described in the `Stock` struct.
 
 Examples:
-```
+```jldoctest; output = false, setup = :(using Bruno)
 # creating an array to represent prices
 historic_prices = collect(40:60)
 
@@ -61,6 +65,10 @@ a_commodity = Commodity(;
 
 # creating a 'static' Commodity with a single price
 static_commodity = Commodity(60; volatility=.3, name="static_stock")
+
+# output
+
+Commodity(AbstractFloat[60.0], "static_stock", 0, 0.3)
 ```
 
 #### [`Bond`](@ref Bond(::Real))
