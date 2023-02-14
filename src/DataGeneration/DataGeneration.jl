@@ -46,7 +46,7 @@ input2 = BootstrapInput(data1, Stationary; n=100);
 data2 = makedata(input2, 2)
 ```
 """
-makedata(input::Any) = error("Use a DataGenInput subtype to synthesize data")
+makedata(input) = error("Use a DataGenInput subtype to synthesize data")
 
 include("logdiffusion.jl")
 include("bootstrap.jl")

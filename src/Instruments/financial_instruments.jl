@@ -104,8 +104,8 @@ EuroCallOption(;kwargs...)
 ```
 """
 EuroCallOption(
-    widget::Widget,
-    strike_price::Real = widget.prices[end];
+    widget,
+    strike_price = widget.prices[end];
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
@@ -120,11 +120,11 @@ EuroCallOption(
 )
 
 EuroCallOption(
-    widget::Widget,
-    strike_price::Real,
-    maturity::Real,
-    label::String,
-    values_library::Dict{String,Dict{String,Float64}},
+    widget,
+    strike_price,
+    maturity,
+    label,
+    values_library,
 ) = EuroCallOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -159,7 +159,6 @@ struct AmericanCallOption{T<:Widget} <: CallOption{T}
     strike_price::Float64
     maturity::Float64
     risk_free_rate::Float64
-
     label::String
     values_library::Dict{String,Dict{String,Float64}}
 
@@ -226,8 +225,8 @@ AmericanCallOption(;kwargs...)
 ```
 """
 AmericanCallOption(
-    widget::Widget,
-    strike_price::Real = widget.prices[end];
+    widget,
+    strike_price = widget.prices[end];
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
@@ -242,12 +241,12 @@ AmericanCallOption(
 )
 
 AmericanCallOption(
-    widget::Widget,
-    strike_price::Real,
-    maturity::Real,
-    risk_free_rate::Real,
-    label::String,
-    values_library::Dict{String,Dict{String,Float64}},
+    widget,
+    strike_price,
+    maturity,
+    risk_free_rate,
+    label,
+    values_library,
 ) = AmericanCallOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -282,7 +281,6 @@ struct EuroPutOption{T<:Widget} <: PutOption{T}
     strike_price::Float64
     maturity::Float64
     risk_free_rate::Float64
-
     label::String
     values_library::Dict{String,Dict{String,Float64}}
 
@@ -351,8 +349,8 @@ EuroPutOption(;kwargs...)
 ```
 """
 EuroPutOption(
-    widget::Widget,
-    strike_price::Real = widget.prices[end];
+    widget,
+    strike_price = widget.prices[end];
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
@@ -367,12 +365,12 @@ EuroPutOption(
 )
 
 EuroPutOption(
-    widget::Widget,
-    strike_price::Real,
-    maturity::Real,
-    risk_free_rate::Real,
-    label::String,
-    values_library::Dict{String,Dict{String,Float64}},
+    widget,
+    strike_price,
+    maturity,
+    risk_free_rate,
+    label,
+    values_library,
 ) = EuroPutOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -408,7 +406,6 @@ struct AmericanPutOption{T<:Widget} <: PutOption{T}
     strike_price::Float64
     maturity::Float64
     risk_free_rate::Float64
-
     label::String
     values_library::Dict{String,Dict{String,Float64}}
 
@@ -479,8 +476,8 @@ AmericanPutOption(;kwargs...)
 ```
 """
 AmericanPutOption(
-    widget::Widget,
-    strike_price::Real = widget.prices[end];
+    widget,
+    strike_price = widget.prices[end];
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
@@ -495,11 +492,11 @@ AmericanPutOption(
 )
 
 AmericanPutOption(
-    widget::Widget,
-    strike_price::Real,
-    maturity::Real,
-    risk_free_rate::Real,
-    values_library::Dict{String,Dict{String,Float64}},
+    widget,
+    strike_price,
+    maturity,
+    risk_free_rate,
+    values_library,
 ) = AmericanPutOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -549,7 +546,7 @@ struct ETF <: FinancialInstrument end
 struct InterestRateSwap <: FinancialInstrument end
 
 #------- Helpers
-function add_price_value(a_fin_inst::FinancialInstrument, a_new_price::Real)
+function add_price_value(a_fin_inst::FinancialInstrument, a_new_price)
     a_new_price >= 0 ? nothing :
     @warn("You are trying to add a negative number to a prices list")
     push!(a_fin_inst.widget.prices, a_new_price)

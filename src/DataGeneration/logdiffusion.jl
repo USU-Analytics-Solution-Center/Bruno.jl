@@ -65,11 +65,11 @@ struct LogDiffInput <: DataGenInput
     end
 end
 # outer constructor for passing just nTimeStep
-LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.3, drift = 0.02) =
+LogDiffInput(nTimeStep; initial = 100, volatility = 0.3, drift = 0.02) =
     LogDiffInput(nTimeStep, initial, volatility, drift)
 
 
-function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
+function makedata(Input::LogDiffInput, nSimulation = 1)
 
     # compute array of random values
     nData = Input.nTimeStep + 1

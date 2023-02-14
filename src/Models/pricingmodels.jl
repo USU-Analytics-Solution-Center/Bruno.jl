@@ -56,14 +56,6 @@ function price!(
     delta = 0,
     _...
 )
-    """ 
-    EURO OPTION
-    tree_depth = the depth of the tree
-    r = rate of return
-    strike_price = the strike price in dollars
-    delta = intrest rate
-    """
-
     r = fin_obj.risk_free_rate
     strike_price = fin_obj.strike_price
     s_0 = last(fin_obj.widget.prices)
