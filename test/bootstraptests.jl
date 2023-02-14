@@ -16,7 +16,7 @@
     beta = top / bottom
 
     # check a set of bootstraps to see if we can recover beta
-    input = BootstrapInput{v}(ar1, 1000, 50)
+    input = BootstrapInput(ar1, v; n=1000)
     results = zeros(1000)
     for i = 1:1000
         bootstrap = makedata(input)
@@ -39,7 +39,7 @@ end
     @test ar1ADF.stat < ar1ADF.cv[1]
 
     # bootstrap AR(1) series 
-    input = BootstrapInput{Stationary}(ar1, 1000, 50)
+    input = BootstrapInput(ar1, Stationary; n=10000)
     bs_data = makedata(input)
     bootstrap = [bs_data[i] for i = 1:length(bs_data)]
     bsADF = ADFTest(bootstrap, :none, 0)
@@ -148,7 +148,7 @@ end
 ]
     n = 10 # number of rows (resample size) in the resulting matrix
     m = 4 # number of columns (runs) in resulting matrix
-    bs_input = BootstrapInput{bstype}([1, 2, 3, 4, 5, 6, 7, 8], n, 3)
+    bs_input = BootstrapInput([1, 2, 3, 4, 5, 6, 7, 8], bstype; n=n, block_size=3)
     @test size(makedata(bs_input, m)) == (n, m)
 end
 

@@ -375,7 +375,7 @@ function price!(
 
 
     data_input =
-        BootstrapInput{bootstrap_method}(; input_data=returns, 
+        BootstrapInput(returns, bootstrap_method; 
             n=fin_obj.widget.timesteps_per_period - 1
         )
     data = makedata(data_input, n_sims)

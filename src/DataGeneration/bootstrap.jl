@@ -28,17 +28,17 @@ kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
 input2 = BootstrapInput{MovingBlock}(;kwargs...)
 ```
 """
-struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
-    input_data::Array{<:Real} # array of data to be resampled
-    n::Int64 # desired size of resampled data
-    block_size::Float64 #desired average block size (will add more to this later)
+struct BootstrapInput{T,TI,TF,TR} <: DataGenInput
+    input_data::Array{TR} # array of data to be resampled
+    n::TI # desired size of resampled data
+    block_size::TF #desired average block size (will add more to this later)
 
     # constructor for kwargs
-    function BootstrapInput{T}(;
+    function BootstrapInput{T,TI,TF,TR}(;
         input_data,
         n = 100,
         block_size = opt_block_length(input_data, T),
-    ) where {T<:TSBootMethod}
+    ) where {T,TI,TF,TR}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements")
@@ -50,10 +50,10 @@ struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size)
+        new{T,TI,TF,TR}(input_data, n, block_size)
     end
     # constructor for inputing args in exact correct order
-    function BootstrapInput{T}(input_data, n, block_size) where {T<:TSBootMethod}
+    function BootstrapInput{T,TI,TF,TR}(input_data, n, block_size) where {T,TI,TF,TR}
         if length(input_data) < 2
             error("input_data must have at least 2 elements")
         end
@@ -64,18 +64,22 @@ struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size)
+        new{T,TI,TF,TR}(input_data, n, block_size)
     end
 end
 
-# outer constructor for just using input_data and the type
-BootstrapInput(
-    input_data::Array{<:Real},
-    bootstrap_method::Type{<:TSBootMethod};
+# outer constructor for infering types used
+function BootstrapInput(
+    input_data,
+    bootstrap_method;
     n = 100,
-    block_size = opt_block_length(input_data, bootstrap_method),
-) = BootstrapInput{bootstrap_method}(input_data, n, block_size)
-
+    block_size = opt_block_length(input_data, bootstrap_method)
+) 
+    TR = eltype(input_data)
+    TI = typeof(n)
+    TF = typeof(block_size)
+    return BootstrapInput{bootstrap_method,TI,TF,TR}(input_data, n, block_size)
+end
 
 function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
     # check for block_size > 1 so geometric distro doesn't blow up
