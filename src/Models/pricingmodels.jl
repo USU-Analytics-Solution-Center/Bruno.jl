@@ -24,7 +24,7 @@ price!(a_fin_inst, BinomialTree)
 ```
 """
 price!(fin_obj, pricing_model; _...) = 
-    error("Cannon price $(typeof(fin_obj)) with $(typeof(pricing_model))")
+    error("Cannot price $(typeof(fin_obj)) with $(typeof(pricing_model))")
 
 """
     price!(fin_obj::Option, pricing_model::Type{BinomialTree}; kwargs...)

@@ -22,10 +22,10 @@ then shifted and scaled by the drift and volatility terms.
 
 ## Arguments
 
-- `nTimeStep::Integer`:  The number of time steps to synthesize.
-- `initial::Real`:  The assumed value at the 0th time step. Default: 100.
-- `volatility::Real`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
-- `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process 
+- `nTimeStep::Int64`:  The number of time steps to synthesize.
+- `initial::Float64`:  The assumed value at the 0th time step. Default: 100.
+- `volatility::Float64`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
+- `drift::Float64`: The drift parameter describes the mean of the log-normal diffusion process 
 given in terms of the entire implied time period (if simulating a year, drift would be annual 
 expected return). Defaults to 0.02.
 
@@ -42,10 +42,10 @@ input3 = LogDiffInput(;kwargs...)
 ```
 """
 struct LogDiffInput <: DataGenInput
-    nTimeStep::Integer # number of timesteps to simulate
-    initial::Real # in dollars
-    volatility::Real # volatility as a standard deviation
-    drift::Real # 
+    nTimeStep::Int64 # number of timesteps to simulate
+    initial::Float64 # in dollars
+    volatility::Float64 # volatility as a standard deviation
+    drift::Float64 # 
     # constructor for kwargs
     function LogDiffInput(;
         nTimeStep,

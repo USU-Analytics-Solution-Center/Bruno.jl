@@ -34,12 +34,11 @@ European call option with underlying asset `T`.
 """
 struct EuroCallOption{T<:Widget} <: CallOption{T}
     widget::T
-    strike_price::AbstractFloat
-    maturity::AbstractFloat
-    risk_free_rate::AbstractFloat
-
+    strike_price::Float64
+    maturity::Float64
+    risk_free_rate::Float64
     label::String
-    values_library::Dict{String,Dict{String,AbstractFloat}}
+    values_library::Dict{String,Dict{String,Float64}}
 
     # kwargs constructor
     function EuroCallOption{T}(;
@@ -48,11 +47,11 @@ struct EuroCallOption{T<:Widget} <: CallOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,AbstractFloat}}(),
+        values_library = Dict{String,Dict{String,Float64}}(),
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive ", maturity)
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
         new{T}(widget, strike_price, maturity, risk_free_rate, label, values_library)
@@ -69,7 +68,7 @@ struct EuroCallOption{T<:Widget} <: CallOption{T}
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -110,7 +109,7 @@ EuroCallOption(
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = EuroCallOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -125,7 +124,7 @@ EuroCallOption(
     strike_price::Real,
     maturity::Real,
     label::String,
-    values_library::Dict{String,Dict{String,AbstractFloat}},
+    values_library::Dict{String,Dict{String,Float64}},
 ) = EuroCallOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -140,7 +139,7 @@ EuroCallOption(;
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = EuroCallOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -157,12 +156,12 @@ American call option with underlying asset `T`.
 """
 struct AmericanCallOption{T<:Widget} <: CallOption{T}
     widget::T
-    strike_price::AbstractFloat
-    maturity::AbstractFloat
-    risk_free_rate::AbstractFloat
+    strike_price::Float64
+    maturity::Float64
+    risk_free_rate::Float64
 
     label::String
-    values_library::Dict{String,Dict{String,AbstractFloat}}
+    values_library::Dict{String,Dict{String,Float64}}
 
     # kwargs constructor
     function AmericanCallOption{T}(;
@@ -171,11 +170,11 @@ struct AmericanCallOption{T<:Widget} <: CallOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,AbstractFloat}}(),
+        values_library = Dict{String,Dict{String,Float64}}(),
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
         new{T}(widget, strike_price, maturity, risk_free_rate, label, values_library)
@@ -192,7 +191,7 @@ struct AmericanCallOption{T<:Widget} <: CallOption{T}
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
         new{T}(widget, strike_price, maturity, risk_free_rate, label, values_library)
@@ -232,7 +231,7 @@ AmericanCallOption(
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = AmericanCallOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -248,7 +247,7 @@ AmericanCallOption(
     maturity::Real,
     risk_free_rate::Real,
     label::String,
-    values_library::Dict{String,Dict{String,AbstractFloat}},
+    values_library::Dict{String,Dict{String,Float64}},
 ) = AmericanCallOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -264,7 +263,7 @@ AmericanCallOption(;
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = AmericanCallOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -280,12 +279,12 @@ European put option with underlying asset `T`.
 """
 struct EuroPutOption{T<:Widget} <: PutOption{T}
     widget::T
-    strike_price::AbstractFloat
-    maturity::AbstractFloat
-    risk_free_rate::AbstractFloat
+    strike_price::Float64
+    maturity::Float64
+    risk_free_rate::Float64
 
     label::String
-    values_library::Dict{String,Dict{String,AbstractFloat}}
+    values_library::Dict{String,Dict{String,Float64}}
 
     # kwargs constructor
     function EuroPutOption{T}(;
@@ -294,11 +293,11 @@ struct EuroPutOption{T<:Widget} <: PutOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,AbstractFloat}}(),
+        values_library = Dict{String,Dict{String,Float64}}(),
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -316,7 +315,7 @@ struct EuroPutOption{T<:Widget} <: PutOption{T}
     ) where {T<:Widget}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -357,7 +356,7 @@ EuroPutOption(
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = EuroPutOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -373,7 +372,7 @@ EuroPutOption(
     maturity::Real,
     risk_free_rate::Real,
     label::String,
-    values_library::Dict{String,Dict{String,AbstractFloat}},
+    values_library::Dict{String,Dict{String,Float64}},
 ) = EuroPutOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -389,7 +388,7 @@ EuroPutOption(;
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = EuroPutOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -406,12 +405,12 @@ American put option with underlying asset `T`.
 """
 struct AmericanPutOption{T<:Widget} <: PutOption{T}
     widget::T
-    strike_price::AbstractFloat
-    maturity::AbstractFloat
-    risk_free_rate::AbstractFloat
+    strike_price::Float64
+    maturity::Float64
+    risk_free_rate::Float64
 
     label::String
-    values_library::Dict{String,Dict{String,AbstractFloat}}
+    values_library::Dict{String,Dict{String,Float64}}
 
     # kwargs constructor
     function AmericanPutOption{T}(;
@@ -420,12 +419,12 @@ struct AmericanPutOption{T<:Widget} <: PutOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,AbstractFloat}}(),
+        values_library = Dict{String,Dict{String,Float64}}(),
     ) where {T<:Widget}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -444,7 +443,7 @@ struct AmericanPutOption{T<:Widget} <: PutOption{T}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,AbstractFloat}}() ? nothing :
+        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -485,7 +484,7 @@ AmericanPutOption(
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = AmericanPutOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -500,7 +499,7 @@ AmericanPutOption(
     strike_price::Real,
     maturity::Real,
     risk_free_rate::Real,
-    values_library::Dict{String,Dict{String,AbstractFloat}},
+    values_library::Dict{String,Dict{String,Float64}},
 ) = AmericanPutOption{typeof(widget)}(;
     widget = widget,
     strik_price = strike_price,
@@ -516,7 +515,7 @@ AmericanPutOption(;
     maturity = 1,
     risk_free_rate = 0.02,
     label = "",
-    values_library = Dict{String,Dict{String,AbstractFloat}}(),
+    values_library = Dict{String,Dict{String,Float64}}(),
 ) = AmericanPutOption{typeof(widget)}(;
     widget = widget,
     strike_price = strike_price,
@@ -536,11 +535,11 @@ Future contract with underlying asset 'T'.
 """
 struct Future{T<:Widget} <: FinancialInstrument
     widget::T
-    strike_price::AbstractFloat
-    risk_free_rate::AbstractFloat
-    maturity::AbstractFloat
+    strike_price::Float64
+    risk_free_rate::Float64
+    maturity::Float64
     label::String
-    values_library::Dict{String,Dict{String,AbstractFloat}}
+    values_library::Dict{String,Dict{String,Float64}}
 end
 
 # ------ Type system for stuff we haven't figured out yet ------ 
