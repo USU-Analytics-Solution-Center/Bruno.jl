@@ -5,7 +5,7 @@ using Logging
     
 @testset "buy function tests" begin
     @testset "buy without transaction costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
@@ -25,7 +25,7 @@ using Logging
     end
 
     @testset "buy with transaction_costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
@@ -45,7 +45,7 @@ using Logging
     end
 
     @testset "buy function limitations" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # buying negative widget
@@ -63,7 +63,7 @@ end
 
 @testset "sell function tests" begin
     @testset "sell without transaction costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
@@ -83,7 +83,7 @@ end
     end
 
     @testset "sell with transaction_costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
@@ -103,7 +103,7 @@ end
     end
 
     @testset "sell function limitations" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
         test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # sell negative widget
@@ -530,9 +530,6 @@ end
             fin_obj_count,
             widget_count
         )
-
-        
-        
     end
 end
 end # master hedging/ strategy testset 

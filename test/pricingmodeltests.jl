@@ -17,7 +17,7 @@ using Random
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
     a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate = 0.08) # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
@@ -45,7 +45,7 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
     a_fin_inst = EuroPutOption(a_stock, 40; risk_free_rate = 0.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
@@ -72,7 +72,7 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
     a_fin_inst = AmericanPutOption(a_stock, 40; risk_free_rate = 0.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
@@ -99,7 +99,7 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(110; volatility = 0.3)  # create a widget
+    a_stock = Stock(110.0; volatility = 0.3)  # create a widget
     a_fin_inst = AmericanCallOption(a_stock, 100; risk_free_rate = 0.05)  # create an Option
     price!(a_fin_inst, BinomialTree; delta = 0.035)  # add the binomial Option value to the options values
 
@@ -126,7 +126,7 @@ end # test for BinomialTree
         The call option value should be 3.399
         """
         # create underlying stock and the needed call option
-        stock = Stock(41; volatility = 0.3)
+        stock = Stock(41.0; volatility = 0.3)
         call = EuroCallOption(stock, 40; risk_free_rate = 0.08, maturity = 0.25)
         price!(call, BlackScholes)
 
@@ -145,7 +145,7 @@ end # test for BinomialTree
         The put option value should be 1.607
         """
         # create underlying stock and the needed call option
-        stock = Stock(41; volatility = 0.3)
+        stock = Stock(41.0; volatility = 0.3)
         put = EuroPutOption(stock, 40; risk_free_rate = 0.08, maturity = 0.25)
         price!(put, BlackScholes)
 
