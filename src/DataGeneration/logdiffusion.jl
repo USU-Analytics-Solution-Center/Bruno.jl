@@ -41,35 +41,39 @@ kwargs = Dict(:nTimeStep=>250, :initial=>100, :volatility=>.05, :drift=>.1)
 input3 = LogDiffInput(;kwargs...)
 ```
 """
-struct LogDiffInput <: DataGenInput
-    nTimeStep::Int64 # number of timesteps to simulate
-    initial::Float64 # in dollars
-    volatility::Float64 # volatility as a standard deviation
-    drift::Float64 # 
+struct LogDiffInput{TI,TR} <: DataGenInput
+    nTimeStep::TI # number of timesteps to simulate
+    initial::TR # in dollars
+    volatility::TR # volatility as a standard deviation
+    drift::TR # 
     # constructor for kwargs
-    function LogDiffInput(;
+    function LogDiffInput{TI,TR}(;
         nTimeStep,
         initial = 100,
         volatility = 0.3,
         drift = 0.02,
-    )
+    ) where {TI,TR}
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
     # constructor for ordered inputs
-    function LogDiffInput(nTimeStep, initial, volatility, drift)
+    function LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift) where {TI,TR}
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
 end
 # outer constructor for passing just nTimeStep
-LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.3, drift = 0.02) =
-    LogDiffInput(nTimeStep, initial, volatility, drift)
+function LogDiffInput(nTimeStep; initial = 100, volatility = 0.3, drift = 0.02)
+    TI = typeof(nTimeStep)
+    TR = typeof(initial)
+    volatility = convert(TR, volatility)
+    drift = convert(TR, drift)
+    return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
+end
 
-
-function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
+function makedata(Input::LogDiffInput, nSimulation = 1)
 
     # compute array of random values
     nData = Input.nTimeStep + 1

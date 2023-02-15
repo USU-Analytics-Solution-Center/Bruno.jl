@@ -159,8 +159,8 @@ end
 
     @testset "LogDiffusion price test" begin
         Random.seed!(78)
-        test_stock = Stock(100; volatility = .3)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+        test_stock = Stock(100.0; volatility = .3)
+        test_call = EuroCallOption(test_stock, 110.0; maturity=.5, risk_free_rate=.02)
 
         # testing with a simulation that ends with all paths out of the money
         @test price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=3) == 0.0
