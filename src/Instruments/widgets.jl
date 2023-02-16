@@ -78,7 +78,6 @@ end
 """
     Stock(prices, name, timesteps_per_period, volatility)
     Stock(;kwargs)
-    Stock(price; kwargs)
 
 Construct a Stock type to use as a base asset for FinancialInstrument.
 
@@ -213,7 +212,6 @@ end
 """
     Commodity(prices, name, timesteps_per_period, volatility)
     Commodity(;kwargs)
-    Commodity(price; kwargs)
 
 Construct a Commodity type to use as a base asset for FinancialInstrument.
 
@@ -309,7 +307,6 @@ end
 """
     Bond(prices, name, time_mat, coupon_rate)
     Bond(;kwargs)
-    Bond(price; kwargs)
 
 Construct a Bond type to use as a base asset for FinancialInstrument.
 

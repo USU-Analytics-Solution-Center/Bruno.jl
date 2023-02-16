@@ -78,10 +78,9 @@ end
 # Outer constructors for passing only the widget
 """
     EuroCallOption(;kwargs...)
-    EuroCallOption{T<:Widget}(;kwargs...)
-    EuroCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
+    EuroCallOption(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroCallOption with underlying asset `T`.
+Construct a EuroCallOption with underlying asset of type `Widget`
 
 ## Arguments
 - `widget`: underlying asset
@@ -136,7 +135,7 @@ end
 """
     AmericanCallOption{T <: Widget} <: CallOption{T}
 
-American call option with underlying asset `T`. 
+American call option with underlying asset of type `T`
 """
 struct AmericanCallOption{T<:Widget,S,D} <: CallOption{T}
     widget::T
@@ -185,10 +184,8 @@ end
 """
     AmericanCallOption(widget, strike_price; kwargs...)
     AmericanCallOption(;kwargs...)
-    AmericanCallOption{T<:Widget}(;kwargs...)
-    AmericanCallOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a AmericanCallOption with underlying asset `T`.
+Construct a AmericanCallOption with underlying asset of type `Widget`
 
 ## Arguments
 - `widget::Widget`: The underlying asset
@@ -293,10 +290,8 @@ end
 """
     EuroPutOption(widget, strike_price; kwargs...)
     EuroPutOption(;kwargs...)
-    EuroPutOption{T<:Widget}(;kwargs...)
-    EuroPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct a EuroPutOption with underlying asset `T`. 
+Construct a EuroPutOption with underlying asset of type `Widget`
 
 ## Arguments
 - `widget::Widget`: The underlying asset.
@@ -403,10 +398,8 @@ end
 """
     AmericanPutOption(widget, strike_price; kwargs...)
     AmericanPutOption(;kwargs...)
-    AmericanPutOption{T<:Widget}(;kwargs...)
-    AmericanPutOption{T<:Widget}(widget, strike_price, maturity, risk_free_rate, values_library)
 
-Construct an AmericanPutOption with underlying asset `T` 
+Construct an AmericanPutOption with underlying asset of type `Widget`
 
 ## Arguments
 - `widget::Widget`: underlying asset

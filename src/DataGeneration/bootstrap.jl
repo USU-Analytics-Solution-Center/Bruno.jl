@@ -13,10 +13,10 @@ Contains the parameters needed to perform block bootstrap of type T to be used b
 function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
 
 ## Keyword Arguments
-- `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
+- `input_data`: data to be resampled. Must be a 1-D array
 - `bootstrap_method`: Type of time series bootstrap to use. Must be subtype of TSBootMethod.
-- `n::Int64`: size of resampled output data. Default: 100
-- `block_size::Float64`: block size to use. Defaults to the optimal block length using `opt_block_length()`
+- `n`: size of resampled output data. Default: 100
+- `block_size`: block size to use. Defaults to the optimal block length using `opt_block_length()`
 
 ## Examples
 ```julia

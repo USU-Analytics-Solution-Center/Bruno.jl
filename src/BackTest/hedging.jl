@@ -6,13 +6,13 @@ using Distributions
         pricing_model,
         strategy_type,
         future_prices,
-        n_timesteps::Int,
-        timesteps_per_period::Int,
-        cash_injection::Real= 0,
-        fin_obj_count::Real= 0,
-        widget_count::Real= 0,
-        pay_int_rate::Real= 0,
-        hold_return_int_rate::Real= 0;
+        n_timesteps,
+        timesteps_per_period,
+        cash_injection = 0.0,
+        fin_obj_count = 0.0,
+        widget_count = 0.0,
+        pay_int_rate = 0.0,
+        hold_return_int_rate = 0.0;
         kwargs...
     )
 
@@ -24,7 +24,7 @@ Returns the dollar cumulative return from the strategy, the time-series of all h
 the strategy, and the updated object array. 
 
 ## Arguments
-- `obj::FinancialInstrument`: financial instrument the trading or hedging strategy runs on
+- `obj`: financial instrument the trading or hedging strategy runs on
 - `pricing_model`: `Model` subtype that defines how to price the `obj`
 - `strategy_type`: `Hedging` subtype that the `strategy()` function dispatches off. Must provide a new subtype for new `strategy()` methods
 - `future_prices`: vector of future prices for the underlying `Widget` asset of obj to run strategy on
@@ -60,7 +60,7 @@ cumulative_return, ts_holdings, obj = strategy_returns(
     future_prices,
     10,
     252, 
-    10, 
+    10.0, 
     fin_obj_count, 
     widget_count,
     pay_int_rate, 
@@ -164,14 +164,14 @@ end
         objs::Vector{<:FinancialInstrument},
         pricing_model,
         strategy_type,
-        future_prices::Dict{String, Vector{Real}},
-        n_timesteps::Int,
-        timesteps_per_period::Int,
-        cash_injection::Real = 0,
-        fin_obj_count::Dict{String, Real},
-        widget_count::Dict{String, Real},
-        pay_int_rate::Real= 0,
-        hold_return_int_rate::Real= 0;
+        future_prices,
+        n_timesteps,
+        timesteps_per_period,
+        cash_injection = 0.0,
+        fin_obj_count,
+        widget_count,
+        pay_int_rate = 0.0,
+        hold_return_int_rate = 0.0;
         kwargs...
     )
 
@@ -219,7 +219,7 @@ future_prices = Dict(
 # make dictionaries for the starting amounts held of each Widget and FinancialInstrument
 fin_obj_count = Dict("call" => 1.0, "call2" => 2)
 widget_count = Dict("stock" => 2.0, "stock2" => 3)
-cash_injection = 0
+cash_injection = 0.0
 
 pay_int_rate = 0.08
 hold_return_int_rate = 0.02
@@ -419,18 +419,18 @@ end
 """
     buy(
         fin_obj::FinancialInstrument, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
     buy(
         fin_obj::Widget, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
 
@@ -492,18 +492,18 @@ end
 """
     sell(
         fin_obj::FinancialInstrument, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
     sell(
         fin_obj::Widget, 
-        number::Real,
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
 
@@ -515,7 +515,7 @@ pricing_model. To be used in `strategy()` functions to define trading and hedgin
 - `number`: number of objects to be sold
 - `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
 - `pricing_model`: Model subtype to be used to define sell price
-- `transaction_cost::Real`: total transaction costs for the transaction
+- `transaction_cost`: total transaction costs for the transaction
 - `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
 """
 function sell(

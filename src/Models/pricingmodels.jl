@@ -331,8 +331,8 @@ function price!(
 
     dt = fin_obj.maturity / sim_size
     # create the data to be used in the analysis 
-    data_input = LogDiffInput(
-        sim_size;
+    data_input = LogDiffInput(;
+        nTimeStep = sim_size,
         initial = fin_obj.widget.prices[end],
         volatility = fin_obj.widget.volatility * sqrt(fin_obj.maturity),
         drift = fin_obj.risk_free_rate * fin_obj.maturity,

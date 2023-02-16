@@ -4,7 +4,6 @@ import Distributions.Normal
 
 """
     LogDiffInput(nTimeStep, initial, volatility, drift)
-    LogDiffInput(nTimeStep; kwargs...)
     LogDiffInput(;kwargs...)
 
 Contains parameters that are used by `makedata()` to synthesize data
@@ -65,12 +64,20 @@ struct LogDiffInput{TI,TR} <: DataGenInput
     end
 end
 # outer constructor for passing just nTimeStep
-function LogDiffInput(nTimeStep; initial = 100, volatility = 0.3, drift = 0.02)
+function LogDiffInput(nTimeStep, initial = 100, volatility = 0.3, drift = 0.02)
     TI = typeof(nTimeStep)
     initial, volatility, drift = promote(initial, volatility, drift)
     TR = typeof(initial)
     return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
 end
+function LogDiffInput(;nTimeStep, initial = 100, volatility = 0.3, drift = 0.02)
+    TI = typeof(nTimeStep)
+    initial, volatility, drift = promote(initial, volatility, drift)
+    TR = typeof(initial)
+    return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
+end
+
+
 
 function makedata(Input::LogDiffInput, nSimulation = 1)
 

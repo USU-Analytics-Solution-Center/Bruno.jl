@@ -7,8 +7,8 @@ All widgets use first difference.
 
 ## Positional Inputs
 - `widget::Widget`: A concrete widget struct. See the Widget documentation for more.
-- `bootstrap_method::TSBootMethod`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
-- `nWidgets::Signed`: The amount of widgets you want widget factory to return.
+- `bootstrap_method`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
+- `nWidgets`: The amount of widgets you want widget factory to return.
 
 
 # Example
