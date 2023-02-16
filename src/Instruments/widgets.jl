@@ -120,7 +120,7 @@ end
 
 # outer constructor to infer the type used in the prices array
 function Stock(
-    prices,
+    prices::Vector,
     name = "",
     timesteps_per_period = length(prices),
     volatility = get_volatility(prices, timesteps_per_period)
@@ -131,7 +131,7 @@ function Stock(
     return Stock{T,TI,TF}(prices, name, timesteps_per_period, volatility)
 end
 function Stock(;
-        prices::Vector,
+        prices,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
