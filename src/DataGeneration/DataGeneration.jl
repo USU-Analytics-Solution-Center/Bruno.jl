@@ -29,7 +29,7 @@ Possible DataGenInput types are
 - `Input<:DataGenInput`:  struct with parameters to generate data
 - `nSimulation::Integer`: the number of simulations to run.  
 ## Outputs
-- `data::AbstractArray`: nTimeStep x nSimulation Real valued array, where each column
+- `data`:   nTimeStep x nSimulation array, where each column
                          contains the data for one simulation, and each row contains
                          data for each timestep
 

@@ -266,7 +266,7 @@ end
    @testset "single fininst method" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
         test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
-        holdings = Dict{String, AbstractFloat}(
+        holdings = Dict{String, Float64}(
             "cash" => 0,
             "stock" => 2,
             "call" => -1
@@ -289,7 +289,7 @@ end
         
         obj_array = [test_call, test_put, test_call2] # doesn't have test_put2
         widget_dict = Dict("stock" => test_stock, "stock2" => test_stock2) # doesnt' have stock3
-        holdings = Dict{String, AbstractFloat}(
+        holdings = Dict{String, Float64}(
             "cash" => 0,
             "stock" => 1, 
             "stock2" => -2, 
