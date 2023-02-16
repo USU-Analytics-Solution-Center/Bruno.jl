@@ -188,7 +188,7 @@ end
 Construct a AmericanCallOption with underlying asset of type `Widget`
 
 ## Arguments
-- `widget::Widget`: The underlying asset
+- `widget`: The underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
@@ -294,7 +294,7 @@ end
 Construct a EuroPutOption with underlying asset of type `Widget`
 
 ## Arguments
-- `widget::Widget`: The underlying asset.
+- `widget`: The underlying asset.
 - `strike_price`: Contracted price to buy underlying asset at maturity.
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.
@@ -402,7 +402,7 @@ end
 Construct an AmericanPutOption with underlying asset of type `Widget`
 
 ## Arguments
-- `widget::Widget`: underlying asset
+- `widget`: underlying asset
 - `strike_price`: Contracted price to buy underlying asset at maturity
 - `maturity`: time to maturity of the option with respect to implicit time period. Default 1.
 - `risk_free_rate`: market risk free interest rate. Default is .02.

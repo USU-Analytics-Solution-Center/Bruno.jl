@@ -119,7 +119,7 @@ end
 
 # outer constructor to infer the type used in the prices array
 function Stock(
-    prices::Vector,
+    prices,
     name = "",
     timesteps_per_period = length(prices),
     volatility = get_volatility(prices, timesteps_per_period)
@@ -217,8 +217,8 @@ Construct a Commodity type to use as a base asset for FinancialInstrument.
 
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
-- `name::String`: Name of the commodity or commodity ticker symbol. Default "".
-- `timesteps_per_period::Int64`: For the size of a timestep in the data, the number of 
+- `name`: String name of the commodity or commodity ticker symbol. Default "".
+- `timesteps_per_period`: For the size of a timestep in the data, the number of 
 time steps for a given period of time, cannot be negative. For example, if the period of 
 interest is a year, and daily commodity price data is used, `timesteps_per_period=252`. 
 Defualt is the length of the `prices` array or 0 for a single price (static) Commodity. 
@@ -312,7 +312,7 @@ Construct a Bond type to use as a base asset for FinancialInstrument.
 
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
-- `name::String`: Name of the Bond or issuing company. Default "".
+- `name`: String name of the Bond or issuing company. Default "".
 - `time_mat`: Time until the bond expires (matures) in years. Default 1.
 - `coupon_rate`: The coupon rate for the bond. Default .03.
 
@@ -341,7 +341,7 @@ function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
     TF = typeof(coupon_rate)
     return Bond{T,TF}(prices, name, time_mat, coupon_rate)
 end
-function Bond(prices::Vector, name = "", time_mat = 1, coupon_rate = 0.03)
+function Bond(prices, name = "", time_mat = 1, coupon_rate = 0.03)
     T = eltype(prices)
     time_mat, coupon_rate = promote(time_mat, coupon_rate)
     TF = typeof(coupon_rate)
@@ -368,7 +368,7 @@ get_volatility(prices) = get_volatility(prices, length(prices))
 # to make positional arguments work
 get_volatility(prices, timesteps_per_period) = nothing
 
-function add_price_value(a_widget::Widget, a_new_price::Real)
+function add_price_value(a_widget::Widget, a_new_price)
     a_new_price >= 0 ? nothing :
     @warn("You are trying to add a negative number to a prices list")
     push!(a_widget.prices, a_new_price)

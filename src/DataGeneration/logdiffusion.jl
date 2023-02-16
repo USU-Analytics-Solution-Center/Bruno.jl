@@ -21,10 +21,10 @@ then shifted and scaled by the drift and volatility terms.
 
 ## Arguments
 
-- `nTimeStep::Int64`:  The number of time steps to synthesize.
-- `initial::Float64`:  The assumed value at the 0th time step. Default: 100.
-- `volatility::Float64`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
-- `drift::Float64`: The drift parameter describes the mean of the log-normal diffusion process 
+- `nTimeStep`:  The number of time steps to synthesize.
+- `initial`:  The assumed value at the 0th time step. Default: 100.
+- `volatility`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
+- `drift`: The drift parameter describes the mean of the log-normal diffusion process 
 given in terms of the entire implied time period (if simulating a year, drift would be annual 
 expected return). Defaults to 0.02.
 

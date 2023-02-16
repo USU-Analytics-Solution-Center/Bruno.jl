@@ -304,11 +304,11 @@ specified. Note: Only European Options call be priced via Monte Carlo methods.
 # Keyword arguments
 
 ## For LogDiffusion model
-- `n_sims::Int`: Number of simulations to be run. Default 100.
-- `sim_size::Int`: The number of generated steps in each simulated run. Default 100.
+- `n_sims`: Number of simulations to be run. Default 100.
+- `sim_size`: The number of generated steps in each simulated run. Default 100.
 
 ## For MCBootstrap model
-- `n_sims::Int`: Number of simulations to be run. Defualt 100
+- `n_sims`: Number of simulations to be run. Defualt 100
 - `bootstrap_method`: block bootstrap method to be used. Must be a subtype of `TSBootMethod`. Defualt=`Stationary`
 
 # Examples 
