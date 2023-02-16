@@ -327,7 +327,7 @@ end
             BlackScholes,
             Naked,
             future_prices,
-            10,
+            10.0,
             252;
             transaction_cost = 0.0
         )
@@ -349,9 +349,9 @@ end
             future_prices,
             10,
             252, 
-            10, 
-            2, 
-            3;
+            10.0, 
+            2.0, 
+            3.0;
             transaction_cost = 0.0
         )
 
@@ -367,9 +367,9 @@ end
             future_prices,
             10,
             252, 
-            10, 
-            0, 
-            0,
+            10.0, 
+            0.0, 
+            0.0,
             .08;
             transaction_cost = 0.0
         )
@@ -383,10 +383,10 @@ end
             future_prices,
             10,
             252, 
-            30, 
-            0, 
-            0,
-            0,
+            30.0, 
+            0.0, 
+            0.0,
+            0.0,
             .08;
             transaction_cost = 0.0
         )
@@ -404,7 +404,7 @@ end
             kwargs...
         )
             if step == 1
-                buy(fin_obj, 2, holdings, pricing_model)
+                buy(fin_obj, 2.0, holdings, pricing_model)
             end
 
             if step == 4
@@ -453,8 +453,8 @@ end
             "stock2" => [67, 74, 73, 67, 67, 75, 69, 71, 69, 70]
         )
         objs = [test_call, test_call2]
-        fin_obj_count = Dict("call" => 1.0, "call2" => 2)
-        widget_count = Dict("stock" => 2.0, "stock2" => 3)
+        fin_obj_count = Dict("call" => 1.0, "call2" => 2.0)
+        widget_count = Dict("stock" => 2.0, "stock2" => 3.0)
 
         test_ret, ts_holdings, obj_array = strategy_returns(
             objs, 
@@ -463,7 +463,7 @@ end
             future_prices,
             10,
             252,
-            0,
+            0.0,
             fin_obj_count,
             widget_count
         )
