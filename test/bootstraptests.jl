@@ -16,7 +16,7 @@
     beta = top / bottom
 
     # check a set of bootstraps to see if we can recover beta
-    input = BootstrapInput(ar1, v; n=1000)
+    input = BootstrapInput(ar1, v; n=1000,block_size=50)
     results = zeros(1000)
     for i = 1:1000
         bootstrap = makedata(input)

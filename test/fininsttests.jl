@@ -51,11 +51,11 @@
         # check for negative strike price
         @test_throws ErrorException fininst(widget, -1)
         # check for negative maturity
-        @test_throws ErrorException fininst(widget, 6; maturity=-1)
+        @test_throws ErrorException fininst(;widget = widget, strike_price = 6, maturity=-1)
         # check for warning of giving constructor prefilled dictionary
-        @test_warn "It is not recommended to pass values through the constructor. price!(Instrument, pricing_model) should be used" fininst(
-            widget, 
-            6; 
+        @test_warn "It is not recommended to pass values through the constructor. price!(Instrument, pricing_model) should be used" fininst(;
+            widget = widget, 
+            strike_price = 6, 
             values_library=Dict{String, Dict{String, AbstractFloat}}("test" => Dict("test2" => 1.0)))
     end
 end
