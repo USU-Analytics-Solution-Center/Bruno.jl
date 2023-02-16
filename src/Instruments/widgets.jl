@@ -332,22 +332,22 @@ Bond(2; coupon_rate=.05)
 function Bond(price; name = "", time_mat = 1, coupon_rate = 0.03)
     prices = [price]
     T = typeof(price)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
     TF = typeof(coupon_rate)
-    time_mat = convert(TF, time_mat)
     return Bond{T,TF}(; prices = prices, name = name, time_mat = time_mat, coupon_rate = coupon_rate)
 end
 
 # outer constructor with implied type of prices vector 
 function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
     T = eltype(prices)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
     TF = typeof(coupon_rate)
-    time_mat = convert(TF, time_mat)
     return Bond{T,TF}(prices, name, time_mat, coupon_rate)
 end
 function Bond(prices::Vector, name = "", time_mat = 1, coupon_rate = 0.03)
     T = eltype(prices)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
     TF = typeof(coupon_rate)
-    time_mat = convert(TF, time_mat)
     return Bond{T,TF}(prices, name, time_mat, coupon_rate)
 end
 # Helpers 

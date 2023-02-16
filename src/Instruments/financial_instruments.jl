@@ -391,7 +391,7 @@ struct AmericanPutOption{T<:Widget,S,D} <: PutOption{T}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
-        values_library == Dict{String,Dict{String,Float64}}() ? nothing :
+        values_library == Dict{String,Dict{String,D}}() ? nothing :
         @warn("It is not recommended to pass values through the constructor. \
         price!(Instrument, pricing_model) should be used")
 
@@ -480,7 +480,7 @@ struct ETF <: FinancialInstrument end
 struct InterestRateSwap <: FinancialInstrument end
 
 #------- Helpers
-function add_price_value(a_fin_inst::FinancialInstrument, a_new_price::Real)
+function add_price_value(a_fin_inst::FinancialInstrument, a_new_price)
     a_new_price >= 0 ? nothing :
     @warn("You are trying to add a negative number to a prices list")
     push!(a_fin_inst.widget.prices, a_new_price)

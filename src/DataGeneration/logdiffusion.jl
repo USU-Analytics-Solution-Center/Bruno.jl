@@ -67,9 +67,8 @@ end
 # outer constructor for passing just nTimeStep
 function LogDiffInput(nTimeStep; initial = 100, volatility = 0.3, drift = 0.02)
     TI = typeof(nTimeStep)
+    initial, volatility, drift = promote(initial, volatility, drift)
     TR = typeof(initial)
-    volatility = convert(TR, volatility)
-    drift = convert(TR, drift)
     return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
 end
 
