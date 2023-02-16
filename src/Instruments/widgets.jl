@@ -77,6 +77,7 @@ end
 # outer constructor to make a stock with a (static) single price
 """
     Stock(prices, name, timesteps_per_period, volatility)
+    Stock(price; kwargs...)
     Stock(;kwargs)
 
 Construct a Stock type to use as a base asset for FinancialInstrument.
@@ -130,7 +131,7 @@ function Stock(
     return Stock{T,TI,TF}(prices, name, timesteps_per_period, volatility)
 end
 function Stock(;
-        prices,
+        prices::Vector,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
@@ -211,6 +212,7 @@ end
 # outer constructor to make a Commodity with a (static) single price
 """
     Commodity(prices, name, timesteps_per_period, volatility)
+    commodity(price; kwargs...)
     Commodity(;kwargs)
 
 Construct a Commodity type to use as a base asset for FinancialInstrument.
@@ -306,6 +308,7 @@ end
 # outer constructor to make a Bond with a (static) single price
 """
     Bond(prices, name, time_mat, coupon_rate)
+    Bond(price; kwargs...)
     Bond(;kwargs)
 
 Construct a Bond type to use as a base asset for FinancialInstrument.
@@ -341,7 +344,7 @@ function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
     TF = typeof(coupon_rate)
     return Bond{T,TF}(prices, name, time_mat, coupon_rate)
 end
-function Bond(prices, name = "", time_mat = 1, coupon_rate = 0.03)
+function Bond(prices::Vector, name = "", time_mat = 1, coupon_rate = 0.03)
     T = eltype(prices)
     time_mat, coupon_rate = promote(time_mat, coupon_rate)
     TF = typeof(coupon_rate)

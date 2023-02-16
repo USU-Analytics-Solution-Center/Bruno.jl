@@ -442,7 +442,7 @@ pricing_model. To be used in `strategy()` functions to define trading and hedgin
 - `number`: number of objects to be bought
 - `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
 - `pricing_model`: Model subtype to be used to define buy price
-- `transaction_cost::Real`: total transaction costs for the transaction
+- `transaction_cost`: total transaction costs for the transaction
 - `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
 """
 function buy(
