@@ -47,7 +47,7 @@ struct EuroCallOption{T<:Widget,S,D} <: CallOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,Float64}}(),
+        values_library = Dict{String,Dict{String,D}}(),
     ) where {T<:Widget,S,D}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive ", maturity)
@@ -153,7 +153,7 @@ struct AmericanCallOption{T<:Widget,S,D} <: CallOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,Float64}}(),
+        values_library = Dict{String,Dict{String,D}}(),
     ) where {T<:Widget,S,D}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
@@ -259,7 +259,7 @@ struct EuroPutOption{T<:Widget,S,D} <: PutOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,Float64}}(),
+        values_library = Dict{String,Dict{String,D}}(),
     ) where {T<:Widget,S,D}
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")
         maturity >= 0 ? nothing : error("maturity must be positive")
@@ -368,7 +368,7 @@ struct AmericanPutOption{T<:Widget,S,D} <: PutOption{T}
         maturity = 1,
         risk_free_rate = 0.02,
         label = "",
-        values_library = Dict{String,Dict{String,Float64}}(),
+        values_library = Dict{String,Dict{String,D}}(),
     ) where {T<:Widget,S,D}
 
         strike_price >= 0 ? nothing : error("strike_price must be non-negative")

@@ -361,7 +361,6 @@ function get_volatility(prices::Vector, timesteps_per_period)
     length(prices) > 2 ? nothing :
     # need at least three values so std can work
     return error("Must have at least three values to calculate the volatility")  
-    prices = convert(Vector{Float64}, prices)
     returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i = 1:(length(prices)-1)]
     cont_return = log.(returns)
     std(cont_return, corrected = false) * sqrt(timesteps_per_period)

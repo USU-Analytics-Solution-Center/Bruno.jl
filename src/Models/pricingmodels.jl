@@ -109,9 +109,9 @@ function price!(
     p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
 
     # Get terminal node p*
-    a_vector = AbstractFloat[]
+    a_vector = zeros(valtype(valtype(fin_obj.values_library)), tree_depth + 1)
     for k = tree_depth:-1:0
-        push!(a_vector, max(s_0 * u^k * d^(tree_depth - k) - strike_price, 0))
+        a_vector[tree_depth-k+1] = max(s_0 * u^k * d^(tree_depth - k) - strike_price, 0)
     end
     to_return = 0
 
@@ -189,9 +189,9 @@ function price!(
     p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
 
     # Get terminal node p*
-    a_vector = AbstractFloat[]
+    a_vector = zeros(valtype(valtype(fin_obj.values_library)), tree_depth + 1)
     for k = tree_depth:-1:0
-        push!(a_vector, max(strike_price - s_0 * u^k * d^(tree_depth - k), 0))
+        a_vector[tree_depth-k+1] = max(strike_price - s_0 * u^k * d^(tree_depth - k), 0)
     end
 
     to_return = 0
