@@ -81,7 +81,7 @@ function BootstrapInput(
     return BootstrapInput{bootstrap_method,TI,TF,TR}(input_data, n, block_size)
 end
 
-function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{Stationary}, nSimulation = 1)
     # check for block_size > 1 so geometric distro doesn't blow up
     param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
     p = 1 / block_size
@@ -120,7 +120,7 @@ function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
     return data
 end
 
-function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{MovingBlock}, nSimulation = 1)
     data = zeros((param.n, nSimulation))
     for run_num = 1:nSimulation
         block_counter = 0
@@ -140,7 +140,7 @@ function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer = 1)
     return data
 end
 
-function makedata(param::BootstrapInput{CircularBlock}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{CircularBlock}, nSimulation = 1)
     data = zeros((param.n, nSimulation))
     for run_num = 1:nSimulation
         block_counter = 0
@@ -203,7 +203,7 @@ st_bl = opt_block_length(ar1, Stationary)
 cb_bl = opt_block_length(ar1, CircularBlock)
 ```
 """
-function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})
+function opt_block_length(array, bootstrap_method)
     N = size(array)[1]
     K_N = max(5, floor(Int, sqrt(log10(N))))
     # m_max from Kevin Sheppard arch package and Andrew Patton Matlab code
