@@ -324,8 +324,8 @@ price!(call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=10)
 function price!(
     fin_obj::Option,
     pricing_model::Type{MonteCarlo{LogDiffusion}};
-    n_sims::Int = 100,
-    sim_size::Int = 100,
+    n_sims = 100,
+    sim_size = 100,
     _...
 )
 
@@ -352,8 +352,8 @@ end
 function price!(
     fin_obj::Option,
     pricing_model::Type{MonteCarlo{MCBootstrap}};
-    bootstrap_method::Type{<:TSBootMethod} = Stationary,
-    n_sims::Int = 100,
+    bootstrap_method = Stationary,
+    n_sims = 100,
     _...
 )
     length(fin_obj.widget.prices) >= 2 ? 

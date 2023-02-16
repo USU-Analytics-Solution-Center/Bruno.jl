@@ -165,7 +165,7 @@ struct AmericanCallOption{T<:Widget,S,D} <: CallOption{T}
 
     # ordered arguments constructor
     function AmericanCallOption{T,S,D}(
-        widget::T,
+        widget,
         strike_price,
         maturity,
         risk_free_rate,
