@@ -34,11 +34,11 @@ a_stock = Stock(;
 )
 
 # creating a 'static' Stock with a single price
-static_stock = Stock(60; volatility=.3, name="static_stock")
+static_stock = Stock(60.0; volatility=.3, name="static_stock")
 
 # output
 
-Stock(AbstractFloat[60.0], "static_stock", 0, 0.3)
+Stock{Float64, Int64, Float64}([60.0], "static_stock", 0, 0.3)
 ```
 
 #### [`Commodity`](@ref Commodity(::Real))
@@ -68,7 +68,8 @@ static_commodity = Commodity(60; volatility=.3, name="static_stock")
 
 # output
 
-Commodity(AbstractFloat[60.0], "static_stock", 0, 0.3)
+Commodity{Int64, Int16, Float64}([60], "static_stock", 0, 0.3)
+
 ```
 
 #### [`Bond`](@ref Bond(::Real))

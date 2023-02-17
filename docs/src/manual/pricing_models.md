@@ -19,10 +19,10 @@ pricing a three month European call option
 
 ```jldoctest; output = false, setup = :(using Bruno)
 # creating a stock
-stock = Stock(50; volatility=.32)
+stock = Stock(50.0; volatility=.32)
 
 # creating a 3 month European call option with a $55 strike price 
-call = EuroCallOption(stock, 55; maturity=.25, risk_free_rate=.02)
+call = EuroCallOption(;widget=stock, strike_price=55, maturity=.25, risk_free_rate=.02)
 
 call_price = price!(call, BlackScholes)
 call_price == call.values_library["BlackScholes"]["value"]
@@ -48,10 +48,10 @@ pricing a three month American call option.
 
 ```jldoctest; output = false, setup = :(using Bruno)
 # creating a stock
-stock = Stock(50; volatility=.32)
+stock = Stock(50.0; volatility=.32)
 
 # creating a 3 month American call option with a $55 strike price 
-call = AmericanCallOption(stock, 55; maturity=.25, risk_free_rate=.02)
+call = AmericanCallOption(;widget=stock, strike_price=55, maturity=.25, risk_free_rate=.02)
 
 # calculating the options price using 5 time steps in the tree
 call_price = price!(call, BinomialTree; tree_depth=5)
@@ -90,7 +90,7 @@ historic_prices = rand(45:50, 20)
 stock = Stock(;prices = historic_prices)
 
 # creating a 6 month European call option with a $55 strike price 
-call = EuroCallOption(stock, 55; maturity=.5, risk_free_rate=.02)
+call = EuroCallOption(stock, 55, .5, .02)
 
 # calculating the options price using log diffusion sim model
 mc_logdiff_price = price!(call, MonteCarlo{LogDiffusion}; n_sims=50, sim_size=60)
