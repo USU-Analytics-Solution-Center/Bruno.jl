@@ -1,6 +1,7 @@
 [deps]
 Bruno = "2c64e276-ffac-4684-a264-d42a389bacb2"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Documenter = "0.27"

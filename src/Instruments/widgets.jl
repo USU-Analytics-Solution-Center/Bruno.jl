@@ -114,8 +114,8 @@ Stock(40; volatility=.05)
 function Stock(price; name = "", volatility)
     prices = [price]
     T = typeof(price)
-    TI = Int16
-    return Stock{T,TI,T}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
+    TF = typeof(volatility)
+    return Stock{T,Int64,TF}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
 end
 
 # outer constructor to infer the type used in the prices array
@@ -249,8 +249,8 @@ Commodity(40; volatility=.05)
 function Commodity(price; name = "", volatility)
     prices = [price]
     T = typeof(price)
-    TI = Int16
-    return Commodity{T,TI,T}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
+    TF = typeof(volatility)
+    return Commodity{T,Int16,TF}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
 end
 
 # outer constructor to infer the type used in the prices array

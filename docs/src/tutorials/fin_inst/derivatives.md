@@ -7,7 +7,7 @@
 Here's how to create a stock `Option` (more specifically a European Call Option). To do that, we need to make a stock first. You can find a tutorial [here](@ref widget_tutorial).
 
 ```jldoctest derivative; output = false, setup = :(using Bruno)
-historical_prices = [1, 2, 3, 4, 5]
+historical_prices = [1.0, 2.0, 3.0, 4.0, 5.0]
 
 # creates a Stock widget assuming hisorical prices are daily prices
 a_widget = Stock(;prices=historical_prices, name="my_widget", timesteps_per_period=252)
@@ -17,7 +17,7 @@ call = EuroCallOption(a_widget, 60)
 
 # output
 
-EuroCallOption{Stock}(Stock(AbstractFloat[1.0, 2.0, 3.0, 4.0, 5.0], "my_widget", 252, 2.8600161683167746), 60.0, 1.0, 0.02, "", Dict{String, Dict{String, AbstractFloat}}())
+EuroCallOption{Stock{Float64, Int64, Float64}, Float64, Float64}(Stock{Float64, Int64, Float64}([1.0, 2.0, 3.0, 4.0, 5.0], "my_widget", 252, 2.8600161683167746), 60.0, 1.0, 0.02, "", Dict{String, Dict{String, Float64}}())
 ```
 
 ## Interacting With a Financial Instrument (Asset Pricing)

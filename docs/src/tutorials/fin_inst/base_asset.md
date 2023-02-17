@@ -22,7 +22,7 @@ a_widget = Stock(;prices=historical_prices, name="my_widget", timesteps_per_peri
 
 # output
 
-Stock(AbstractFloat[55.0, 65.0, 67.0, 59.0, 69.0, 51.0, 68.0, 67.0, 57.0, 54.0, 67.0, 64.0, 68.0, 63.0, 65.0], "my_widget", 252, 2.437334881898636)
+Stock{Int64, Int64, Float64}([55, 65, 67, 59, 69, 51, 68, 67, 57, 54, 67, 64, 68, 63, 65], "my_widget", 252, 2.437334881898636)
 
 ```
 
@@ -42,5 +42,5 @@ stock_price = price!(a_widget, StockPrice)
 
 # output
 
-5.0
+5
 ```
