@@ -6,13 +6,13 @@ using Distributions
         pricing_model,
         strategy_type,
         future_prices,
-        n_timesteps::Int,
-        timesteps_per_period::Int,
-        cash_injection::Real= 0,
-        fin_obj_count::Real= 0,
-        widget_count::Real= 0,
-        pay_int_rate::Real= 0,
-        hold_return_int_rate::Real= 0;
+        n_timesteps,
+        timesteps_per_period,
+        cash_injection = 0.0,
+        fin_obj_count = 0.0,
+        widget_count = 0.0,
+        pay_int_rate = 0.0,
+        hold_return_int_rate = 0.0;
         kwargs...
     )
 
@@ -24,7 +24,7 @@ Returns the dollar cumulative return from the strategy, the time-series of all h
 the strategy, and the updated object array. 
 
 ## Arguments
-- `obj::FinancialInstrument`: financial instrument the trading or hedging strategy runs on
+- `obj`: financial instrument the trading or hedging strategy runs on
 - `pricing_model`: `Model` subtype that defines how to price the `obj`
 - `strategy_type`: `Hedging` subtype that the `strategy()` function dispatches off. Must provide a new subtype for new `strategy()` methods
 - `future_prices`: vector of future prices for the underlying `Widget` asset of obj to run strategy on
@@ -60,7 +60,7 @@ cumulative_return, ts_holdings, obj = strategy_returns(
     future_prices,
     10,
     252, 
-    10, 
+    10.0, 
     fin_obj_count, 
     widget_count,
     pay_int_rate, 
@@ -74,13 +74,13 @@ function strategy_returns(
     pricing_model,
     strategy_type,
     future_prices,
-    n_timesteps::Int,
-    timesteps_per_period::Int,
-    cash_injection::AbstractFloat = 0,
-    fin_obj_count::AbstractFloat = 0,
-    widget_count::AbstractFloat = 0,
-    pay_int_rate::AbstractFloat = 0,
-    hold_return_int_rate::AbstractFloat = 0;
+    n_timesteps,
+    timesteps_per_period,
+    cash_injection = 0.0,
+    fin_obj_count = 0.0,
+    widget_count = 0.0,
+    pay_int_rate = 0.0,
+    hold_return_int_rate = 0.0;
     kwargs...
 ) 
     # make some checks
@@ -158,58 +158,20 @@ function strategy_returns(
     return holdings["cash"] - initial_value, ts_holdings, obj
 end
 
-# converter function to let users input whatever type of number they want
-function strategy_returns(
-    obj::FinancialInstrument,
-    pricing_model,
-    strategy_type,
-    future_prices,
-    n_timesteps::Int,
-    timesteps_per_period::Int,
-    cash_injection::Real = 0,
-    fin_obj_count::Real = 0,
-    widget_count::Real = 0,
-    pay_int_rate::Real = 0,
-    hold_return_int_rate::Real = 0;
-    kwargs...
-)  
-
-    cash_injection = convert(AbstractFloat, cash_injection)
-    fin_obj_count = convert(AbstractFloat,fin_obj_count)
-    widget_count= convert(AbstractFloat, widget_count)
-    pay_int_rate = convert(AbstractFloat, pay_int_rate)
-    hold_return_int_rate= convert(AbstractFloat, hold_return_int_rate)
-
-    strategy_returns(
-        obj,
-        pricing_model,
-        strategy_type,
-        future_prices,
-        n_timesteps,
-        timesteps_per_period,
-        cash_injection,
-        fin_obj_count,
-        widget_count,
-        pay_int_rate,
-        hold_return_int_rate;
-        kwargs...
-    )  
-end
-
 # for an array of fin objs
 """
     strategy_returns(
         objs::Vector{<:FinancialInstrument},
         pricing_model,
         strategy_type,
-        future_prices::Dict{String, Vector{Real}},
-        n_timesteps::Int,
-        timesteps_per_period::Int,
-        cash_injection::Real = 0,
-        fin_obj_count::Dict{String, Real},
-        widget_count::Dict{String, Real},
-        pay_int_rate::Real= 0,
-        hold_return_int_rate::Real= 0;
+        future_prices,
+        n_timesteps,
+        timesteps_per_period,
+        cash_injection = 0.0,
+        fin_obj_count,
+        widget_count,
+        pay_int_rate = 0.0,
+        hold_return_int_rate = 0.0;
         kwargs...
     )
 
@@ -257,7 +219,7 @@ future_prices = Dict(
 # make dictionaries for the starting amounts held of each Widget and FinancialInstrument
 fin_obj_count = Dict("call" => 1.0, "call2" => 2)
 widget_count = Dict("stock" => 2.0, "stock2" => 3)
-cash_injection = 0
+cash_injection = 0.0
 
 pay_int_rate = 0.08
 hold_return_int_rate = 0.02
@@ -281,16 +243,16 @@ function strategy_returns(
     objs::Vector{<:FinancialInstrument},
     pricing_model,
     strategy_type,
-    future_prices::Dict{String,Vector{AbstractFloat}},
-    n_timesteps::Int,
-    timesteps_per_period::Int,
-    cash_injection::AbstractFloat = 0.0,
-    fin_obj_count = Dict{String,AbstractFloat}(),
-    widget_count = Dict{String,AbstractFloat}(),
-    pay_int_rate::AbstractFloat = 0,
-    hold_return_int_rate::AbstractFloat = 0;
+    future_prices,
+    n_timesteps,
+    timesteps_per_period,
+    cash_injection = 0.0,
+    fin_obj_count = Dict{String,Float64}(),
+    widget_count = Dict{String,Float64}(),
+    pay_int_rate = 0.0,
+    hold_return_int_rate = 0.0;
     kwargs...
-) where {T<:Real}
+)
 
     # checks before the sim starts
     for fin_obj in objs
@@ -332,12 +294,12 @@ function strategy_returns(
 
 
     # set up holdings dictionary. Holdings is the active holdings of the program while ts_holdings produces a history
-   holdings = Dict{String, AbstractFloat}(
+   holdings = Dict(
         "cash" => cash_injection, 
         fin_obj_count..., 
         widget_count...
     ) 
-    ts_holdings = Dict("cash" => AbstractFloat[cash_injection])
+    ts_holdings = Dict("cash" => [cash_injection])
 
     for key in keys(widget_dict)
         try
@@ -418,48 +380,8 @@ function strategy_returns(
     return holdings["cash"] - initial_value, ts_holdings, obj_array, widget_dict
 end
 
-# function to convert all to float so can input whatever numeric type
-function strategy_returns(
-    objs::Vector{<:FinancialInstrument},
-    pricing_model,
-    strategy_type,
-    future_prices::Dict{String,Vector{T}},
-    n_timesteps::Int,
-    timesteps_per_period::Int,
-    cash_injection::Real = 0.0,
-    fin_obj_count::Dict{String, Real} = Dict{String, AbstractFloat}(),
-    widget_count::Dict{String, Real} = Dict{String, AbstractFloat}(),
-    pay_int_rate::Real = 0,
-    hold_return_int_rate::Real = 0;
-    kwargs...
-) where {T<:Real}
-
-    cash_injection = convert(AbstractFloat, cash_injection)
-    future_prices = convert(Dict{String, Vector{AbstractFloat}}, future_prices)
-    fin_obj_count = convert(Dict{String, AbstractFloat}, fin_obj_count)
-    widget_count = convert(Dict{String, AbstractFloat}, widget_count)
-    pay_int_rate = convert(AbstractFloat, pay_int_rate)
-    hold_return_int_rate = convert(AbstractFloat, hold_return_int_rate)
-
-    strategy_returns(
-        objs,
-        pricing_model,
-        strategy_type,
-        future_prices,
-        n_timesteps,
-        timesteps_per_period,
-        cash_injection,
-        fin_obj_count,
-        widget_count,
-        pay_int_rate,
-        hold_return_int_rate;
-        kwargs...
-    )
-end
-
 # helper for copying an array of financial objects. Keeps pointer structure the same
-
-function copy_obj(objs::Vector{<:FinancialInstrument})
+function copy_obj(objs)
     widget_dict = Dict{String, Widget}()
     new_obj_arr = []
     # do first one
@@ -497,18 +419,18 @@ end
 """
     buy(
         fin_obj::FinancialInstrument, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
     buy(
         fin_obj::Widget, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
 
@@ -520,15 +442,15 @@ pricing_model. To be used in `strategy()` functions to define trading and hedgin
 - `number`: number of objects to be bought
 - `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
 - `pricing_model`: Model subtype to be used to define buy price
-- `transaction_cost::Real`: total transaction costs for the transaction
+- `transaction_cost`: total transaction costs for the transaction
 - `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
 """
 function buy(
     fin_obj::FinancialInstrument,
-    number::Real,
+    number,
     holdings,
     pricing_model,
-    transaction_cost::Real = 0.0;
+    transaction_cost = 0.0;
     kwargs...
 )
     # checks for non sensical buying
@@ -551,10 +473,10 @@ end
 
 function buy(
     widget_obj::Widget, 
-    number::Real, 
+    number,
     holdings, 
     pricing_model, 
-    transaction_cost::Real=0.0,
+    transaction_cost = 0.0;
     kwargs...
 )
     if number < 0
@@ -570,18 +492,18 @@ end
 """
     sell(
         fin_obj::FinancialInstrument, 
-        number::Real, 
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
     sell(
         fin_obj::Widget, 
-        number::Real,
+        number,
         holdings, 
         pricing_model, 
-        trasaction_cost::Real; 
+        trasaction_cost;
         kwargs...
     )
 
@@ -593,15 +515,15 @@ pricing_model. To be used in `strategy()` functions to define trading and hedgin
 - `number`: number of objects to be sold
 - `holdings`: dictionary with all holdings of widgets and financial instruments (generally supplied by strategy_returns() function)
 - `pricing_model`: Model subtype to be used to define sell price
-- `transaction_cost::Real`: total transaction costs for the transaction
+- `transaction_cost`: total transaction costs for the transaction
 - `kwargs`: pass through for any keyword arguments needed by the `pricing_model` in `price!()` function
 """
 function sell(
     fin_obj::FinancialInstrument,
-    number::Real,
+    number,
     holdings,
     pricing_model,
-    transaction_cost::Real = 0.0;
+    transaction_cost = 0.0;
     kwargs...
 )
     if number < 0
@@ -622,10 +544,10 @@ end
 
 function sell(
     widget_obj::Widget, 
-    number::Real, 
+    number,
     holdings, 
     pricing_model, 
-    transaction_cost::Real = 0.0;
+    transaction_cost = 0.0;
     kwargs...
 )
     
@@ -668,7 +590,7 @@ end
 
 function unwind(
     obj_array::Vector{<:FinancialInstrument},
-    widget_dict::Dict{String, <:Widget},
+    widget_dict,
     pricing_model,
     holdings
 )
@@ -703,7 +625,7 @@ end
 # default update_function for all financial instruments and all pricing/ strategy modes
 function update_obj(
     obj::FinancialInstrument,
-    strategy_type::Type{<:Hedging},
+    strategy_type,
     pricing_model,
     holdings,
     future_prices,
@@ -749,7 +671,7 @@ end
 
 function update_obj(
     obj::Widget, 
-    strategy_type::Type{<:Hedging}, 
+    strategy_type, 
     pricing_model, 
     holdings, 
     future_prices, 
@@ -774,8 +696,8 @@ end
 # for multi strategy_returns()
 # general update_obj function that will always fall back onto for multi strategy_returns()
 function update_obj(
-    obj_array::Vector{T},
-    widget_dict::Dict{String, <:Widget},
+    obj_array::Vector{<:FinancialInstrument},
+    widget_dict,
     strategy_type,
     pricing_model,
     holdings,
@@ -783,7 +705,7 @@ function update_obj(
     n_timesteps,
     timesteps_per_period,
     step
-) where {T<:FinancialInstrument}
+)
 
     # update all the widgets first
     for (name, widget) in widget_dict

@@ -17,8 +17,8 @@ using Random
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
-    a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate = 0.08) # create an Option
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
+    a_fin_inst = EuroCallOption(;widget = a_stock, strike_price = 40, risk_free_rate = 0.08) # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
     # check that a value was added to a_fin_inst
@@ -45,8 +45,8 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
-    a_fin_inst = EuroPutOption(a_stock, 40; risk_free_rate = 0.08)  # create an Option
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
+    a_fin_inst = EuroPutOption(;widget = a_stock, strike_price = 40, risk_free_rate = 0.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
     # check that a value was added to a_fin_inst
@@ -72,8 +72,8 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(41; volatility = 0.3)  # create a widget
-    a_fin_inst = AmericanPutOption(a_stock, 40; risk_free_rate = 0.08)  # create an Option
+    a_stock = Stock(41.0; volatility = 0.3)  # create a widget
+    a_fin_inst = AmericanPutOption(;widget = a_stock, strike_price = 40, risk_free_rate = 0.08)  # create an Option
     price!(a_fin_inst, BinomialTree)  # add the binomial Option value to the options values
 
     # check that a value was added to a_fin_inst
@@ -99,8 +99,8 @@ end
     The Value of this call option should be 7.074
     """
     # Create needed values
-    a_stock = Stock(110; volatility = 0.3)  # create a widget
-    a_fin_inst = AmericanCallOption(a_stock, 100; risk_free_rate = 0.05)  # create an Option
+    a_stock = Stock(110.0; volatility = 0.3)  # create a widget
+    a_fin_inst = AmericanCallOption(;widget = a_stock, strike_price = 100, risk_free_rate = 0.05)  # create an Option
     price!(a_fin_inst, BinomialTree; delta = 0.035)  # add the binomial Option value to the options values
 
     # check that a value was added to a_fin_inst
@@ -126,8 +126,8 @@ end # test for BinomialTree
         The call option value should be 3.399
         """
         # create underlying stock and the needed call option
-        stock = Stock(41; volatility = 0.3)
-        call = EuroCallOption(stock, 40; risk_free_rate = 0.08, maturity = 0.25)
+        stock = Stock(41.0; volatility = 0.3)
+        call = EuroCallOption(;widget = stock, strike_price = 40, risk_free_rate = 0.08, maturity = 0.25)
         price!(call, BlackScholes)
 
         @test isapprox(call.values_library["BlackScholes"]["value"], 3.399; atol = 0.01)
@@ -145,8 +145,8 @@ end # test for BinomialTree
         The put option value should be 1.607
         """
         # create underlying stock and the needed call option
-        stock = Stock(41; volatility = 0.3)
-        put = EuroPutOption(stock, 40; risk_free_rate = 0.08, maturity = 0.25)
+        stock = Stock(41.0; volatility = 0.3)
+        put = EuroPutOption(;widget = stock, strike_price = 40, risk_free_rate = 0.08, maturity = 0.25)
         price!(put, BlackScholes)
 
         @test isapprox(put.values_library["BlackScholes"]["value"], 1.607; atol = 0.01)
@@ -159,8 +159,8 @@ end
 
     @testset "LogDiffusion price test" begin
         Random.seed!(78)
-        test_stock = Stock(100; volatility = .3)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+        test_stock = Stock(100.0; volatility = .3)
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 110.0, maturity=.5, risk_free_rate=.02)
 
         # testing with a simulation that ends with all paths out of the money
         @test price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=3) == 0.0
@@ -175,7 +175,7 @@ end
     @testset "MCBootstrap price tests" begin
         Random.seed!(78)
         test_stock = Stock([99, 97, 90, 83, 83, 88, 88, 89, 97, 100])
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, risk_free_rate=.02)
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 110, maturity=.5, risk_free_rate=.02)
 
         @test isapprox(
             price!(test_call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=3),

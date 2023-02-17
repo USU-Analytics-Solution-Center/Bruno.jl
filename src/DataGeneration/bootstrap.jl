@@ -13,10 +13,10 @@ Contains the parameters needed to perform block bootstrap of type T to be used b
 function. T can be any subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
 
 ## Keyword Arguments
-- `input_data::Array{<:Real}`: data to be resampled. Must be a 1-D array
+- `input_data`: data to be resampled. Must be a 1-D array
 - `bootstrap_method`: Type of time series bootstrap to use. Must be subtype of TSBootMethod.
-- `n::Integer`: size of resampled output data. Default: 100
-- `block_size::Integer`: block size to use. Defaults to the optimal block length using `opt_block_length()`
+- `n`: size of resampled output data. Default: 100
+- `block_size`: block size to use. Defaults to the optimal block length using `opt_block_length()`
 
 ## Examples
 ```julia
@@ -28,17 +28,17 @@ kwargs = Dict(:input_data=>input_data, :n=>20, :block_size=>4);
 input2 = BootstrapInput{MovingBlock}(;kwargs...)
 ```
 """
-struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
-    input_data::Array{<:Real} # array of data to be resampled
-    n::Integer # desired size of resampled data
-    block_size::Float32 #desired average block size (will add more to this later)
+struct BootstrapInput{T,TI,TF,TR} <: DataGenInput
+    input_data::Array{TR} # array of data to be resampled
+    n::TI # desired size of resampled data
+    block_size::TF #desired average block size (will add more to this later)
 
     # constructor for kwargs
-    function BootstrapInput{T}(;
+    function BootstrapInput{T,TI,TF,TR}(;
         input_data,
         n = 100,
         block_size = opt_block_length(input_data, T),
-    ) where {T<:TSBootMethod}
+    ) where {T,TI,TF,TR}
         # check input_data is more than a single data point 
         if length(input_data) < 2
             error("input_data must have at least 2 elements")
@@ -50,10 +50,10 @@ struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size)
+        new{T,TI,TF,TR}(input_data, n, block_size)
     end
     # constructor for inputing args in exact correct order
-    function BootstrapInput{T}(input_data, n, block_size) where {T<:TSBootMethod}
+    function BootstrapInput{T,TI,TF,TR}(input_data, n, block_size) where {T,TI,TF,TR}
         if length(input_data) < 2
             error("input_data must have at least 2 elements")
         end
@@ -64,20 +64,24 @@ struct BootstrapInput{T<:TSBootMethod} <: DataGenInput
         if n < 1
             error("n (size of resampled data) must be greater than 0")
         end
-        new(input_data, n, block_size)
+        new{T,TI,TF,TR}(input_data, n, block_size)
     end
 end
 
-# outer constructor for just using input_data and the type
-BootstrapInput(
-    input_data::Array{<:Real},
-    bootstrap_method::Type{<:TSBootMethod};
+# outer constructor for infering types used
+function BootstrapInput(
+    input_data,
+    bootstrap_method;
     n = 100,
-    block_size = opt_block_length(input_data, bootstrap_method),
-) = BootstrapInput{bootstrap_method}(input_data, n, block_size)
+    block_size = opt_block_length(input_data, bootstrap_method)
+) 
+    TR = eltype(input_data)
+    TI = typeof(n)
+    TF = typeof(block_size)
+    return BootstrapInput{bootstrap_method,TI,TF,TR}(input_data, n, block_size)
+end
 
-
-function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{Stationary}, nSimulation = 1)
     # check for block_size > 1 so geometric distro doesn't blow up
     param.block_size > 1 ? block_size = param.block_size : block_size = 1.01
     p = 1 / block_size
@@ -116,7 +120,7 @@ function makedata(param::BootstrapInput{Stationary}, nSimulation::Integer = 1)
     return data
 end
 
-function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{MovingBlock}, nSimulation = 1)
     data = zeros((param.n, nSimulation))
     for run_num = 1:nSimulation
         block_counter = 0
@@ -136,7 +140,7 @@ function makedata(param::BootstrapInput{MovingBlock}, nSimulation::Integer = 1)
     return data
 end
 
-function makedata(param::BootstrapInput{CircularBlock}, nSimulation::Integer = 1)
+function makedata(param::BootstrapInput{CircularBlock}, nSimulation = 1)
     data = zeros((param.n, nSimulation))
     for run_num = 1:nSimulation
         block_counter = 0
@@ -199,7 +203,7 @@ st_bl = opt_block_length(ar1, Stationary)
 cb_bl = opt_block_length(ar1, CircularBlock)
 ```
 """
-function opt_block_length(array, bootstrap_method::Type{<:TSBootMethod})
+function opt_block_length(array, bootstrap_method)
     N = size(array)[1]
     K_N = max(5, floor(Int, sqrt(log10(N))))
     # m_max from Kevin Sheppard arch package and Andrew Patton Matlab code

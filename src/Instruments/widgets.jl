@@ -14,23 +14,23 @@ abstract type Widget end
 
 Widget subtype. Used as a base or root asset for financial instrument.
 """
-struct Stock <: Widget
-    prices::Array{AbstractFloat}
+struct Stock{T, TI, TF} <: Widget
+    prices::Vector{T}
     name::String
-    timesteps_per_period::Integer
-    volatility::AbstractFloat
+    timesteps_per_period::TI
+    volatility::TF
 
     # constructor for kwargs
 
-    function Stock(;
+    function Stock{T,TI,TF}(;
         prices,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
         _...
-    )
+    ) where {T,TI,TF}
         # allows single price input through kwargs (and ordered arguments)
-        if typeof(prices) <: Real
+        if !isa(prices, Vector)
             prices >= 0 ? prices = [prices] :
             error("Single price point must be non-negative")
             volatility == nothing ?
@@ -45,17 +45,17 @@ struct Stock <: Widget
         # catch negative timesteps_per_period
         timesteps_per_period >= 0 ? nothing : 
         error("timesteps_per_period cannot be negative")
-        new(prices, name, timesteps_per_period, volatility)
+	new{T,TI,TF}(prices, name, timesteps_per_period, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Stock(
+    function Stock{T,TI,TF}(
         prices,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period)
-    )
-        if typeof(prices) <: Real
+    ) where {T,TI,TF}
+        if !isa(prices, Vector)
             prices >= 0 ? prices = [prices] :
             error("Single price point must be non-negative")
             volatility == nothing ?
@@ -70,22 +70,22 @@ struct Stock <: Widget
         timesteps_per_period >= 0 ? nothing : 
         # catch negative timesteps_per_period
         error("timesteps_per_period cannot be negative")
-        new(prices, name, timesteps_per_period, volatility)
+	new{T,TI,TF}(prices, name, timesteps_per_period, volatility)
     end
 end
 
 # outer constructor to make a stock with a (static) single price
 """
     Stock(prices, name, timesteps_per_period, volatility)
+    Stock(price; kwargs...)
     Stock(;kwargs)
-    Stock(price; kwargs)
 
 Construct a Stock type to use as a base asset for FinancialInstrument.
 
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
 - `name::String`: Name of the stock or stock ticker symbol. Default "".
-- `timesteps_per_period::Integer`: For the size of a timestep in the data, the number of 
+- `timesteps_per_period::Int64`: For the size of a timestep in the data, the number of 
 time steps for a given period of time, cannot be negative. For example, if the period of 
 interest is a year, and daily stock data is used, `timesteps_per_period=252`. Defualt is 
 length of the `prices` array or 0 for single price (static) stock. 
@@ -111,33 +111,60 @@ Stock(;kwargs...)
 Stock(40; volatility=.05)
 ```
 """
-function Stock(price::Real; name = "", volatility)
+function Stock(price; name = "", volatility)
     prices = [price]
-    Stock(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
+    T = typeof(price)
+    TI = Int16
+    return Stock{T,TI,T}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
 end
 
+# outer constructor to infer the type used in the prices array
+function Stock(
+    prices::Vector,
+    name = "",
+    timesteps_per_period = length(prices),
+    volatility = get_volatility(prices, timesteps_per_period)
+)
+    T = eltype(prices)
+    TI = typeof(timesteps_per_period)
+    TF = typeof(volatility)
+    return Stock{T,TI,TF}(prices, name, timesteps_per_period, volatility)
+end
+function Stock(;
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+        _...
+)
+    T = eltype(prices)
+    TI = typeof(timesteps_per_period)
+    TF = typeof(volatility)
+    return Stock{T,TI,TF}(prices, name, timesteps_per_period, volatility)
+end
 # ------ Commodities ------
 """ 
     Commodity <: Widget
 
 Widget subtype. Used as a base or root asset for FinancialInstrument.
 """
-struct Commodity <: Widget
-    prices::Array{AbstractFloat}
+struct Commodity{T, TI, TF} <: Widget
+    prices::Vector{T}
     name::String
-    timesteps_per_period::Integer
-    volatility::AbstractFloat
+    timesteps_per_period::TI
+    volatility::TF
 
     # constructor for kwargs
-    function Commodity(;
+
+    function Commodity{T,TI,TF}(;
         prices,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period),
         _...
-    )
-        # allows for single number input for prices
-        if typeof(prices) <: Real
+    ) where {T,TI,TF}
+        # allows single price input through kwargs (and ordered arguments)
+        if !isa(prices, Vector)
             prices >= 0 ? prices = [prices] :
             error("Single price point must be non-negative")
             volatility == nothing ?
@@ -152,18 +179,17 @@ struct Commodity <: Widget
         # catch negative timesteps_per_period
         timesteps_per_period >= 0 ? nothing : 
         error("timesteps_per_period cannot be negative")
-
-        new(prices, name, timesteps_per_period, volatility)
+	new{T,TI,TF}(prices, name, timesteps_per_period, volatility)
     end
 
     # constructor for ordered argumentes 
-    function Commodity(
+    function Commodity{T,TI,TF}(
         prices,
         name = "",
         timesteps_per_period = length(prices),
         volatility = get_volatility(prices, timesteps_per_period)
-    )
-        if typeof(prices) <: Real
+    ) where {T,TI,TF}
+        if !isa(prices, Vector)
             prices >= 0 ? prices = [prices] :
             error("Single price point must be non-negative")
             volatility == nothing ?
@@ -175,26 +201,26 @@ struct Commodity <: Widget
         volatility == nothing ? error("Volatility cannot be nothing") : nothing
         # catch negative volatility
         volatility >= 0 ? nothing : error("volatility must be non negative")
-        # catch negative timesteps_per_period
         timesteps_per_period >= 0 ? nothing : 
+        # catch negative timesteps_per_period
         error("timesteps_per_period cannot be negative")
-
-        new(prices, name, timesteps_per_period, volatility)
+	new{T,TI,TF}(prices, name, timesteps_per_period, volatility)
     end
 end
+
 
 # outer constructor to make a Commodity with a (static) single price
 """
     Commodity(prices, name, timesteps_per_period, volatility)
+    commodity(price; kwargs...)
     Commodity(;kwargs)
-    Commodity(price; kwargs)
 
 Construct a Commodity type to use as a base asset for FinancialInstrument.
 
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
-- `name::String`: Name of the commodity or commodity ticker symbol. Default "".
-- `timesteps_per_period::Integer`: For the size of a timestep in the data, the number of 
+- `name`: String name of the commodity or commodity ticker symbol. Default "".
+- `timesteps_per_period`: For the size of a timestep in the data, the number of 
 time steps for a given period of time, cannot be negative. For example, if the period of 
 interest is a year, and daily commodity price data is used, `timesteps_per_period=252`. 
 Defualt is the length of the `prices` array or 0 for a single price (static) Commodity. 
@@ -220,14 +246,36 @@ Commodity(;kwargs...)
 Commodity(40; volatility=.05)
 ```
 """
-function Commodity(price::Real; name = "", volatility)
+function Commodity(price; name = "", volatility)
     prices = [price]
-    Commodity(;
-        prices = prices,
-        name = name,
-        volatility = volatility,
-        timesteps_per_period = 0
-    )
+    T = typeof(price)
+    TI = Int16
+    return Commodity{T,TI,T}(; prices = prices, name = name, volatility = volatility, timesteps_per_period = 0)
+end
+
+# outer constructor to infer the type used in the prices array
+function Commodity(
+    prices::Vector,
+    name = "",
+    timesteps_per_period = length(prices),
+    volatility = get_volatility(prices, timesteps_per_period)
+)
+    T = eltype(prices)
+    TI = typeof(timesteps_per_period)
+    TF = typeof(volatility)
+    return Commodity{T,TI,TF}(prices, name, timesteps_per_period, volatility)
+end
+function Commodity(;
+        prices,
+        name = "",
+        timesteps_per_period = length(prices),
+        volatility = get_volatility(prices, timesteps_per_period),
+        _...
+)
+    T = eltype(prices)
+    TI = typeof(timesteps_per_period)
+    TF = typeof(volatility)
+    return Commodity{T,TI,TF}(prices, name, timesteps_per_period, volatility)
 end
 
 # ---------- Bonds -----------------
@@ -236,38 +284,38 @@ end
 
 Widget subtype. Used as a base or root asset for FinancialInstrument.
 """
-struct Bond <: Widget
-    prices::Array{AbstractFloat}
+struct Bond{T,TF} <: Widget
+    prices::Array{T}
     name::String
-    time_mat::AbstractFloat
-    coupon_rate::AbstractFloat
+    time_mat::TF
+    coupon_rate::TF
 
     # constructor for kwargs
-    function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
+    function Bond{T,TF}(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...) where {T,TF}
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         time_mat > 0 ? nothing : error("time_mat must be positive")
-        new(prices, name, time_mat, coupon_rate)
+	new{T,TF}(prices, name, time_mat, coupon_rate)
     end
 
     # constructor for ordered argumentes 
-    function Bond(prices, name = "", time_mat = 1, coupon_rate = 0.03)
+    function Bond{T,TF}(prices, name = "", time_mat = 1, coupon_rate = 0.03) where {T,TF}
         size(prices)[1] > 0 ? nothing : error("Prices cannot be an empty vector")
         time_mat > 0 ? nothing : error("time_mat must be positive")
-        new(prices, name, time_mat, coupon_rate)
+	new{T,TF}(prices, name, time_mat, coupon_rate)
     end
 end
 
 # outer constructor to make a Bond with a (static) single price
 """
     Bond(prices, name, time_mat, coupon_rate)
+    Bond(price; kwargs...)
     Bond(;kwargs)
-    Bond(price; kwargs)
 
 Construct a Bond type to use as a base asset for FinancialInstrument.
 
 ## Arguments
 - `prices`:Historical prices (input as a 1-D array) or the current price input as a number `<: Real`
-- `name::String`: Name of the Bond or issuing company. Default "".
+- `name`: String name of the Bond or issuing company. Default "".
 - `time_mat`: Time until the bond expires (matures) in years. Default 1.
 - `coupon_rate`: The coupon rate for the bond. Default .03.
 
@@ -281,11 +329,27 @@ Bond(;kwargs...)
 Bond(2; coupon_rate=.05)
 ```
 """
-function Bond(price::Real; name = "", time_mat = 1, coupon_rate = 0.03)
+function Bond(price; name = "", time_mat = 1, coupon_rate = 0.03)
     prices = [price]
-    Bond(; prices = prices, name = name, time_mat = time_mat, coupon_rate = coupon_rate)
+    T = typeof(price)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
+    TF = typeof(coupon_rate)
+    return Bond{T,TF}(; prices = prices, name = name, time_mat = time_mat, coupon_rate = coupon_rate)
 end
 
+# outer constructor with implied type of prices vector 
+function Bond(; prices, name = "", time_mat = 1, coupon_rate = 0.03, _...)
+    T = eltype(prices)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
+    TF = typeof(coupon_rate)
+    return Bond{T,TF}(prices, name, time_mat, coupon_rate)
+end
+function Bond(prices::Vector, name = "", time_mat = 1, coupon_rate = 0.03)
+    T = eltype(prices)
+    time_mat, coupon_rate = promote(time_mat, coupon_rate)
+    TF = typeof(coupon_rate)
+    return Bond{T,TF}(prices, name, time_mat, coupon_rate)
+end
 # Helpers 
 """
     get_volatility(prices)
@@ -293,7 +357,7 @@ end
 Finds the standard deviation of continuous returns for an array of prices.
 """
 
-function get_volatility(prices, timesteps_per_period)
+function get_volatility(prices::Vector, timesteps_per_period)
     length(prices) > 2 ? nothing :
     # need at least three values so std can work
     return error("Must have at least three values to calculate the volatility")  
@@ -304,7 +368,10 @@ end
 
 get_volatility(prices) = get_volatility(prices, length(prices))
 
-function add_price_value(a_widget::Widget, a_new_price::Real)
+# to make positional arguments work
+get_volatility(prices, timesteps_per_period) = nothing
+
+function add_price_value(a_widget::Widget, a_new_price)
     a_new_price >= 0 ? nothing :
     @warn("You are trying to add a negative number to a prices list")
     push!(a_widget.prices, a_new_price)

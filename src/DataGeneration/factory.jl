@@ -7,8 +7,8 @@ All widgets use first difference.
 
 ## Positional Inputs
 - `widget::Widget`: A concrete widget struct. See the Widget documentation for more.
-- `bootstrap_method::TSBootMethod`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
-- `nWidgets::Signed`: The amount of widgets you want widget factory to return.
+- `bootstrap_method`: A subtype of TSBootMethod: Stationary, MovingBlock, or CircularBlock.
+- `nWidgets`: The amount of widgets you want widget factory to return.
 
 
 # Example
@@ -19,7 +19,7 @@ widget = Stock(prices)
 list_of_widgets = factory(widget, Stationary, 2)
 ```
 """
-function factory(widget::Widget, bootstrap_method::Type{<:TSBootMethod}, nWidgets::Signed)
+function factory(widget::Widget, bootstrap_method, nWidgets)
     fields = field_exclude(widget)
     # calculating the returns
     # TODO: check if time series Stationary 
@@ -52,8 +52,8 @@ end
 
 function factory(
     fin_instrument::FinancialInstrument,
-    bootstrap_method::Type{<:TSBootMethod},
-    nInstruments::Signed,
+    bootstrap_method,
+    nInstruments,
 )
     fields = field_exclude(fin_instrument)
     widget_ar = factory(fin_instrument.widget, bootstrap_method, nInstruments)

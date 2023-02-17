@@ -21,7 +21,7 @@
         @test test_fininst.maturity == 0.5
         @test test_fininst.risk_free_rate == 0.08
         @test test_fininst.label == "test"
-        @test test_fininst.values_library == Dict{String,Dict{String,AbstractFloat}}()
+        @test test_fininst.values_library == Dict{String,Dict{String,Float64}}()
     end
 
     @testset "Only widget and strike_price constructor for $fininst" for fininst in [
@@ -36,7 +36,7 @@
         @test test_fininst.maturity == 1.0
         @test test_fininst.risk_free_rate == 0.02
         @test test_fininst.label == ""
-        @test test_fininst.values_library == Dict{String,Dict{String,AbstractFloat}}()
+        @test test_fininst.values_library == Dict{String,Dict{String,Float64}}()
     end
     
     @testset "Constructor limits for $fininst" for fininst in [
@@ -51,12 +51,12 @@
         # check for negative strike price
         @test_throws ErrorException fininst(widget, -1)
         # check for negative maturity
-        @test_throws ErrorException fininst(widget, 6; maturity=-1)
+        @test_throws ErrorException fininst(;widget = widget, strike_price = 6, maturity=-1)
         # check for warning of giving constructor prefilled dictionary
-        @test_warn "It is not recommended to pass values through the constructor. price!(Instrument, pricing_model) should be used" fininst(
-            widget, 
-            6; 
-            values_library=Dict{String, Dict{String, AbstractFloat}}("test" => Dict("test2" => 1.0)))
+        @test_warn "It is not recommended to pass values through the constructor. price!(Instrument, pricing_model) should be used" fininst(;
+            widget = widget, 
+            strike_price = 6, 
+            values_library=Dict{String, Dict{String, Float64}}("test" => Dict("test2" => 1.0)))
     end
 end
 

@@ -5,8 +5,8 @@ using Logging
     
 @testset "buy function tests" begin
     @testset "buy without transaction costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # buy call without transaction costs
@@ -25,8 +25,8 @@ using Logging
     end
 
     @testset "buy with transaction_costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # buy call without transaction costs
@@ -45,8 +45,8 @@ using Logging
     end
 
     @testset "buy function limitations" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # buying negative widget
         @test_logs (:warn,"unable to buy negative amounts. Use sell instead") buy(test_stock, -1, holdings, BlackScholes)
@@ -56,15 +56,15 @@ using Logging
         @test_logs (:warn,"unable to buy negative amounts. Use sell instead") buy(test_call, -1, holdings, BlackScholes, 1)
 
         # buying expired FinancialInstrument
-        expired_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.0)
+        expired_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.0)
         @test_logs (:warn, "unable to buy expired FinancialInstrument") buy(expired_call, 1, holdings, BlackScholes, 1)
     end
 end
 
 @testset "sell function tests" begin
     @testset "sell without transaction costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # sell call without transaction costs
@@ -83,8 +83,8 @@ end
     end
 
     @testset "sell with transaction_costs" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         # the price!() of this call should be 3.399 (see pricingmodel tests)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # sell call without transaction costs
@@ -103,8 +103,8 @@ end
     end
 
     @testset "sell function limitations" begin
-        test_stock = Stock(41; name = "test", volatility = 0.3)  
-        test_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
+        test_stock = Stock(41.0; name = "test", volatility = 0.3)  
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.25)
         holdings = Dict("cash" => 10.0, "test_call" => 1, "test" => 1)
         # sell negative widget
         @test_logs (:warn,"unable to sell negative amounts. Use buy instead") sell(test_stock, -1, holdings, BlackScholes)
@@ -114,7 +114,7 @@ end
         @test_logs (:warn,"unable to sell negative amounts. Use buy instead") sell(test_call, -1, holdings, BlackScholes, 1)
 
         # sell expired FinancialInstrument
-        expired_call = EuroCallOption(test_stock, 40; label = "test_call", risk_free_rate = 0.08, maturity = 0.0)
+        expired_call = EuroCallOption(;widget = test_stock, strike_price = 40, label = "test_call", risk_free_rate = 0.08, maturity = 0.0)
         @test_logs (:warn, "unable to sell expired FinancialInstrument") sell(expired_call, 1, holdings, BlackScholes, 1)
     end
 end
@@ -122,7 +122,7 @@ end
 @testset verbose=true "update_obj tests" begin
     @testset "single update_obj tests" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+        test_call = EuroCallOption(;widget = test_stock, strike_price = 110, maturity=.5, label="call", risk_free_rate=.02)
         future_prices = [1, 2, 3]
         holdings = Dict("cash" => 0.0, "stock" => 1.0, "call" => 1.0)
         new_call = update_obj(
@@ -149,7 +149,7 @@ end
         @test new_call.risk_free_rate == .02
         
         # test for expiring object
-        exp_call = EuroCallOption(test_stock, 1; maturity=.001, label="exp_call", risk_free_rate=.02)
+        exp_call = EuroCallOption(;widget = test_stock, strike_price = 1, maturity=.001, label="exp_call", risk_free_rate=.02)
         holdings["exp_call"] = 1
         @test_logs (:warn, "exp_call has expired, it will not be able to be bought or sold") update_obj(
             exp_call,
@@ -166,7 +166,7 @@ end
         @test holdings["cash"] == 1
         
         # test that it doesn't warn on already expired fin obj 
-        exp_call = EuroCallOption(test_stock, 1; maturity=0, label="exp_call", risk_free_rate=.02)
+        exp_call = EuroCallOption(;widget = test_stock, strike_price = 1, maturity=0, label="exp_call", risk_free_rate=.02)
         @test_logs min_level=Logging.Warn update_obj(
             exp_call,
             Naked, 
@@ -182,10 +182,10 @@ end
     @testset "vector update_obj() tests" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
         test_stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
-        test_put = EuroPutOption(test_stock, 110; maturity=.5, label="put", risk_free_rate=.02)
-        test_call2 = EuroCallOption(test_stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
-        test_put2 = EuroPutOption(test_stock2, 70; maturity=0.001, label="put2", risk_free_rate=.02)
+        test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
+        test_put = EuroPutOption(;widget=test_stock, strike_price=110, maturity=.5, label="put", risk_free_rate=.02)
+        test_call2 = EuroCallOption(;widget=test_stock2, strike_price=70, maturity=1, label="call2", risk_free_rate=.02)
+        test_put2 = EuroPutOption(;widget=test_stock2, strike_price=70, maturity=0.001, label="put2", risk_free_rate=.02)
         
         obj_array = [test_call, test_put, test_call2]
         obj_array2 = [test_put2] # one that should throw a warning
@@ -246,7 +246,7 @@ end
         @test holdings["cash"] == 65
 
         # test that doesn't throw warning a second time (if holdings != 0)
-        test_put2 = EuroPutOption(test_stock2, 70; maturity=0, label="put2", risk_free_rate=.02)
+        test_put2 = EuroPutOption(;widget=test_stock2, strike_price=70, maturity=0, label="put2", risk_free_rate=.02)
         obj_array2 = [test_put2]
         @test_logs min_level=Logging.Warn update_obj(
             obj_array2, 
@@ -265,8 +265,8 @@ end
 @testset verbose=true "unwind tests" begin
    @testset "single fininst method" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
-        holdings = Dict{String, AbstractFloat}(
+        test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
+        holdings = Dict{String, Float64}(
             "cash" => 0,
             "stock" => 2,
             "call" => -1
@@ -282,14 +282,14 @@ end
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
         test_stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
         test_stock3 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock3", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
-        test_put = EuroPutOption(test_stock, 110; maturity=.5, label="put", risk_free_rate=.02)
-        test_call2 = EuroCallOption(test_stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
-        test_put2 = EuroPutOption(test_stock2, 70; maturity=0.001, label="put2", risk_free_rate=.02)
+        test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
+        test_put = EuroPutOption(;widget=test_stock, strike_price=110, maturity=.5, label="put", risk_free_rate=.02)
+        test_call2 = EuroCallOption(;widget=test_stock2, strike_price=70, maturity=1, label="call2", risk_free_rate=.02)
+        test_put2 = EuroPutOption(;widget=test_stock2, strike_price=70, maturity=0.001, label="put2", risk_free_rate=.02)
         
         obj_array = [test_call, test_put, test_call2] # doesn't have test_put2
         widget_dict = Dict("stock" => test_stock, "stock2" => test_stock2) # doesnt' have stock3
-        holdings = Dict{String, AbstractFloat}(
+        holdings = Dict{String, Float64}(
             "cash" => 0,
             "stock" => 1, 
             "stock2" => -2, 
@@ -318,7 +318,7 @@ end
 @testset verbose=true "strategy_returns tests" begin
     @testset "single strategy_returns tests" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
+        test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
         future_prices = [100, 104, 109, 105, 108, 108, 101, 101, 104, 110]
 
         # with default values
@@ -327,7 +327,7 @@ end
             BlackScholes,
             Naked,
             future_prices,
-            10,
+            10.0,
             252;
             transaction_cost = 0.0
         )
@@ -349,9 +349,9 @@ end
             future_prices,
             10,
             252, 
-            10, 
-            2, 
-            3;
+            10.0, 
+            2.0, 
+            3.0;
             transaction_cost = 0.0
         )
 
@@ -367,9 +367,9 @@ end
             future_prices,
             10,
             252, 
-            10, 
-            0, 
-            0,
+            10.0, 
+            0.0, 
+            0.0,
             .08;
             transaction_cost = 0.0
         )
@@ -383,10 +383,10 @@ end
             future_prices,
             10,
             252, 
-            30, 
-            0, 
-            0,
-            0,
+            30.0, 
+            0.0, 
+            0.0,
+            0.0,
             .08;
             transaction_cost = 0.0
         )
@@ -404,7 +404,7 @@ end
             kwargs...
         )
             if step == 1
-                buy(fin_obj, 2, holdings, pricing_model)
+                buy(fin_obj, 2.0, holdings, pricing_model)
             end
 
             if step == 4
@@ -446,15 +446,15 @@ end
     @testset "vector/ multi strategy_returns tests" begin
         test_stock = Stock(; prices=[99, 97, 90, 83, 83, 88, 88, 89, 97, 100], name="stock", timesteps_per_period=252)
         test_stock2 = Stock(; prices=[66, 61, 70, 55, 65, 63, 57, 55, 53, 68], name="stock2", timesteps_per_period=252)
-        test_call = EuroCallOption(test_stock, 110; maturity=.5, label="call", risk_free_rate=.02)
-        test_call2 = EuroCallOption(test_stock2, 70; maturity=1, label="call2", risk_free_rate=.02)
+        test_call = EuroCallOption(;widget=test_stock, strike_price=110, maturity=.5, label="call", risk_free_rate=.02)
+        test_call2 = EuroCallOption(;widget=test_stock2, strike_price=70, maturity=1, label="call2", risk_free_rate=.02)
         future_prices = Dict(
             "stock" => [100, 104, 109, 105, 108, 108, 101, 101, 104, 110],
             "stock2" => [67, 74, 73, 67, 67, 75, 69, 71, 69, 70]
         )
         objs = [test_call, test_call2]
-        fin_obj_count = Dict("call" => 1.0, "call2" => 2)
-        widget_count = Dict("stock" => 2.0, "stock2" => 3)
+        fin_obj_count = Dict("call" => 1.0, "call2" => 2.0)
+        widget_count = Dict("stock" => 2.0, "stock2" => 3.0)
 
         test_ret, ts_holdings, obj_array = strategy_returns(
             objs, 
@@ -463,7 +463,7 @@ end
             future_prices,
             10,
             252,
-            0,
+            0.0,
             fin_obj_count,
             widget_count
         )
@@ -530,9 +530,6 @@ end
             fin_obj_count,
             widget_count
         )
-
-        
-        
     end
 end
 end # master hedging/ strategy testset 

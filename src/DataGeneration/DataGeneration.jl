@@ -27,9 +27,9 @@ Possible DataGenInput types are
 
 ## Arguments
 - `Input<:DataGenInput`:  struct with parameters to generate data
-- `nSimulation::Integer`: the number of simulations to run.  
+- `nSimulation`: the number of simulations to run.  
 ## Outputs
-- `data::AbstractArray`: nTimeStep x nSimulation Real valued array, where each column
+- `data`:   nTimeStep x nSimulation array, where each column
                          contains the data for one simulation, and each row contains
                          data for each timestep
 
@@ -46,7 +46,7 @@ input2 = BootstrapInput(data1, Stationary; n=100);
 data2 = makedata(input2, 2)
 ```
 """
-makedata(input::Any) = error("Use a DataGenInput subtype to synthesize data")
+makedata(input) = error("Use a DataGenInput subtype to synthesize data")
 
 include("logdiffusion.jl")
 include("bootstrap.jl")

@@ -23,8 +23,9 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Any, pricing_model::Type{<:Any}; _...) =
-    error("Use a FinancialObject and a Model type")
+price!(fin_obj, pricing_model; _...) = 
+    error("Cannot price $(typeof(fin_obj)) with $(typeof(pricing_model))")
+
 """
     price!(fin_obj::Option, pricing_model::Type{BinomialTree}; kwargs...)
 
@@ -47,8 +48,6 @@ a_fin_inst = EuroCallOption(a_stock, 40; risk_free_rate=.05)
 price!(a_fin_inst, BinomialTree)  
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BinomialTree}; _...) =
-    error("Something went wrong. Make sure you're using a defined Option subtype")
 
 function price!(
     fin_obj::EuroCallOption,
@@ -110,9 +109,9 @@ function price!(
     p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
 
     # Get terminal node p*
-    a_vector = AbstractFloat[]
+    a_vector = zeros(valtype(valtype(fin_obj.values_library)), tree_depth + 1)
     for k = tree_depth:-1:0
-        push!(a_vector, max(s_0 * u^k * d^(tree_depth - k) - strike_price, 0))
+        a_vector[tree_depth-k+1] = max(s_0 * u^k * d^(tree_depth - k) - strike_price, 0)
     end
     to_return = 0
 
@@ -190,9 +189,9 @@ function price!(
     p = get_p(r, dt, u, d, delta)  # risk neutral probability of an up move
 
     # Get terminal node p*
-    a_vector = AbstractFloat[]
+    a_vector = zeros(valtype(valtype(fin_obj.values_library)), tree_depth + 1)
     for k = tree_depth:-1:0
-        push!(a_vector, max(strike_price - s_0 * u^k * d^(tree_depth - k), 0))
+        a_vector[tree_depth-k+1] = max(strike_price - s_0 * u^k * d^(tree_depth - k), 0)
     end
 
     to_return = 0
@@ -251,8 +250,6 @@ call = EuroCallOption(stock, 40; risk_free_rate=.08, maturity=.25)
 price!(call, BlackScholes)
 ```
 """
-price!(fin_obj::Option, pricing_model::Type{BlackScholes}; _...) =
-    error("Use a European call or put option for the Black Scholes pricing method")
 
 function price!(fin_obj::EuroCallOption{<:Widget}, pricing_model::Type{BlackScholes}; _...)
     c1 = log(fin_obj.widget.prices[end] / fin_obj.strike_price)
@@ -294,28 +291,6 @@ end
 
 
 # ----- Price models using Monte Carlo sims
-
-# error out if using an American option 
-price!(
-    fin_obj::AmericanCallOption{<:Widget},
-    pricing_model::Type{MonteCarlo{LogDiffusion}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanPutOption{<:Widget},
-    pricing_model::Type{MonteCarlo{LogDiffusion}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanCallOption{<:Widget},
-    pricing_model::Type{MonteCarlo{MCBootstrap}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
-price!(
-    fin_obj::AmericanPutOption{<:Widget},
-    pricing_model::Type{MonteCarlo{MCBootstrap}};
-    _...,
-) = error("Cannot price an American Option using Monte Carlo methods now")
 """
     price!(fin_obj::Option, MonteCarlo{MonteCarloModel}; kwargs...)
 
@@ -329,11 +304,11 @@ specified. Note: Only European Options call be priced via Monte Carlo methods.
 # Keyword arguments
 
 ## For LogDiffusion model
-- `n_sims::Int`: Number of simulations to be run. Default 100.
-- `sim_size::Int`: The number of generated steps in each simulated run. Default 100.
+- `n_sims`: Number of simulations to be run. Default 100.
+- `sim_size`: The number of generated steps in each simulated run. Default 100.
 
 ## For MCBootstrap model
-- `n_sims::Int`: Number of simulations to be run. Defualt 100
+- `n_sims`: Number of simulations to be run. Defualt 100
 - `bootstrap_method`: block bootstrap method to be used. Must be a subtype of `TSBootMethod`. Defualt=`Stationary`
 
 # Examples 
@@ -349,15 +324,15 @@ price!(call, MonteCarlo{MCBootstrap}; bootstrap_method=CircularBlock, n_sims=10)
 function price!(
     fin_obj::Option,
     pricing_model::Type{MonteCarlo{LogDiffusion}};
-    n_sims::Int = 100,
-    sim_size::Int = 100,
+    n_sims = 100,
+    sim_size = 100,
     _...
 )
 
     dt = fin_obj.maturity / sim_size
     # create the data to be used in the analysis 
-    data_input = LogDiffInput(
-        sim_size;
+    data_input = LogDiffInput(;
+        nTimeStep = sim_size,
         initial = fin_obj.widget.prices[end],
         volatility = fin_obj.widget.volatility * sqrt(fin_obj.maturity),
         drift = fin_obj.risk_free_rate * fin_obj.maturity,
@@ -377,8 +352,8 @@ end
 function price!(
     fin_obj::Option,
     pricing_model::Type{MonteCarlo{MCBootstrap}};
-    bootstrap_method::Type{<:TSBootMethod} = Stationary,
-    n_sims::Int = 100,
+    bootstrap_method = Stationary,
+    n_sims = 100,
     _...
 )
     length(fin_obj.widget.prices) >= 2 ? 
@@ -400,7 +375,7 @@ function price!(
 
 
     data_input =
-        BootstrapInput{bootstrap_method}(; input_data=returns, 
+        BootstrapInput(returns, bootstrap_method; 
             n=fin_obj.widget.timesteps_per_period - 1
         )
     data = makedata(data_input, n_sims)

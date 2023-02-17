@@ -4,7 +4,6 @@ import Distributions.Normal
 
 """
     LogDiffInput(nTimeStep, initial, volatility, drift)
-    LogDiffInput(nTimeStep; kwargs...)
     LogDiffInput(;kwargs...)
 
 Contains parameters that are used by `makedata()` to synthesize data
@@ -22,10 +21,10 @@ then shifted and scaled by the drift and volatility terms.
 
 ## Arguments
 
-- `nTimeStep::Integer`:  The number of time steps to synthesize.
-- `initial::Real`:  The assumed value at the 0th time step. Default: 100.
-- `volatility::Real`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
-- `drift::Real`: The drift parameter describes the mean of the log-normal diffusion process 
+- `nTimeStep`:  The number of time steps to synthesize.
+- `initial`:  The assumed value at the 0th time step. Default: 100.
+- `volatility`:  The price volatility as a standard deviation in terms of implied time period. Defaults to 0.3.
+- `drift`: The drift parameter describes the mean of the log-normal diffusion process 
 given in terms of the entire implied time period (if simulating a year, drift would be annual 
 expected return). Defaults to 0.02.
 
@@ -41,35 +40,46 @@ kwargs = Dict(:nTimeStep=>250, :initial=>100, :volatility=>.05, :drift=>.1)
 input3 = LogDiffInput(;kwargs...)
 ```
 """
-struct LogDiffInput <: DataGenInput
-    nTimeStep::Integer # number of timesteps to simulate
-    initial::Real # in dollars
-    volatility::Real # volatility as a standard deviation
-    drift::Real # 
+struct LogDiffInput{TI,TR} <: DataGenInput
+    nTimeStep::TI # number of timesteps to simulate
+    initial::TR # in dollars
+    volatility::TR # volatility as a standard deviation
+    drift::TR # 
     # constructor for kwargs
-    function LogDiffInput(;
+    function LogDiffInput{TI,TR}(;
         nTimeStep,
         initial = 100,
         volatility = 0.3,
         drift = 0.02,
-    )
+    ) where {TI,TR}
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
     # constructor for ordered inputs
-    function LogDiffInput(nTimeStep, initial, volatility, drift)
+    function LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift) where {TI,TR}
         nTimeStep > 0 ? nothing : error("nTimeStep must be a positive integer")
         volatility >= 0 ? nothing : error("volatility cannot be negative")
         new(nTimeStep, initial, volatility, drift)
     end
 end
 # outer constructor for passing just nTimeStep
-LogDiffInput(nTimeStep::Int; initial = 100, volatility = 0.3, drift = 0.02) =
-    LogDiffInput(nTimeStep, initial, volatility, drift)
+function LogDiffInput(nTimeStep, initial = 100, volatility = 0.3, drift = 0.02)
+    TI = typeof(nTimeStep)
+    initial, volatility, drift = promote(initial, volatility, drift)
+    TR = typeof(initial)
+    return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
+end
+function LogDiffInput(;nTimeStep, initial = 100, volatility = 0.3, drift = 0.02)
+    TI = typeof(nTimeStep)
+    initial, volatility, drift = promote(initial, volatility, drift)
+    TR = typeof(initial)
+    return LogDiffInput{TI,TR}(nTimeStep, initial, volatility, drift)
+end
 
 
-function makedata(Input::LogDiffInput, nSimulation::Integer = 1)
+
+function makedata(Input::LogDiffInput, nSimulation = 1)
 
     # compute array of random values
     nData = Input.nTimeStep + 1

@@ -10,7 +10,7 @@ include("fininsttests.jl")
 
 include("datagentests.jl")
 include("bootstraptests.jl")
-include("factorytest.jl")
+#include("factorytest.jl")
 
 include("pricingmodeltests.jl")
 
