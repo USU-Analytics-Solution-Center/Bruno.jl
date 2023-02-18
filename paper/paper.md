@@ -31,7 +31,7 @@ bibliography: paper.bib
 
 # Summary
 
-When engaging in activities in financial markets, market makers and other financial practitioners face a variety of risks. Many attempt to offset these risks by hedging. Hedging involves taking an offsetting position in an investment or asset, allowing potential risks to be mitigated and transferred to investors willing to take the risk [@culp2011risk]. (Is this a quote? If not think about changing to "Hedging is entering an offset psotion...) Hedging is often accomplished using financial derivatives. Derivatives are financial instruments that derive their value from an underlying asset [@mcdonald_2013]. Some popular examples of financial derivatives include futures, forwards, options, and swaps.
+When engaging in activities in financial markets, market makers and other financial practitioners face a variety of risks. Many attempt to reduce these risks by hedging. Hedging is entering an offset position in an investment or asset, allowing potential risks to be mitigated and transferred to investors willing to take the risk [@culp2011risk]. Hedging is often accomplished using financial derivatives. Derivatives are financial instruments that derive their value from an underlying asset [@mcdonald_2013]. Some popular examples of financial derivatives include futures, forwards, options, and swaps.
 
 Bruno is a Julia [@bezanson2017julia] package that allows for comparison of different hedging and trading strategies, many of which are based on financial derivatives.
 
@@ -41,12 +41,12 @@ Bruno allows users to compare different financial derivatives, hedging, and trad
 
 Another key feature of Bruno is that it has the ability to produce a distribution of maximum loss that could result from a trading or hedging strategy. This information is valuable to financial practitioners and market makers as it helps quantify the risk of a potential strategy before putting the strategy into place. Bruno also allows for comparison of different trading and hedging strategies. Creation of these distributions is facilitated by Bruno’s data generating processes. These processes include non-parametric methods, such as the stationary bootstrap [@politis1994stationary] with automatic block-length selection [@politis2004automatic][@patton2009correction] as well as parametric methods, such as log diffusion.
 
-Bruno was designed to be used by finance professionals and academics alike. Financial analysis of trading and hedging strategies can be intensive. This package is designed to make this type of investigation more straightforward and accessible. Many other software packages can calculate derivative prices, simulate hedging, and generate data. For example in the Julia programing language, FinancialDerivatives.jl [@financialderivativesjl], FinancialMonteCarlo.jl [@financialmontecarlojl], and Strategems.jl [@strategemsjl] are packages that are used for derivative asset pricing, data simulation, and strategy testing, respectively. However, none of these packages have been compiled in a manner that allows for integrated analysis. Each of the listed packages performs one part of the process independently and must be assembled by the programmer. Bruno on the other hand is novel because it provides a replacement for these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner. Bruno was recently used in a conference publication[@pound_2022], with several other publications nearing completion.
+Bruno was designed to be used by finance professionals and academics alike. Financial analysis of trading and hedging strategies can be intensive. This package is designed to make this type of investigation more straightforward and accessible. Many other software packages can calculate derivative prices, simulate hedging, and generate data. For example, in the Julia programing language, FinancialDerivatives.jl [@financialderivativesjl], FinancialMonteCarlo.jl [@financialmontecarlojl], and Strategems.jl [@strategemsjl] are packages that are used for derivative asset pricing, data simulation, and strategy testing, respectively. However, none of these packages have been compiled in a manner that allows for integrated analysis. Each of the listed packages performs one part of the process independently and must be assembled by the programmer. Bruno on the other hand is novel because it provides a replacement for these independent packages with a fully integrated set of tools for derivatives analysis designed to work in a unified manner. Bruno was recently used in a conference publication[@pound_2022], with several other publications nearing completion.
 
 # Example usage
 
 ## Defining a strategy
-Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivative asset and its underlying stock is bought every Friday (The code shows how to buy every five days not every firday IDK what you'd want to change to bring these two inline.) and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
+Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivative asset and its underlying stock is bought every Friday (assuming a 5-day trading week) and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
 
 ```julia 
 using Bruno
@@ -76,12 +76,13 @@ end
 
 ## Setting up assets and running the strategy
 
-Using the type system for derivatives assets in Bruno, we define assets to be used in the strategy and run the strategy on simulated data from log diffusion models. (I am confused by what you are saying here. Reword to clarify) This example uses a European stock option priced using the Black Scholes Model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types (plural?) used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
-All logic for interest accrued and transaction costs during the time steps are all handled by the simulation environment. The code returns the cumulative return from the simulated strategy as well as the agent's holdings in the agent's portfolio at each timestep along the simulation. This allows for more complicated strategies such as those that depend on the derivative or the underlying asset, the holdings can be analyzed using common statistical time series tools. 
+Using the type system for derivatives assets in Bruno, we define a stock and a European call option as example assets to be used in the strategy. We then run the strategy on simulated data from a log diffusion model. In this example, the European stock option is priced using the Black Scholes Model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
+
+All logic for interest accrued and transaction costs during the time steps are all handled by the simulation environment. The code returns the cumulative return from the simulated strategy as well as the agent's holdings in the agent's portfolio at each timestep during the simulation. This allows for more complicated strategies such as those that depend on the derivative or the underlying asset, the holdings can be analyzed using common statistical time series tools. 
 
 ```julia
 # create a random array to act as historic prices
-historic_prices = rand(50:75, 40)
+historic_prices = rand(50.0:75.0, 40)
 
 # create stock from daily 'historic' prices
 stock = Stock(;
@@ -91,7 +92,7 @@ stock = Stock(;
 )
 
 # create European stock call option using the defined stock
-option = EuroCallOption(stock, 60)
+option = EuroCallOption(stock, 60.0)
 
 # create vector of simulated future prices using the log diffusion model
 input = LogDiffInput(; 
@@ -108,8 +109,8 @@ cumulative_returns, holdings = strategy_returns(
     BlackScholes, 
     ExampleStrategy,
     future_prices, 
-    20, # (explain magic number here and for 252)
-    252
+    20, # number of days (20) for the simulation to run
+    252 # Assuming 252 trading days in a year
 )
 ```
 
