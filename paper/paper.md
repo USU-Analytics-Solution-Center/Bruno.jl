@@ -8,14 +8,19 @@ tags:
   - Simulation
 authors:
   - name: Mitchell Pound
+    orcid: 0000-0002-1244-427X
     affiliation: 1
   - name: Spencer Clemens
+    orcid: 0000-0002-5381-9242
     affiliation: 1
   - name: Tyler Brough
+    orcid: 0000-0003-4005-5324
     affiliation: 1
   - name: Pedram Jahangiry
+    orcid: 0000-0002-9555-7500
     affiliation: 1
   - name: Janette Goodridge
+    orcid: 0000-0002-5400-5961
     affiliation: 1
 affiliations:
  - name: Utah State University
