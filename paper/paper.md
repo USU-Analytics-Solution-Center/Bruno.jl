@@ -41,7 +41,7 @@ Bruno was designed to be used by finance professionals and academics alike. Fina
 # Example usage
 
 ## Defining a strategy
-Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivate asset and its underlying stock is bought every Friday and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
+Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivative asset and its underlying stock is bought every Friday and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
 
 ```julia 
 using Bruno
@@ -71,7 +71,7 @@ end
 
 ## Setting up assets and running the strategy
 
-Using the type system for derivatives assets in Bruno, we define assets to be used in the strategy and run the strategy on simulated data from log diffusion model. This example uses a European stock option priced using the Black Scholes model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
+Using the type system for derivatives assets in Bruno, we define assets to be used in the strategy and run the strategy on simulated data from log diffusion models. This example uses a European stock option priced using the Black Scholes model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
 All logic for interest accrued during the time steps as well as transaction costs are all handled by the simulation environment. The code returns the cumulative return from the simulated strategy as well as the agent's holdings in the agent's portfolio at each timestep along the simulation. Thus, for more complicated strategies such as those that depend on the derivative or the underlying asset, the holdings can be analyzed using common statistical time series tools. 
 
 ```julia
