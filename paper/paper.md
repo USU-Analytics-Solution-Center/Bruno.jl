@@ -31,7 +31,7 @@ bibliography: paper.bib
 
 # Summary
 
-When engaging in activities in financial markets, market makers and other financial practitioners face a variety of risks. Many attempt to offset these risks by hedging. Hedging involves taking an offsetting position in an investment or asset, allowing potential risks to be mitigated and transferred to investors willing to take the risk [@culp2011risk]. Hedging is often accomplished using financial derivatives. Derivatives are financial instruments that derive their value from an underlying asset [@mcdonald_2013]. Some popular examples of financial derivatives include futures, forwards, options, and swaps.
+When engaging in activities in financial markets, market makers and other financial practitioners face a variety of risks. Many attempt to offset these risks by hedging. Hedging involves taking an offsetting position in an investment or asset, allowing potential risks to be mitigated and transferred to investors willing to take the risk [@culp2011risk]. (Is this a quote? If not think about changing to "Hedging is entering an offset psotion...) Hedging is often accomplished using financial derivatives. Derivatives are financial instruments that derive their value from an underlying asset [@mcdonald_2013]. Some popular examples of financial derivatives include futures, forwards, options, and swaps.
 
 Bruno is a Julia [@bezanson2017julia] package that allows for comparison of different hedging and trading strategies, many of which are based on financial derivatives.
 
@@ -46,7 +46,7 @@ Bruno was designed to be used by finance professionals and academics alike. Fina
 # Example usage
 
 ## Defining a strategy
-Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivative asset and its underlying stock is bought every Friday and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
+Here we demonstrate how to define and use a trading strategy for testing. In this example, a strategy is defined where a derivative asset and its underlying stock is bought every Friday (The code shows how to buy every five days not every firday IDK what you'd want to change to bring these two inline.) and held until the end of the month. The `buy` and `sell` functions are provided by Bruno to make defining a strategy easier.
 
 ```julia 
 using Bruno
@@ -76,8 +76,8 @@ end
 
 ## Setting up assets and running the strategy
 
-Using the type system for derivatives assets in Bruno, we define assets to be used in the strategy and run the strategy on simulated data from log diffusion models. This example uses a European stock option priced using the Black Scholes model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
-All logic for interest accrued during the time steps as well as transaction costs are all handled by the simulation environment. The code returns the cumulative return from the simulated strategy as well as the agent's holdings in the agent's portfolio at each timestep along the simulation. Thus, for more complicated strategies such as those that depend on the derivative or the underlying asset, the holdings can be analyzed using common statistical time series tools. 
+Using the type system for derivatives assets in Bruno, we define assets to be used in the strategy and run the strategy on simulated data from log diffusion models. (I am confused by what you are saying here. Reword to clarify) This example uses a European stock option priced using the Black Scholes Model. It is important to note that alternative pricing and data simulation models could be used simply by changing the types (plural?) used. This means strategies can be analyzed using a variety of assumptions about the asset and market conditions. 
+All logic for interest accrued and transaction costs during the time steps are all handled by the simulation environment. The code returns the cumulative return from the simulated strategy as well as the agent's holdings in the agent's portfolio at each timestep along the simulation. This allows for more complicated strategies such as those that depend on the derivative or the underlying asset, the holdings can be analyzed using common statistical time series tools. 
 
 ```julia
 # create a random array to act as historic prices
@@ -108,7 +108,7 @@ cumulative_returns, holdings = strategy_returns(
     BlackScholes, 
     ExampleStrategy,
     future_prices, 
-    20, 
+    20, # (explain magic number here and for 252)
     252
 )
 ```
