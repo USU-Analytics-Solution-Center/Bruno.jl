@@ -1,5 +1,5 @@
 # Welcome to Bruno.jl!
-
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05056/status.svg)](https://doi.org/10.21105/joss.05056)
 ## What is Bruno?
 Bruno is a modular, flexible package for simulating financial data, asset pricing, and trading strategy testing. 
 
