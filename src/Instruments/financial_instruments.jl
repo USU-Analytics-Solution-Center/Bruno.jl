@@ -1,5 +1,5 @@
 # financial instruments that can be passed to simulate. They house underlying widgets as part
-# of the insturment. Ex: Stock call options house an underlying stock
+# of the instrument. Ex: Stock call options house an underlying stock
 """FinancialInstrument is the supertype for any instrument that uses a base asset
 (widget) in its definition (like a financial derivative)."""
 abstract type FinancialInstrument end

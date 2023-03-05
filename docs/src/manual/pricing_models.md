@@ -74,11 +74,11 @@ Only defined for [`EuroCallOption`](@ref) and [`EuroPutOption`](@ref). For `MCBo
 
 Extra function arguments for `LogDiffusion` :
 * `n_sims`: The number of simulations to run in the Monte Carlo analysis. Default 100.
-* `sim_size`: The number of generated steps in each simulation. Defualt 100. 
+* `sim_size`: The number of generated steps in each simulation. Default 100. 
 
 For `MCBootstrap`:
 * `n_sims`: The number of simulations to run in the Monte Carlo analysis. Default 100.
-* `bootstrap_method`: The type of time-series bootstrap to be used. Possiple types are `Stationary`, `CircularBlock`, and `MovingBlock`. Default is `Stationary`. 
+* `bootstrap_method`: The type of time-series bootstrap to be used. Possible types are `Stationary`, `CircularBlock`, and `MovingBlock`. Default is `Stationary`. 
 
 Note: values are stored in the `Option.values_library` field with the keys `"MC_LogDiffusion"` and `"MC_Bootstrap{bootstrap_method}"`.
 

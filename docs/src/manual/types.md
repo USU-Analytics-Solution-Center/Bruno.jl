@@ -75,7 +75,7 @@ Commodity{Int64, Int16, Float64}([60], "static_stock", 0, 0.3)
 #### [`Bond`](@ref Bond(::Real))
 Bonds are long term loans issued by companies.
 
-`Bond` structs can theoretically be used currently as an underlying asset in a `FinancialInstrument`. However additional funcitonality is not currently supported in Bruno. Pull requests are welcome!
+`Bond` structs can theoretically be used currently as an underlying asset in a `FinancialInstrument`. However additional functionality is not currently supported in Bruno. Pull requests are welcome!
 
 ### Interacting With `Widgets`
 Widgets can be used with the [`price!`](@ref)function however, unlike most `FinancialInstruments`, the `price!` function will dispatch to return the last number in the `prices` array of the `Widget` struct. This is the assumed current market price for the `Widget`. Widgets can also be used in trading strategies with [`strategy_returns`](@ref)

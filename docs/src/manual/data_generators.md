@@ -74,6 +74,6 @@ Time-series bootstrapping samples with replacement from blocks of the original t
 
 All time series bootstraps use the [`BootstrapInput`](@ref) struct with parameters. 
 
-* `Stationary` bootstrap (Politis and Romano, 1994) uses expnentially distributed blocksizes.
+* `Stationary` bootstrap (Politis and Romano, 1994) uses exponentially distributed blocksizes.
 * `MovingBlock` uses constant sized blocks that do not wrap around the time-series.
 * `CircularBlock` uses constant sized blocks that wrap around the time-series.

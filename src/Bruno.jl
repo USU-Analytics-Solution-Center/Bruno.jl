@@ -5,7 +5,7 @@ Instruments.jl contains the exports for the different Bruno Structs.
 At the core of the struct hierarchy lives the "Widget" abstract type.
 From there concrete structs are made like Stocks or Commodities. These
 widgets are then put into a Financial Instrument. These Financial 
-Instruments are then used in varius Bruno functions.
+Instruments are then used in various Bruno functions.
 """
 
 include("Instruments/Instruments.jl")
@@ -36,8 +36,8 @@ export factory, makedata, opt_block_length
 """
 Models.jl is where Financial Instruments go to be priced. In
 the future other pricing methods can live here. As a note
-"price!" returns what a given model belives a FinancialInstrument
-should be worth and adds the function call paramters / result to the
+"price!" returns what a given model believes a FinancialInstrument
+should be worth and adds the function call parameters / result to the
 FinancialInstrument.
 """
 

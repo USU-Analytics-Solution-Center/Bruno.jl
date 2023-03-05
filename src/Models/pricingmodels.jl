@@ -33,8 +33,8 @@ price a call or put option using the binomial tree pricing method
 
 # Arguments
 - `fin_obj::Option`: the call or put option to be priced 
-- `tree_depth`: number of levels to the binomial tree. Defualt 3.
-- `delta`: the continous dividend rate. Defualt 0.
+- `tree_depth`: number of levels to the binomial tree. Default 3.
+- `delta`: the continuous dividend rate. Default 0.
 
 # Example
 ```julia
@@ -308,8 +308,8 @@ specified. Note: Only European Options call be priced via Monte Carlo methods.
 - `sim_size`: The number of generated steps in each simulated run. Default 100.
 
 ## For MCBootstrap model
-- `n_sims`: Number of simulations to be run. Defualt 100
-- `bootstrap_method`: block bootstrap method to be used. Must be a subtype of `TSBootMethod`. Defualt=`Stationary`
+- `n_sims`: Number of simulations to be run. Default 100
+- `bootstrap_method`: block bootstrap method to be used. Must be a subtype of `TSBootMethod`. Default=`Stationary`
 
 # Examples 
 ```julia

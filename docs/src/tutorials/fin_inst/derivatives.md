@@ -9,7 +9,7 @@ Here's how to create a stock `Option` (more specifically a European Call Option)
 ```jldoctest derivative; output = false, setup = :(using Bruno)
 historical_prices = [1.0, 2.0, 3.0, 4.0, 5.0]
 
-# creates a Stock widget assuming hisorical prices are daily prices
+# creates a Stock widget assuming historical prices are daily prices
 a_widget = Stock(;prices=historical_prices, name="my_widget", timesteps_per_period=252)
 
 # creates a call option with a strike price of $60
