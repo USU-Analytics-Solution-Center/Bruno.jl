@@ -1,7 +1,7 @@
 name = "Bruno"
 uuid = "2c64e276-ffac-4684-a264-d42a389bacb2"
 authors = ["Mitchell Pound <mitchell.pound@usu.edu>", "Spencer Clemens <soclemens@gmail.com>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
