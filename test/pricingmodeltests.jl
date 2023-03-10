@@ -165,10 +165,11 @@ end
         # testing with a simulation that ends with all paths out of the money
         @test price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=3) == 0.0
         # testing with simulations that have a path that works
+        # in the limit should approach Black Scholes price of 5.071
         @test isapprox(
-            price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=5), 
-            5.35; 
-            atol = .1
+            price!(test_call, MonteCarlo{LogDiffusion}; sim_size=10, n_sims=10_000), 
+            5.07; 
+            atol = .4
         )
     end
 
