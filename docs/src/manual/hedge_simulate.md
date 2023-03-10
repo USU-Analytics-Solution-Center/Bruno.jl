@@ -42,7 +42,7 @@ The `step` function can also be used to buy or sell at a specific time interval.
 ## [`strategy_returns`](@ref) Function
 [`strategy_returns`](@ref) acts as a wrapper for the `strategy` function. It handles all interest on cash balances, and updates the `ts_holdings` object of a time-series of the `holdings` dictionary. 
 
-`timesteps_per_period` reflects the size of time that passes between each time the `strategy` funciton is called compared to the implicit time period.
+`timesteps_per_period` reflects the size of time that passes between each time the `strategy` function is called compared to the implicit time period.
 For example, if daily data is used for historic and future prices, assuming yearly interest rates, then `timesteps_per_period` would be 252. 
 This is to allow `strategy_returns` function to be as generic as possible. Yearly, biyearly, or even hourly time windows are possible depending on the nature of the data used. 
 

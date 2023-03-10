@@ -14,7 +14,7 @@ export FinancialInstrument,
     AmericanPutOption,
     Future
 
-export get_volatility, add_price_value, get_prices # exporting this to make tests easiers
+export get_volatility, add_price_value, get_prices # exporting this to make tests easier
 
 include("widgets.jl")
 include("financial_instruments.jl")

@@ -41,7 +41,7 @@ input1 = LogDiffInput(nTimeStep);
 # create a dataset using the log diffusion model
 data1 = makedata(input1, 1)
 
-# create another dataset with 2 simulation runs using a startionary bootstrap 
+# create another dataset with 2 simulation runs using a stationary bootstrap 
 input2 = BootstrapInput(data1, Stationary; n=100);
 data2 = makedata(input2, 2)
 ```

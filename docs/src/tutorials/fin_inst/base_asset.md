@@ -17,7 +17,7 @@ end
 # creating a random 'dataset' of 15 simulated prices
 historical_prices = rand(50:70, 15)
 
-# creates a Stock widget assuming hisorical prices are daily prices
+# creates a Stock widget assuming historical prices are daily prices
 a_widget = Stock(;prices=historical_prices, name="my_widget", timesteps_per_period=252)
 
 # output
