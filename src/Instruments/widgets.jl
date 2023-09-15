@@ -356,14 +356,12 @@ end
 
 Finds the standard deviation of continuous returns for an array of prices.
 """
-
 function get_volatility(prices::Vector, timesteps_per_period)
     length(prices) > 2 ? nothing :
     # need at least three values so std can work
     return error("Must have at least three values to calculate the volatility")  
-    returns = [((prices[i+1] - prices[i]) / prices[i]) + 1 for i = 1:(length(prices)-1)]
-    cont_return = log.(returns)
-    std(cont_return, corrected = false) * sqrt(timesteps_per_period)
+    log_returns = [log(prices[i+1]/prices[i]) for i = 1:(length(prices)-1)]
+    std(log_returns, corrected = false) * sqrt(timesteps_per_period)
 end
 
 get_volatility(prices) = get_volatility(prices, length(prices))
